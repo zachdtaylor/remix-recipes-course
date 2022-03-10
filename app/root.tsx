@@ -1,6 +1,5 @@
 import {
   Links,
-  LinksFunction,
   LiveReload,
   Meta,
   Outlet,
