@@ -10,7 +10,10 @@ import {
 import type { MetaFunction } from "remix";
 
 export const meta: MetaFunction = () => {
-  return { title: "New Remix App" };
+  return {
+    title: "Remix Recipes",
+    description: "Welcome to the Remix Recipes app!",
+  };
 };
 
 export default function App() {
