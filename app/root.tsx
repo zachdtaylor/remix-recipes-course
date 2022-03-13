@@ -1,4 +1,5 @@
 import {
+  Link,
   Links,
   LiveReload,
   Meta,
@@ -9,7 +10,7 @@ import {
 import type { MetaFunction } from "remix";
 
 export const meta: MetaFunction = () => {
-  return { title: "Remix Recipes" };
+  return { title: "New Remix App" };
 };
 
 export default function App() {
@@ -22,6 +23,12 @@ export default function App() {
         <Links />
       </head>
       <body>
+        <nav>
+          <Link to="/">Home</Link>
+          <Link to="discover">Discover</Link>
+          <Link to="app">App</Link>
+          <Link to="settings">Settings</Link>
+        </nav>
         <Outlet />
         <ScrollRestoration />
         <Scripts />
