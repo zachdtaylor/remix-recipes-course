@@ -1,6 +1,7 @@
 import {
   Link,
   Links,
+  LinksFunction,
   LiveReload,
   Meta,
   Outlet,
@@ -8,12 +9,17 @@ import {
   ScrollRestoration,
 } from "remix";
 import type { MetaFunction } from "remix";
+import styles from "./shared.css";
 
 export const meta: MetaFunction = () => {
   return {
     title: "Remix Recipes",
     description: "Welcome to the Remix Recipes app!",
   };
+};
+
+export const links: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: styles }];
 };
 
 export default function App() {

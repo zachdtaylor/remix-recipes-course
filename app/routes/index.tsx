@@ -1,3 +1,10 @@
+import { LinksFunction } from "remix";
+import styles from "~/styles/index.css";
+
+export const links: LinksFunction = () => {
+  return [{ rel: "stylesheet", href: styles }];
+};
+
 export default function Index() {
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
