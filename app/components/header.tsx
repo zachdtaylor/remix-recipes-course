@@ -1,13 +1,6 @@
-import { LinksFunction } from "remix";
-import headerStyles from "./header.css";
-
-export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: headerStyles }];
-};
-
 type HeaderProps = {
   children: string;
 };
 export function Header({ children }: HeaderProps) {
-  return <h1 className="header">{children}</h1>;
+  return <h1 className="text-lg text-gray-800">{children}</h1>;
 }

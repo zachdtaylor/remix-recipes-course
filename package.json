@@ -5,9 +5,13 @@
   "license": "",
   "sideEffects": false,
   "scripts": {
-    "build": "cross-env NODE_ENV=production remix build",
+    "build:css": "npx tailwindcss -o ./app/tailwind.css --minify",
+    "build:remix": "cross-env NODE_ENV=production remix build",
+    "build": "run-s build:*",
     "deploy": "fly deploy --remote-only",
-    "dev": "cross-env NODE_ENV=development remix dev",
+    "dev:css": "npx tailwindcss -o ./app/tailwind.css --watch",
+    "dev:remix": "cross-env NODE_ENV=development remix dev",
+    "dev": "run-p dev:*",
     "postinstall": "remix setup node",
     "start": "cross-env NODE_ENV=production remix-serve build"
   },
@@ -23,6 +27,8 @@
     "@remix-run/dev": "^1.2.2",
     "@types/react": "^17.0.24",
     "@types/react-dom": "^17.0.9",
+    "npm-run-all": "^4.1.5",
+    "tailwindcss": "^3.0.23",
     "typescript": "^4.5.5"
   },
   "engines": {

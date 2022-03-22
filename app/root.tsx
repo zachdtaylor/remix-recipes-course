@@ -9,7 +9,7 @@ import {
   ScrollRestoration,
 } from "remix";
 import type { MetaFunction } from "remix";
-import styles from "./shared.css";
+import styles from "./tailwind.css";
 
 export const meta: MetaFunction = () => {
   return {
