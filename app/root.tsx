@@ -1,5 +1,5 @@
 import {
-  Link,
+  NavLink,
   Links,
   LinksFunction,
   LiveReload,
@@ -10,6 +10,13 @@ import {
 } from "remix";
 import type { MetaFunction } from "remix";
 import styles from "./tailwind.css";
+import {
+  DiscoverIcon,
+  HomeIcon,
+  RecipeBookIcon,
+  SettingsIcon,
+} from "./components/icons";
+import { classNames } from "./utils/misc";
 
 export const meta: MetaFunction = () => {
   return {
@@ -31,18 +38,53 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
-        <nav>
-          <Link to="/">Home</Link>
-          <Link to="discover">Discover</Link>
-          <Link to="app">App</Link>
-          <Link to="settings">Settings</Link>
+      <body className="md:flex md:h-screen">
+        <nav className="bg-primary text-white md:w-16">
+          <ul className="flex md:flex-col">
+            <AppNavLink to="/">
+              <HomeIcon />
+            </AppNavLink>
+            <AppNavLink to="discover">
+              <DiscoverIcon />
+            </AppNavLink>
+            <AppNavLink to="app">
+              <RecipeBookIcon />
+            </AppNavLink>
+            <AppNavLink to="settings">
+              <SettingsIcon />
+            </AppNavLink>
+          </ul>
         </nav>
-        <Outlet />
+        <div className="p-4">
+          <Outlet />
+        </div>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
       </body>
     </html>
+  );
+}
+
+type AppNavLinkProps = {
+  children: React.ReactNode;
+  to: string;
+};
+function AppNavLink({ children, to }: AppNavLinkProps) {
+  return (
+    <li className="w-16">
+      <NavLink to={to}>
+        {({ isActive }) => (
+          <div
+            className={classNames(
+              "py-4 text-center hover:bg-primary-light",
+              isActive ? "bg-primary-light" : ""
+            )}
+          >
+            {children}
+          </div>
+        )}
+      </NavLink>
+    </li>
   );
 }
