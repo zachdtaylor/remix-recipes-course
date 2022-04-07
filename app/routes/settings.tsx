@@ -1,15 +1,7 @@
 import { Link, LoaderFunction, Outlet, useLoaderData, json } from "remix";
 
 export const loader: LoaderFunction = () => {
-  return json(
-    { message: "Hello, there!" },
-    {
-      status: 418,
-      headers: {
-        custom: "hey",
-      },
-    }
-  );
+  return json({ message: "Hello, there!" });
 };
 
 export default function Settings() {
