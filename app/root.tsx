@@ -7,6 +7,8 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useTransition,
+  useResolvedPath,
 } from "remix";
 import type { MetaFunction } from "remix";
 import styles from "./tailwind.css";
@@ -71,6 +73,13 @@ type AppNavLinkProps = {
   to: string;
 };
 function AppNavLink({ children, to }: AppNavLinkProps) {
+  const path = useResolvedPath(to);
+  const transition = useTransition();
+
+  const isLoading =
+    transition.state === "loading" &&
+    transition.location.pathname === path.pathname;
+
   return (
     <li className="w-16">
       <NavLink to={to}>
@@ -78,7 +87,8 @@ function AppNavLink({ children, to }: AppNavLinkProps) {
           <div
             className={classNames(
               "py-4 text-center hover:bg-primary-light",
-              isActive ? "bg-primary-light" : ""
+              isActive ? "bg-primary-light" : "",
+              isLoading ? "bg-primary-light animate-pulse" : ""
             )}
           >
             {children}
