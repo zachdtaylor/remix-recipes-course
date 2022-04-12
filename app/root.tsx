@@ -9,6 +9,7 @@ import {
   ScrollRestoration,
   useTransition,
   useResolvedPath,
+  useMatches,
 } from "remix";
 import type { MetaFunction } from "remix";
 import styles from "./tailwind.css";
@@ -19,6 +20,7 @@ import {
   SettingsIcon,
 } from "./components/icons";
 import { classNames } from "./utils/misc";
+import React from "react";
 
 export const meta: MetaFunction = () => {
   return {
@@ -32,6 +34,10 @@ export const links: LinksFunction = () => {
 };
 
 export default function App() {
+  const matches = useMatches();
+  React.useEffect(() => {
+    console.log(matches);
+  }, [matches]);
   return (
     <html lang="en">
       <head>
