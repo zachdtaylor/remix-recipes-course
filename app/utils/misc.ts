@@ -1,5 +1,5 @@
 import React from "react";
-import { useMatches } from "remix";
+import { useMatches } from "@remix-run/react";
 
 export function classNames(...names: Array<string | undefined>) {
   const className = names.reduce(

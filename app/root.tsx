@@ -1,17 +1,19 @@
+import type { MetaFunction } from "@remix-run/node";
+import { LinksFunction } from "@remix-run/node";
+
 import {
-  NavLink,
   Links,
-  LinksFunction,
   LiveReload,
   Meta,
+  NavLink,
   Outlet,
   Scripts,
   ScrollRestoration,
-  useTransition,
-  useResolvedPath,
   useMatches,
-} from "remix";
-import type { MetaFunction } from "remix";
+  useResolvedPath,
+  useTransition,
+} from "@remix-run/react";
+
 import styles from "./tailwind.css";
 import {
   DiscoverIcon,

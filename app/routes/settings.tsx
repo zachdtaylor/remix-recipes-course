@@ -1,11 +1,5 @@
-import {
-  Link,
-  LoaderFunction,
-  Outlet,
-  useLoaderData,
-  json,
-  ErrorBoundaryComponent,
-} from "remix";
+import { ErrorBoundaryComponent, json, LoaderFunction } from "@remix-run/node";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
 export const loader: LoaderFunction = () => {
   return json({ message: "Hello, there!" });

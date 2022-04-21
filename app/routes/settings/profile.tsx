@@ -1,10 +1,5 @@
-import {
-  ErrorBoundaryComponent,
-  json,
-  LoaderFunction,
-  useCatch,
-  useLoaderData,
-} from "remix";
+import { ErrorBoundaryComponent, json, LoaderFunction } from "@remix-run/node";
+import { useCatch, useLoaderData } from "@remix-run/react";
 
 export const loader: LoaderFunction = () => {
   // const user = db.user.get(id)
