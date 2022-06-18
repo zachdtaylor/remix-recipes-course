@@ -36,10 +36,6 @@ export const links: LinksFunction = () => {
 };
 
 export default function App() {
-  const matches = useMatches();
-  React.useEffect(() => {
-    console.log(matches);
-  }, [matches]);
   return (
     <html lang="en">
       <head>
@@ -69,7 +65,7 @@ export default function App() {
           <Outlet />
         </div>
         <ScrollRestoration />
-        {/* <Scripts /> */}
+        <Scripts />
         <LiveReload />
       </body>
     </html>

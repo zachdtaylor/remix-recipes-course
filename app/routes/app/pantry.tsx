@@ -1,5 +1,10 @@
 import { json, LoaderFunction } from "@remix-run/node";
-import { useLoaderData, useSearchParams } from "@remix-run/react";
+import {
+  Form,
+  useLoaderData,
+  useSearchParams,
+  useTransition,
+} from "@remix-run/react";
 import { SearchIcon } from "~/components/icons";
 import { getAllShelves } from "~/models/pantry-shelf.server";
 import { classNames } from "~/utils/misc";
@@ -18,12 +23,17 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function Pantry() {
   const data = useLoaderData() as LoaderData;
   const [searchParams] = useSearchParams();
+  const transition = useTransition();
+
+  const isSearching = transition.submission?.formData.has("q");
+
   return (
     <div>
-      <form
+      <Form
         className={classNames(
           "flex border-2 border-gray-300 rounded-md",
-          "focus-within:border-primary md:w-80"
+          "focus-within:border-primary md:w-80",
+          isSearching ? "animate-pulse" : ""
         )}
       >
         <button className="px-2 mr-1">
@@ -37,7 +47,7 @@ export default function Pantry() {
           placeholder="Search Shelves..."
           className="w-full py-3 px-2 outline-none"
         />
-      </form>
+      </Form>
       <ul
         className={classNames(
           "flex gap-8 overflow-x-auto mt-4",
