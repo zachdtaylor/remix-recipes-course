@@ -1,12 +1,13 @@
-import { json, LoaderFunction } from "@remix-run/node";
+import { ActionFunction, json, LoaderFunction } from "@remix-run/node";
 import {
   Form,
   useLoaderData,
   useSearchParams,
   useTransition,
 } from "@remix-run/react";
-import { SearchIcon } from "~/components/icons";
-import { getAllShelves } from "~/models/pantry-shelf.server";
+import { PrimaryButton } from "~/components/forms";
+import { PlusIcon, SearchIcon } from "~/components/icons";
+import { createShelf, getAllShelves } from "~/models/pantry-shelf.server";
 import { classNames } from "~/utils/misc";
 
 type LoaderData = {
@@ -18,6 +19,10 @@ export const loader: LoaderFunction = async ({ request }) => {
   const q = url.searchParams.get("q");
   const shelves = await getAllShelves(q);
   return json({ shelves });
+};
+
+export const action: ActionFunction = async () => {
+  return createShelf();
 };
 
 export default function Pantry() {
@@ -48,9 +53,15 @@ export default function Pantry() {
           className="w-full py-3 px-2 outline-none"
         />
       </Form>
+      <Form method="post" reloadDocument>
+        <PrimaryButton className="mt-4 w-full md:w-fit">
+          <PlusIcon />
+          <span className="pl-2">Create Shelf</span>
+        </PrimaryButton>
+      </Form>
       <ul
         className={classNames(
-          "flex gap-8 overflow-x-auto mt-4",
+          "flex gap-8 overflow-x-auto mt-4 pb-4",
           "snap-x snap-mandatory md:snap-none"
         )}
       >
