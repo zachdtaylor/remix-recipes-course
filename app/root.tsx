@@ -82,7 +82,8 @@ function AppNavLink({ children, to }: AppNavLinkProps) {
 
   const isLoading =
     transition.state === "loading" &&
-    transition.location.pathname === path.pathname;
+    transition.location.pathname === path.pathname &&
+    transition.type === "normalLoad";
 
   return (
     <li className="w-16">
