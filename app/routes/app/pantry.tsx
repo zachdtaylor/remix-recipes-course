@@ -5,6 +5,7 @@ import {
   useSearchParams,
   useTransition,
 } from "@remix-run/react";
+import React from "react";
 import { PrimaryButton } from "~/components/forms";
 import { PlusIcon, SearchIcon } from "~/components/icons";
 import { createShelf, getAllShelves } from "~/models/pantry-shelf.server";
@@ -29,9 +30,16 @@ export default function Pantry() {
   const data = useLoaderData() as LoaderData;
   const [searchParams] = useSearchParams();
   const transition = useTransition();
+  const containerRef = React.useRef<HTMLUListElement>(null);
 
   const isSearching = transition.submission?.formData.has("q");
   const isCreatingShelf = transition.submission?.formData.has("createShelf");
+
+  React.useEffect(() => {
+    if (!isCreatingShelf && containerRef.current) {
+      containerRef.current.scrollLeft = 0;
+    }
+  }, [isCreatingShelf]);
 
   return (
     <div>
@@ -69,6 +77,7 @@ export default function Pantry() {
         </PrimaryButton>
       </Form>
       <ul
+        ref={containerRef}
         className={classNames(
           "flex gap-8 overflow-x-auto mt-4 pb-4",
           "snap-x snap-mandatory md:snap-none"
