@@ -6,9 +6,13 @@ import {
   useTransition,
 } from "@remix-run/react";
 import React from "react";
-import { PrimaryButton } from "~/components/forms";
+import { DeleteButton, PrimaryButton } from "~/components/forms";
 import { PlusIcon, SearchIcon } from "~/components/icons";
-import { createShelf, getAllShelves } from "~/models/pantry-shelf.server";
+import {
+  createShelf,
+  deleteShelf,
+  getAllShelves,
+} from "~/models/pantry-shelf.server";
 import { classNames } from "~/utils/misc";
 
 type LoaderData = {
@@ -22,8 +26,23 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json({ shelves });
 };
 
-export const action: ActionFunction = async () => {
-  return createShelf();
+export const action: ActionFunction = async ({ request }) => {
+  const formData = await request.formData();
+  switch (formData.get("_action")) {
+    case "createShelf": {
+      return createShelf();
+    }
+    case "deleteShelf": {
+      const shelfId = formData.get("shelfId");
+      if (typeof shelfId !== "string") {
+        return json({ errors: { shelfId: "Shelf ID must be a string" } });
+      }
+      return deleteShelf(shelfId);
+    }
+    default: {
+      return null;
+    }
+  }
 };
 
 export default function Pantry() {
@@ -33,7 +52,8 @@ export default function Pantry() {
   const containerRef = React.useRef<HTMLUListElement>(null);
 
   const isSearching = transition.submission?.formData.has("q");
-  const isCreatingShelf = transition.submission?.formData.has("createShelf");
+  const isCreatingShelf =
+    transition.submission?.formData.get("_action") === "createShelf";
 
   React.useEffect(() => {
     if (!isCreatingShelf && containerRef.current) {
@@ -64,11 +84,10 @@ export default function Pantry() {
       </Form>
       <Form method="post">
         <PrimaryButton
-          name="createShelf"
-          className={classNames(
-            "mt-4 w-full md:w-fit",
-            isCreatingShelf ? "bg-primary-light" : ""
-          )}
+          name="_action"
+          value="createShelf"
+          className="mt-4 w-full md:w-fit"
+          isLoading={isCreatingShelf}
         >
           <PlusIcon />
           <span className="pl-2">
@@ -83,25 +102,41 @@ export default function Pantry() {
           "snap-x snap-mandatory md:snap-none"
         )}
       >
-        {data.shelves.map((shelf) => (
-          <li
-            key={shelf.id}
-            className={classNames(
-              "border-2 border-primary rounded-md p-4 h-fit",
-              "w-[calc(100vw-2rem)] flex-none snap-center",
-              "md:w-96"
-            )}
-          >
-            <h1 className="text-2xl font-extrabold mb-2">{shelf.name}</h1>
-            <ul>
-              {shelf.items.map((item) => (
-                <li key={item.id} className="py-2">
-                  {item.name}
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
+        {data.shelves.map((shelf) => {
+          const isDeletingShelf =
+            transition.submission?.formData.get("_action") === "deleteShelf" &&
+            transition.submission?.formData.get("shelfId") === shelf.id;
+          return (
+            <li
+              key={shelf.id}
+              className={classNames(
+                "border-2 border-primary rounded-md p-4 h-fit",
+                "w-[calc(100vw-2rem)] flex-none snap-center",
+                "md:w-96"
+              )}
+            >
+              <h1 className="text-2xl font-extrabold mb-2">{shelf.name}</h1>
+              <ul>
+                {shelf.items.map((item) => (
+                  <li key={item.id} className="py-2">
+                    {item.name}
+                  </li>
+                ))}
+              </ul>
+              <Form method="post" className="pt-8">
+                <input type="hidden" name="shelfId" value={shelf.id} />
+                <DeleteButton
+                  className="w-full"
+                  name="_action"
+                  value="deleteShelf"
+                  isLoading={isDeletingShelf}
+                >
+                  {isDeletingShelf ? "Deleting Shelf" : "Delete Shelf"}
+                </DeleteButton>
+              </Form>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
