@@ -1,6 +1,7 @@
 import { ActionFunction, json, LoaderFunction } from "@remix-run/node";
 import {
   Form,
+  useFetcher,
   useLoaderData,
   useSearchParams,
   useTransition,
@@ -49,11 +50,12 @@ export default function Pantry() {
   const data = useLoaderData() as LoaderData;
   const [searchParams] = useSearchParams();
   const transition = useTransition();
+  const createShelfFetcher = useFetcher();
   const containerRef = React.useRef<HTMLUListElement>(null);
 
   const isSearching = transition.submission?.formData.has("q");
   const isCreatingShelf =
-    transition.submission?.formData.get("_action") === "createShelf";
+    createShelfFetcher.submission?.formData.get("_action") === "createShelf";
 
   React.useEffect(() => {
     if (!isCreatingShelf && containerRef.current) {
@@ -82,7 +84,7 @@ export default function Pantry() {
           className="w-full py-3 px-2 outline-none"
         />
       </Form>
-      <Form method="post">
+      <createShelfFetcher.Form method="post">
         <PrimaryButton
           name="_action"
           value="createShelf"
@@ -94,7 +96,7 @@ export default function Pantry() {
             {isCreatingShelf ? "Creating Shelf" : "Create Shelf"}
           </span>
         </PrimaryButton>
-      </Form>
+      </createShelfFetcher.Form>
       <ul
         ref={containerRef}
         className={classNames(
@@ -102,42 +104,50 @@ export default function Pantry() {
           "snap-x snap-mandatory md:snap-none"
         )}
       >
-        {data.shelves.map((shelf) => {
-          const isDeletingShelf =
-            transition.submission?.formData.get("_action") === "deleteShelf" &&
-            transition.submission?.formData.get("shelfId") === shelf.id;
-          return (
-            <li
-              key={shelf.id}
-              className={classNames(
-                "border-2 border-primary rounded-md p-4 h-fit",
-                "w-[calc(100vw-2rem)] flex-none snap-center",
-                "md:w-96"
-              )}
-            >
-              <h1 className="text-2xl font-extrabold mb-2">{shelf.name}</h1>
-              <ul>
-                {shelf.items.map((item) => (
-                  <li key={item.id} className="py-2">
-                    {item.name}
-                  </li>
-                ))}
-              </ul>
-              <Form method="post" className="pt-8">
-                <input type="hidden" name="shelfId" value={shelf.id} />
-                <DeleteButton
-                  className="w-full"
-                  name="_action"
-                  value="deleteShelf"
-                  isLoading={isDeletingShelf}
-                >
-                  {isDeletingShelf ? "Deleting Shelf" : "Delete Shelf"}
-                </DeleteButton>
-              </Form>
-            </li>
-          );
-        })}
+        {data.shelves.map((shelf) => (
+          <Shelf key={shelf.id} shelf={shelf} />
+        ))}
       </ul>
     </div>
+  );
+}
+
+type ShelfProps = {
+  shelf: LoaderData["shelves"][number];
+};
+function Shelf({ shelf }: ShelfProps) {
+  const deleteShelfFetcher = useFetcher();
+  const isDeletingShelf =
+    deleteShelfFetcher.submission?.formData.get("_action") === "deleteShelf" &&
+    deleteShelfFetcher.submission?.formData.get("shelfId") === shelf.id;
+  return (
+    <li
+      key={shelf.id}
+      className={classNames(
+        "border-2 border-primary rounded-md p-4 h-fit",
+        "w-[calc(100vw-2rem)] flex-none snap-center",
+        "md:w-96"
+      )}
+    >
+      <h1 className="text-2xl font-extrabold mb-2">{shelf.name}</h1>
+      <ul>
+        {shelf.items.map((item) => (
+          <li key={item.id} className="py-2">
+            {item.name}
+          </li>
+        ))}
+      </ul>
+      <deleteShelfFetcher.Form method="post" className="pt-8">
+        <input type="hidden" name="shelfId" value={shelf.id} />
+        <DeleteButton
+          className="w-full"
+          name="_action"
+          value="deleteShelf"
+          isLoading={isDeletingShelf}
+        >
+          {isDeletingShelf ? "Deleting Shelf" : "Delete Shelf"}
+        </DeleteButton>
+      </deleteShelfFetcher.Form>
+    </li>
   );
 }
