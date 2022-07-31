@@ -8,11 +8,12 @@ import {
 } from "@remix-run/react";
 import React from "react";
 import { DeleteButton, PrimaryButton } from "~/components/forms";
-import { PlusIcon, SearchIcon } from "~/components/icons";
+import { PlusIcon, SaveIcon, SearchIcon } from "~/components/icons";
 import {
   createShelf,
   deleteShelf,
   getAllShelves,
+  saveShelfName,
 } from "~/models/pantry-shelf.server";
 import { classNames } from "~/utils/misc";
 
@@ -27,6 +28,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json({ shelves });
 };
 
+type FieldErrors = { [key: string]: string };
+
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   switch (formData.get("_action")) {
@@ -39,6 +42,28 @@ export const action: ActionFunction = async ({ request }) => {
         return json({ errors: { shelfId: "Shelf ID must be a string" } });
       }
       return deleteShelf(shelfId);
+    }
+    case "saveShelfName": {
+      const shelfId = formData.get("shelfId");
+      const shelfName = formData.get("shelfName");
+      const errors: FieldErrors = {};
+      if (
+        typeof shelfId === "string" &&
+        typeof shelfName === "string" &&
+        shelfName !== ""
+      ) {
+        return saveShelfName(shelfId, shelfName);
+      }
+      if (typeof shelfName !== "string") {
+        errors["shelfName"] = "Shelf name must be a string";
+      }
+      if (shelfName === "") {
+        errors["shelfName"] = "Shelf name cannot be blank";
+      }
+      if (typeof shelfId !== "string") {
+        errors["shelfId"] = "Shelf ID must be a string";
+      }
+      return json({ errors });
     }
     default: {
       return null;
@@ -117,6 +142,7 @@ type ShelfProps = {
 };
 function Shelf({ shelf }: ShelfProps) {
   const deleteShelfFetcher = useFetcher();
+  const saveShelfNameFetcher = useFetcher();
   const isDeletingShelf =
     deleteShelfFetcher.submission?.formData.get("_action") === "deleteShelf" &&
     deleteShelfFetcher.submission?.formData.get("shelfId") === shelf.id;
@@ -129,7 +155,23 @@ function Shelf({ shelf }: ShelfProps) {
         "md:w-96"
       )}
     >
-      <h1 className="text-2xl font-extrabold mb-2">{shelf.name}</h1>
+      <saveShelfNameFetcher.Form method="post" reloadDocument className="flex">
+        <input
+          type="text"
+          defaultValue={shelf.name}
+          name="shelfName"
+          placeholder="Shelf Name"
+          autoComplete="off"
+          className={classNames(
+            "text-2xl font-extrabold mb-2 w-full outline-none",
+            "border-b-2 border-b-background focus:border-b-primary"
+          )}
+        />
+        <button name="_action" value="saveShelfName" className="ml-4">
+          <SaveIcon />
+        </button>
+        <input type="hidden" name="shelfId" value={shelf.id} />
+      </saveShelfNameFetcher.Form>
       <ul>
         {shelf.items.map((item) => (
           <li key={item.id} className="py-2">

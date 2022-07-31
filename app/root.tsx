@@ -44,7 +44,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="md:flex md:h-screen">
+      <body className="md:flex md:h-screen bg-background">
         <nav className="bg-primary text-white md:w-16">
           <ul className="flex md:flex-col">
             <AppNavLink to="/">
