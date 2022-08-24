@@ -166,6 +166,8 @@ function Shelf({ shelf }: ShelfProps) {
   const deleteShelfFetcher = useFetcher();
   const saveShelfNameFetcher = useFetcher();
   const createShelfItemFetcher = useFetcher();
+  const createItemFormRef = React.useRef<HTMLFormElement>(null);
+  const { renderedItems, addItem } = useOptimisticItems(shelf.items);
   const isDeletingShelf =
     deleteShelfFetcher.submission?.formData.get("_action") === "deleteShelf" &&
     deleteShelfFetcher.submission?.formData.get("shelfId") === shelf.id;
@@ -209,7 +211,24 @@ function Shelf({ shelf }: ShelfProps) {
       <createShelfItemFetcher.Form
         method="post"
         className="flex py-2"
-        reloadDocument
+        ref={createItemFormRef}
+        onSubmit={(event) => {
+          const target = event.target as HTMLFormElement;
+          const itemNameInput = target.elements.namedItem(
+            "itemName"
+          ) as HTMLInputElement;
+          addItem(itemNameInput.value);
+          event.preventDefault();
+          createShelfItemFetcher.submit(
+            {
+              itemName: itemNameInput.value,
+              shelfId: shelf.id,
+              _action: "createShelfItem",
+            },
+            { method: "post" }
+          );
+          createItemFormRef.current?.reset();
+        }}
       >
         <div className="w-full mb-2">
           <input
@@ -238,7 +257,7 @@ function Shelf({ shelf }: ShelfProps) {
         </ErrorMessage>
       </createShelfItemFetcher.Form>
       <ul>
-        {shelf.items.map((item) => (
+        {renderedItems.map((item) => (
           <ShelfItem key={item.id} shelfItem={item} />
         ))}
       </ul>
@@ -256,7 +275,7 @@ function Shelf({ shelf }: ShelfProps) {
 }
 
 type ShelfItemProps = {
-  shelfItem: LoaderData["shelves"][number]["items"][number];
+  shelfItem: RenderedItem;
 };
 
 function ShelfItem({ shelfItem }: ShelfItemProps) {
@@ -269,9 +288,11 @@ function ShelfItem({ shelfItem }: ShelfItemProps) {
         reloadDocument
       >
         <p className="w-full">{shelfItem.name}</p>
-        <button name="_action" value="deleteShelfItem">
-          <TrashIcon />
-        </button>
+        {shelfItem.isOptimistic ? null : (
+          <button name="_action" value="deleteShelfItem">
+            <TrashIcon />
+          </button>
+        )}
         <input type="hidden" name="itemId" value={shelfItem.id} />
         <ErrorMessage className="pl-2">
           {deleteShelfItemFetcher.data?.errors?.itemId}
@@ -279,4 +300,39 @@ function ShelfItem({ shelfItem }: ShelfItemProps) {
       </deleteShelfItemFetcher.Form>
     </li>
   );
+}
+
+type RenderedItem = {
+  id: string;
+  name: string;
+  isOptimistic?: boolean;
+};
+function useOptimisticItems(savedItems: Array<RenderedItem>) {
+  const [optimisticItems, setOptimisticItems] = React.useState<
+    Array<RenderedItem>
+  >([]);
+
+  const renderedItems = [...optimisticItems, ...savedItems];
+
+  renderedItems.sort((a, b) => {
+    if (a.name === b.name) return 0;
+    return a.name < b.name ? -1 : 1;
+  });
+
+  React.useLayoutEffect(() => {
+    setOptimisticItems([]);
+  }, [savedItems]);
+
+  const addItem = (name: string) => {
+    setOptimisticItems((items) => [
+      ...items,
+      { id: createItemId(), name, isOptimistic: true },
+    ]);
+  };
+
+  return { renderedItems, addItem };
+}
+
+function createItemId() {
+  return `${Math.round(Math.random() * 1_000_000)}`;
 }
