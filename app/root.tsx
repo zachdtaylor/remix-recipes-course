@@ -18,6 +18,7 @@ import styles from "./tailwind.css";
 import {
   DiscoverIcon,
   HomeIcon,
+  LoginIcon,
   RecipeBookIcon,
   SettingsIcon,
 } from "./components/icons";
@@ -45,7 +46,12 @@ export default function App() {
         <Links />
       </head>
       <body className="md:flex md:h-screen bg-background">
-        <nav className="bg-primary text-white md:w-16">
+        <nav
+          className={classNames(
+            "bg-primary text-white md:w-16",
+            "flex justify-between md:flex-col"
+          )}
+        >
           <ul className="flex md:flex-col">
             <AppNavLink to="/">
               <HomeIcon />
@@ -58,6 +64,11 @@ export default function App() {
             </AppNavLink>
             <AppNavLink to="settings">
               <SettingsIcon />
+            </AppNavLink>
+          </ul>
+          <ul>
+            <AppNavLink to="/login">
+              <LoginIcon />
             </AppNavLink>
           </ul>
         </nav>
