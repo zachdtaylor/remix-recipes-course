@@ -9,7 +9,7 @@ import {
 import classNames from "classnames";
 import React from "react";
 import { z } from "zod";
-import { DeleteButton, ErrorMessage, PrimaryButton } from "~/components/form";
+import { DeleteButton, ErrorMessage, PrimaryButton } from "~/components/forms";
 import { PlusIcon, SaveIcon, SearchIcon, TrashIcon } from "~/components/icons";
 import { createShelfItem, deleteShelfItem } from "~/models/pantry-item.server";
 import {
