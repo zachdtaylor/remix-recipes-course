@@ -1,15 +1,15 @@
-import { ActionFunction, json } from "@remix-run/node";
+import { ActionFunction, json, LoaderFunction } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import { z } from "zod";
 import { ErrorMessage, PrimaryButton } from "~/components/forms";
+import { getUser } from "~/models/user.server";
 import { classNames } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 
-export function headers() {
-  return {
-    "Set-Cookie": "remix-recipes-cookie=myValue",
-  };
-}
+export const loader: LoaderFunction = async ({ request }) => {
+  const cookieHeader = request.headers.get("cookie");
+  return null;
+};
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -21,7 +21,25 @@ export const action: ActionFunction = async ({ request }) => {
   return validateForm(
     formData,
     loginSchema,
-    ({ email }) => {},
+    async ({ email }) => {
+      const user = await getUser(email);
+
+      if (user === null) {
+        return json(
+          { errors: { email: "User with this email does not exist" } },
+          { status: 401 }
+        );
+      }
+
+      return json(
+        { user },
+        {
+          headers: {
+            "Set-Cookie": `remix-recipes__userId=${user.id}; HttpOnly; Secure`,
+          },
+        }
+      );
+    },
     (errors) => json({ errors, email: formData.get("email") }, { status: 400 })
   );
 };
