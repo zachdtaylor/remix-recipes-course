@@ -4,9 +4,12 @@ import { validateForm } from "~/utils/validation";
 import { z } from "zod";
 import { data, useActionData } from "react-router";
 import { getUser } from "~/models/user.server";
+import { userIdCookie } from "~/cookies";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const cookieHeader = request.headers.get("cookie");
+  const cookieValue = await userIdCookie.parse(cookieHeader);
+  console.log("Cookie value: ", cookieValue);
   return null;
 }
 
@@ -34,7 +37,7 @@ export async function action({ request }: Route.ActionArgs) {
         { user },
         {
           headers: {
-            "Set-Cookie": `remix-recipes__userId=${user.id}; HttpOnly; Secure`,
+            "Set-Cookie": await userIdCookie.serialize(user.id),
           },
         }
       );
