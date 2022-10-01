@@ -4,11 +4,11 @@ import { validateForm } from "~/utils/validation";
 import { z } from "zod";
 import { data, useActionData } from "react-router";
 import { getUser } from "~/models/user.server";
-import { userIdCookie } from "~/cookies";
+import { sessionCookie } from "~/cookies";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const cookieHeader = request.headers.get("cookie");
-  const cookieValue = await userIdCookie.parse(cookieHeader);
+  const cookieValue = await sessionCookie.parse(cookieHeader);
   console.log("Cookie value: ", cookieValue);
   return null;
 }
@@ -37,7 +37,7 @@ export async function action({ request }: Route.ActionArgs) {
         { user },
         {
           headers: {
-            "Set-Cookie": await userIdCookie.serialize(user.id),
+            "Set-Cookie": await sessionCookie.serialize({ userId: user.id }),
           },
         }
       );
