@@ -2,14 +2,14 @@ import { ActionFunction, json, LoaderFunction } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import { z } from "zod";
 import { ErrorMessage, PrimaryButton } from "~/components/forms";
-import { userIdCookie } from "~/cookies";
+import { sessionCookie } from "~/cookies";
 import { getUser } from "~/models/user.server";
 import { classNames } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const cookieHeader = request.headers.get("cookie");
-  const cookieValue = await userIdCookie.parse(cookieHeader);
+  const cookieValue = await sessionCookie.parse(cookieHeader);
   console.log("Cookie value: ", cookieValue);
   return null;
 };
@@ -38,7 +38,7 @@ export const action: ActionFunction = async ({ request }) => {
         { user },
         {
           headers: {
-            "Set-Cookie": await userIdCookie.serialize(user.id),
+            "Set-Cookie": await sessionCookie.serialize({ userId: user.id }),
           },
         }
       );
