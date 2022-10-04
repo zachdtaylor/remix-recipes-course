@@ -4,12 +4,12 @@ import { validateForm } from "~/utils/validation";
 import { z } from "zod";
 import { data, useActionData } from "react-router";
 import { getUser } from "~/models/user.server";
-import { sessionCookie } from "~/cookies";
+import { commitSession, getSession } from "~/sessions";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const cookieHeader = request.headers.get("cookie");
-  const cookieValue = await sessionCookie.parse(cookieHeader);
-  console.log("Cookie value: ", cookieValue);
+  const session = await getSession(cookieHeader);
+  console.log("Session data: ", session.data);
   return null;
 }
 
@@ -18,6 +18,8 @@ const loginSchema = z.object({
 });
 
 export async function action({ request }: Route.ActionArgs) {
+  const cookieHeader = request.headers.get("cookie");
+  const session = await getSession(cookieHeader);
   const formData = await request.formData();
 
   return validateForm(
@@ -33,11 +35,13 @@ export async function action({ request }: Route.ActionArgs) {
         );
       }
 
+      session.set("userId", user.id);
+
       return data(
         { user },
         {
           headers: {
-            "Set-Cookie": await sessionCookie.serialize({ userId: user.id }),
+            "Set-Cookie": await commitSession(session),
           },
         }
       );
