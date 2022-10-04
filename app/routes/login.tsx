@@ -3,14 +3,14 @@ import { useActionData } from "@remix-run/react";
 import classNames from "classnames";
 import { z } from "zod";
 import { ErrorMessage, PrimaryButton } from "~/components/forms";
-import { sessionCookie } from "~/cookies";
 import { getUser } from "~/models/user.server";
+import { commitSession, getSession } from "~/sessions";
 import { validateForm } from "~/utils/validation";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const cookieHeader = request.headers.get("cookie");
-  const cookieValue = await sessionCookie.parse(cookieHeader);
-  console.log("Cookie value: ", cookieValue);
+  const session = await getSession(cookieHeader);
+  console.log("Session data: ", session.data);
   return null;
 }
 
@@ -19,6 +19,8 @@ const loginSchema = z.object({
 });
 
 export async function action({ request }: ActionFunctionArgs) {
+  const cookieHeader = request.headers.get("cookie");
+  const session = await getSession(cookieHeader);
   const formData = await request.formData();
 
   return validateForm(
@@ -34,11 +36,13 @@ export async function action({ request }: ActionFunctionArgs) {
         );
       }
 
+      session.set("userId", user.id);
+
       return json(
         { user },
         {
           headers: {
-            "Set-Cookie": await sessionCookie.serialize({ userId: user.id }),
+            "Set-Cookie": await commitSession(session),
           },
         }
       );
