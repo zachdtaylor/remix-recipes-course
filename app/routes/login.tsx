@@ -2,10 +2,12 @@ import { ActionFunction, json, LoaderFunction } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import { z } from "zod";
 import { ErrorMessage, PrimaryButton } from "~/components/forms";
+import { generateMagicLink } from "~/magic-links.server";
 import { getUser } from "~/models/user.server";
 import { commitSession, getSession } from "~/sessions";
 import { classNames } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
+import { v4 as uuid } from "uuid";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const cookieHeader = request.headers.get("cookie");
@@ -27,25 +29,10 @@ export const action: ActionFunction = async ({ request }) => {
     formData,
     loginSchema,
     async ({ email }) => {
-      const user = await getUser(email);
-
-      if (user === null) {
-        return json(
-          { errors: { email: "User with this email does not exist" } },
-          { status: 401 }
-        );
-      }
-
-      session.set("userId", user.id);
-
-      return json(
-        { user },
-        {
-          headers: {
-            "Set-Cookie": await commitSession(session),
-          },
-        }
-      );
+      const nonce = uuid();
+      const link = generateMagicLink(email, nonce);
+      console.log(link);
+      return json("ok");
     },
     (errors) => json({ errors, email: formData.get("email") }, { status: 400 })
   );
