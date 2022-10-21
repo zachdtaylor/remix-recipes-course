@@ -10,14 +10,14 @@ const cryptr = new Cryptr(process.env.MAGIC_LINK_SECRET);
 type MagicLinkPayload = {
   email: string;
   nonce: string;
-  createAt: string;
+  createdAt: string;
 };
 
 export function generateMagicLink(email: string, nonce: string) {
   const payload: MagicLinkPayload = {
     email,
     nonce,
-    createAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   };
   const encryptedPayload = cryptr.encrypt(JSON.stringify(payload));
 
@@ -36,7 +36,7 @@ function isMagicLinkPayload(value: any): value is MagicLinkPayload {
     typeof value === "object" &&
     typeof value.email === "string" &&
     typeof value.nonce === "string" &&
-    typeof value.createAt === "string"
+    typeof value.createdAt === "string"
   );
 }
 
