@@ -1,12 +1,12 @@
-import { json, LoaderFunction } from "@remix-run/node";
+import { json, LoaderFunction, redirect } from "@remix-run/node";
 import { getMagicLinkPayload, invalidMagicLink } from "~/magic-links.server";
+import { getUser } from "~/models/user.server";
 import { commitSession, getSession } from "~/sessions";
 
 const magicLinkMaxAge = 1000 * 60 * 10; // 10 minutes
 
 export const loader: LoaderFunction = async ({ request }) => {
   const magicLinkPayload = getMagicLinkPayload(request);
-  console.log(magicLinkPayload);
 
   // 1. Validate expiration time
   const createdAt = new Date(magicLinkPayload.createdAt);
@@ -22,6 +22,17 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   if (session.get("nonce") !== magicLinkPayload.nonce) {
     throw invalidMagicLink("invalid nonce");
+  }
+
+  const user = await getUser(magicLinkPayload.email);
+
+  if (user) {
+    session.set("userId", user.id);
+    return redirect("/app", {
+      headers: {
+        "Set-Cookie": await commitSession(session),
+      },
+    });
   }
 
   return json("ok", {
