@@ -30,9 +30,16 @@ export const action: ActionFunction = async ({ request }) => {
     loginSchema,
     async ({ email }) => {
       const nonce = uuid();
+      session.flash("nonce", nonce);
+
       const link = generateMagicLink(email, nonce);
       console.log(link);
-      return json("ok");
+
+      return json("ok", {
+        headers: {
+          "Set-Cookie": await commitSession(session),
+        },
+      });
     },
     (errors) => json({ errors, email: formData.get("email") }, { status: 400 })
   );

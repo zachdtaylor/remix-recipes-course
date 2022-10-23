@@ -1,9 +1,10 @@
 import { json, LoaderFunction } from "@remix-run/node";
 import { getMagicLinkPayload, invalidMagicLink } from "~/magic-links.server";
+import { commitSession, getSession } from "~/sessions";
 
 const magicLinkMaxAge = 1000 * 60 * 10; // 10 minutes
 
-export const loader: LoaderFunction = ({ request }) => {
+export const loader: LoaderFunction = async ({ request }) => {
   const magicLinkPayload = getMagicLinkPayload(request);
   console.log(magicLinkPayload);
 
@@ -16,6 +17,16 @@ export const loader: LoaderFunction = ({ request }) => {
   }
 
   // 2. Validate nonce
+  const cookieHeader = request.headers.get("cookie");
+  const session = await getSession(cookieHeader);
 
-  return json("ok");
+  if (session.get("nonce") !== magicLinkPayload.nonce) {
+    throw invalidMagicLink("invalid nonce");
+  }
+
+  return json("ok", {
+    headers: {
+      "Set-Cookie": await commitSession(session),
+    },
+  });
 };
