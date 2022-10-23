@@ -40,7 +40,7 @@ function isMagicLinkPayload(value: any): value is MagicLinkPayload {
   );
 }
 
-function invalidMagicLink(message: string) {
+export function invalidMagicLink(message: string) {
   return json({ message }, { status: 400 });
 }
 
