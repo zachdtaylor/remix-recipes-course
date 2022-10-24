@@ -1,4 +1,4 @@
-import { ErrorMessage, PrimaryButton } from "~/components/form";
+import { ErrorMessage, PrimaryButton, PrimaryInput } from "~/components/form";
 import { Route } from "./+types/login";
 import { validateForm } from "~/utils/validation";
 import { z } from "zod";
@@ -65,13 +65,12 @@ export default function Login() {
       <h1 className="text-3xl mb-8">Remix Recipes</h1>
       <form method="post" className="mx-auto md:w-1/3">
         <div className="text-left pb-4">
-          <input
+          <PrimaryInput
             type="email"
             name="email"
             placeholder="Email"
             autoComplete="off"
             defaultValue={defaultValue}
-            className="w-full outline-none border-2 border-gray-200 focus:border-primary rounded-md p-2"
           />
           <ErrorMessage>{emailError}</ErrorMessage>
         </div>
