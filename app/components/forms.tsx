@@ -1,4 +1,8 @@
-import type { ButtonHTMLAttributes, HTMLAttributes } from "react";
+import type {
+  ButtonHTMLAttributes,
+  HTMLAttributes,
+  InputHTMLAttributes,
+} from "react";
 import { classNames } from "~/utils/misc";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -52,4 +56,19 @@ export function ErrorMessage({ className, ...props }: ErrorMessageProps) {
   return props.children ? (
     <p {...props} className={classNames("text-red-600 text-xs", className)} />
   ) : null;
+}
+
+interface PrimaryInputProps extends InputHTMLAttributes<HTMLInputElement> {}
+
+export function PrimaryInput({ className, ...props }: PrimaryInputProps) {
+  return (
+    <input
+      {...props}
+      className={classNames(
+        "w-full outline-none border-2 border-gray-200",
+        "focus:border-primary rounded-md p-2",
+        className
+      )}
+    />
+  );
 }
