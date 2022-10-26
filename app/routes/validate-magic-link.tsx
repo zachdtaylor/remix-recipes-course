@@ -1,10 +1,17 @@
 import { getMagicLinkPayload, invalidMagicLink } from "~/magic-links.server";
-import { getUser } from "~/models/user.server";
+import { createUser, getUser } from "~/models/user.server";
 import { commitSession, getSession } from "~/sessions";
 import { Route } from "./+types/validate-magic-link";
-import { data, isRouteErrorResponse, redirect } from "react-router";
+import {
+  data,
+  isRouteErrorResponse,
+  redirect,
+  useActionData,
+} from "react-router";
 import { ErrorMessage, PrimaryButton, PrimaryInput } from "~/components/form";
 import classNames from "classnames";
+import { validateForm } from "~/utils/validation";
+import { z } from "zod";
 
 const magicLinkMaxAge = 1000 * 60 * 10; // 10 minutes
 
@@ -23,7 +30,10 @@ export async function loader({ request }: Route.LoaderArgs) {
   const cookieHeader = request.headers.get("cookie");
   const session = await getSession(cookieHeader);
 
-  if (session.get("nonce") !== magicLinkPayload.nonce) {
+  if (
+    !session.get("authNonceVerified") &&
+    session.get("nonce") !== magicLinkPayload.nonce
+  ) {
     throw invalidMagicLink("invalid nonce");
   }
 
@@ -38,6 +48,8 @@ export async function loader({ request }: Route.LoaderArgs) {
     });
   }
 
+  session.set("authNonceVerified", true);
+
   return data(
     { ok: true },
     {
@@ -48,7 +60,50 @@ export async function loader({ request }: Route.LoaderArgs) {
   );
 }
 
+const signUpSchema = z.object({
+  firstName: z.string().min(1, "First name cannot be blank"),
+  lastName: z.string().min(1, "Last name cannot be blank"),
+});
+
+export async function action({ request }: Route.ActionArgs) {
+  const formData = await request.formData();
+  return validateForm(
+    formData,
+    signUpSchema,
+    async ({ firstName, lastName }) => {
+      const magicLinkPayload = getMagicLinkPayload(request);
+
+      const user = await createUser(
+        magicLinkPayload.email,
+        firstName,
+        lastName
+      );
+
+      const cookie = request.headers.get("cookie");
+      const session = await getSession(cookie);
+      session.set("userId", user.id);
+      session.unset("authNonceVerified");
+
+      return redirect("/app", {
+        headers: {
+          "Set-Cookie": await commitSession(session),
+        },
+      });
+    },
+    (errors) =>
+      data(
+        {
+          errors,
+          firstName: String(formData.get("firstName")),
+          lastName: String(formData.get("lastName")),
+        },
+        { status: 400 }
+      )
+  );
+}
+
 export default function ValidateMagicLink() {
+  const actionData = useActionData<typeof action>();
   return (
     <div className="text-center">
       <div className="mt-24">
@@ -68,13 +123,19 @@ export default function ValidateMagicLink() {
                 id="firstName"
                 autoComplete="off"
                 name="firstName"
+                defaultValue={actionData?.firstName}
               />
-              <ErrorMessage></ErrorMessage>
+              <ErrorMessage>{actionData?.errors?.firstName}</ErrorMessage>
             </div>
             <div className="text-left">
               <label htmlFor="lastName">Last Name</label>
-              <PrimaryInput id="lastName" autoComplete="off" name="lastName" />
-              <ErrorMessage></ErrorMessage>
+              <PrimaryInput
+                id="lastName"
+                autoComplete="off"
+                name="lastName"
+                defaultValue={actionData?.lastName}
+              />
+              <ErrorMessage>{actionData?.errors?.lastName}</ErrorMessage>
             </div>
           </fieldset>
           <PrimaryButton className="w-36 mx-auto">Sign Up</PrimaryButton>
