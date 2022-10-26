@@ -1,10 +1,17 @@
-import { json, LoaderFunction, redirect } from "@remix-run/node";
-import { useCatch } from "@remix-run/react";
+import {
+  ActionFunction,
+  json,
+  LoaderFunction,
+  redirect,
+} from "@remix-run/node";
+import { useActionData, useCatch } from "@remix-run/react";
+import { z } from "zod";
 import { ErrorMessage, PrimaryButton, PrimaryInput } from "~/components/forms";
 import { getMagicLinkPayload, invalidMagicLink } from "~/magic-links.server";
-import { getUser } from "~/models/user.server";
+import { createUser, getUser } from "~/models/user.server";
 import { commitSession, getSession } from "~/sessions";
 import { classNames } from "~/utils/misc";
+import { validateForm } from "~/utils/validation";
 
 const magicLinkMaxAge = 1000 * 60 * 10; // 10 minutes
 
@@ -31,6 +38,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   if (user) {
     session.set("userId", user.id);
+    session.unset("nonce");
     return redirect("/app", {
       headers: {
         "Set-Cookie": await commitSession(session),
@@ -45,7 +53,50 @@ export const loader: LoaderFunction = async ({ request }) => {
   });
 };
 
+const signUpSchema = z.object({
+  firstName: z.string().min(1, "First name cannot be blank"),
+  lastName: z.string().min(1, "Last name cannot be blank"),
+});
+
+export const action: ActionFunction = async ({ request }) => {
+  const formData = await request.formData();
+  return validateForm(
+    formData,
+    signUpSchema,
+    async ({ firstName, lastName }) => {
+      const magicLinkPayload = getMagicLinkPayload(request);
+
+      const user = await createUser(
+        magicLinkPayload.email,
+        firstName,
+        lastName
+      );
+
+      const cookie = request.headers.get("cookie");
+      const session = await getSession(cookie);
+      session.set("userId", user.id);
+      session.unset("nonce");
+
+      return redirect("/app", {
+        headers: {
+          "Set-Cookie": await commitSession(session),
+        },
+      });
+    },
+    (errors) =>
+      json(
+        {
+          errors,
+          firstName: formData.get("firstName"),
+          lastName: formData.get("lastName"),
+        },
+        { status: 400 }
+      )
+  );
+};
+
 export default function ValidateMagicLink() {
+  const actionData = useActionData();
   return (
     <div className="text-center">
       <div className="mt-24">
@@ -65,13 +116,19 @@ export default function ValidateMagicLink() {
                 id="firstName"
                 autoComplete="off"
                 name="firstName"
+                defaultValue={actionData?.firstName}
               />
-              <ErrorMessage></ErrorMessage>
+              <ErrorMessage>{actionData?.errors?.firstName}</ErrorMessage>
             </div>
             <div className="text-left">
               <label htmlFor="lastName">Last Name</label>
-              <PrimaryInput id="lastName" autoComplete="off" name="lastName" />
-              <ErrorMessage></ErrorMessage>
+              <PrimaryInput
+                id="lastName"
+                autoComplete="off"
+                name="lastName"
+                defaultValue={actionData?.lastName}
+              />
+              <ErrorMessage>{actionData?.errors?.lastName}</ErrorMessage>
             </div>
           </fieldset>
           <PrimaryButton className="w-36 mx-auto">Sign Up</PrimaryButton>
@@ -79,11 +136,4 @@ export default function ValidateMagicLink() {
       </div>
     </div>
   );
-}
-
-export function CatchBoundary() {
-  const caught = useCatch();
-  console.log(caught);
-
-  return <div></div>;
 }

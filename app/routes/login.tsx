@@ -30,7 +30,7 @@ export const action: ActionFunction = async ({ request }) => {
     loginSchema,
     async ({ email }) => {
       const nonce = uuid();
-      session.flash("nonce", nonce);
+      session.set("nonce", nonce);
 
       const link = generateMagicLink(email, nonce);
       console.log(link);
