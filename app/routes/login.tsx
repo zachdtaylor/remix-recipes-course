@@ -28,7 +28,7 @@ export async function action({ request }: ActionFunctionArgs) {
     loginSchema,
     async ({ email }) => {
       const nonce = uuid();
-      session.flash("nonce", nonce);
+      session.set("nonce", nonce);
 
       const link = generateMagicLink(email, nonce);
       console.log(link);
