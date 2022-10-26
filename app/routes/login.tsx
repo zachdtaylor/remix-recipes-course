@@ -2,7 +2,7 @@ import { ActionFunction, json, LoaderFunction } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import { z } from "zod";
 import { ErrorMessage, PrimaryButton, PrimaryInput } from "~/components/forms";
-import { generateMagicLink } from "~/magic-links.server";
+import { generateMagicLink, sendMagicLinkEmail } from "~/magic-links.server";
 import { getUser } from "~/models/user.server";
 import { commitSession, getSession } from "~/sessions";
 import { classNames } from "~/utils/misc";
@@ -33,7 +33,7 @@ export const action: ActionFunction = async ({ request }) => {
       session.set("nonce", nonce);
 
       const link = generateMagicLink(email, nonce);
-      console.log(link);
+      await sendMagicLinkEmail(link, email);
 
       return json("ok", {
         headers: {
