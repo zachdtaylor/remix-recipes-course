@@ -5,7 +5,7 @@ import { ErrorMessage, PrimaryButton, PrimaryInput } from "~/components/forms";
 import { commitSession, getSession } from "~/sessions";
 import { validateForm } from "~/utils/validation";
 import { v4 as uuid } from "uuid";
-import { generateMagicLink } from "~/magic-links.server";
+import { generateMagicLink, sendMagicLinkEmail } from "~/magic-links.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const cookieHeader = request.headers.get("cookie");
@@ -31,7 +31,7 @@ export async function action({ request }: ActionFunctionArgs) {
       session.set("nonce", nonce);
 
       const link = generateMagicLink(email, nonce);
-      console.log(link);
+      await sendMagicLinkEmail(link, email);
 
       return json("ok", {
         headers: {
