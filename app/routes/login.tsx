@@ -5,7 +5,7 @@ import { z } from "zod";
 import { data, useActionData } from "react-router";
 import { commitSession, getSession } from "~/sessions";
 import { v4 as uuid } from "uuid";
-import { generateMagicLink } from "~/magic-links.server";
+import { generateMagicLink, sendMagicLinkEmail } from "~/magic-links.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const cookieHeader = request.headers.get("cookie");
@@ -31,7 +31,7 @@ export async function action({ request }: Route.ActionArgs) {
       session.flash("nonce", nonce);
 
       const link = generateMagicLink(email, nonce);
-      console.log(link);
+      await sendMagicLinkEmail(link, email);
 
       return data(
         { ok: true },
