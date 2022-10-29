@@ -17,7 +17,7 @@ import {
   getAllShelves,
   saveShelfName,
 } from "~/models/pantry-shelf.server";
-import { classNames, useIsHydrated } from "~/utils/misc";
+import { classNames, useIsHydrated, useServerLayoutEffect } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 
 type LoaderData = {
@@ -360,7 +360,7 @@ function useOptimisticItems(
     return a.name < b.name ? -1 : 1;
   });
 
-  React.useLayoutEffect(() => {
+  useServerLayoutEffect(() => {
     if (createShelfItemState === "idle") {
       setOptimisticItems([]);
     }

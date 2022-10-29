@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import { useMatches } from "@remix-run/react";
 
 export function classNames(...names: Array<string | undefined>) {
@@ -30,3 +30,11 @@ export function useIsHydrated() {
 
   return isHydrated;
 }
+
+export function isRunningOnServer() {
+  return typeof window === "undefined";
+}
+
+export const useServerLayoutEffect = isRunningOnServer()
+  ? useEffect
+  : useLayoutEffect;
