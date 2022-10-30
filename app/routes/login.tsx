@@ -3,9 +3,7 @@ import { useActionData } from "@remix-run/react";
 import { z } from "zod";
 import { ErrorMessage, PrimaryButton, PrimaryInput } from "~/components/forms";
 import { generateMagicLink, sendMagicLinkEmail } from "~/magic-links.server";
-import { getUser } from "~/models/user.server";
 import { commitSession, getSession } from "~/sessions";
-import { classNames } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 import { v4 as uuid } from "uuid";
 
