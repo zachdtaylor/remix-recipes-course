@@ -23,9 +23,10 @@ export function getAllShelves(userId: string, query: string | null) {
   });
 }
 
-export function createShelf() {
+export function createShelf(userId: string) {
   return db.pantryShelf.create({
     data: {
+      userId,
       name: "New Shelf",
     },
   });
