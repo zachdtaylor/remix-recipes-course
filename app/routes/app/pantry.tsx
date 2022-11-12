@@ -11,6 +11,7 @@ import {
   createShelf,
   deleteShelf,
   getAllShelves,
+  getShelf,
   saveShelfName,
 } from "~/models/pantry-shelf.server";
 import { Route } from "./+types/pantry";
@@ -62,7 +63,16 @@ export async function action({ request }: Route.ActionArgs) {
       return validateForm(
         formData,
         deleteShelfSchema,
-        (data) => deleteShelf(data.shelfId),
+        async (parsedData) => {
+          const shelf = await getShelf(parsedData.shelfId);
+          if (shelf !== null && shelf.userId !== user.id) {
+            throw data(
+              { message: "This shelf is not yours, so you cannot delete it" },
+              { status: 401 }
+            );
+          }
+          return deleteShelf(parsedData.shelfId);
+        },
         (errors) => data({ errors }, { status: 400 })
       );
     }
@@ -70,7 +80,19 @@ export async function action({ request }: Route.ActionArgs) {
       return validateForm(
         formData,
         saveShelfNameSchema,
-        (data) => saveShelfName(data.shelfId, data.shelfName),
+        async (parsedData) => {
+          const shelf = await getShelf(parsedData.shelfId);
+          if (shelf !== null && shelf.userId !== user.id) {
+            throw data(
+              {
+                message:
+                  "This shelf is not yours, so you cannot change its name",
+              },
+              { status: 401 }
+            );
+          }
+          return saveShelfName(parsedData.shelfId, parsedData.shelfName);
+        },
         (errors) => data({ errors }, { status: 400 })
       );
     }
