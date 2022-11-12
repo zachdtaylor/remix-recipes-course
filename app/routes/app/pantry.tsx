@@ -17,6 +17,7 @@ import {
   getAllShelves,
   saveShelfName,
 } from "~/models/pantry-shelf.server";
+import { requireLoggedInUser } from "~/utils/auth.server";
 import { classNames, useIsHydrated, useServerLayoutEffect } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 
@@ -25,6 +26,8 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
+  await requireLoggedInUser(request);
+
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
   const shelves = await getAllShelves(q);
@@ -50,6 +53,8 @@ const deleteShelfItemSchema = z.object({
 });
 
 export const action: ActionFunction = async ({ request }) => {
+  await requireLoggedInUser(request);
+
   const formData = await request.formData();
   switch (formData.get("_action")) {
     case "createShelf": {
