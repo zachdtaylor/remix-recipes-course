@@ -19,7 +19,11 @@ import { PlusIcon, SaveIcon, SearchIcon, TrashIcon } from "~/components/icons";
 import { DeleteButton, ErrorMessage, PrimaryButton } from "~/components/form";
 import { validateForm } from "~/utils/validation";
 import { z } from "zod";
-import { createShelfItem, deleteShelfItem } from "~/models/pantry-item.server";
+import {
+  createShelfItem,
+  deleteShelfItem,
+  getShelfItem,
+} from "~/models/pantry-item.server";
 import React from "react";
 import { useIsHydrated, useServerLayoutEffect } from "~/utils/misc";
 import { requireLoggedInUser } from "~/utils/auth.server";
@@ -108,7 +112,16 @@ export async function action({ request }: Route.ActionArgs) {
       return validateForm(
         formData,
         deleteShelfItemSchema,
-        (data) => deleteShelfItem(data.itemId),
+        async (parsedData) => {
+          const item = await getShelfItem(parsedData.itemId);
+          if (item !== null && item.userId !== user.id) {
+            throw data(
+              { message: "This item is not yours, so you cannot delete it" },
+              { status: 401 }
+            );
+          }
+          return deleteShelfItem(parsedData.itemId);
+        },
         (errors) => data({ errors }, { status: 400 })
       );
     }
