@@ -6,11 +6,10 @@ import { generateMagicLink, sendMagicLinkEmail } from "~/magic-links.server";
 import { commitSession, getSession } from "~/sessions";
 import { validateForm } from "~/utils/validation";
 import { v4 as uuid } from "uuid";
+import { requireLoggedOutUser } from "~/utils/auth.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const cookieHeader = request.headers.get("cookie");
-  const session = await getSession(cookieHeader);
-  console.log("Session data: ", session.data);
+  await requireLoggedOutUser(request);
   return null;
 };
 
