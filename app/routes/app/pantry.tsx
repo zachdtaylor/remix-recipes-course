@@ -26,11 +26,11 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  await requireLoggedInUser(request);
+  const user = await requireLoggedInUser(request);
 
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
-  const shelves = await getAllShelves(q);
+  const shelves = await getAllShelves(user.id, q);
   return json({ shelves });
 };
 
