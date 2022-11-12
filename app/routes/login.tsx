@@ -18,6 +18,8 @@ const loginSchema = z.object({
 });
 
 export async function action({ request }: ActionFunctionArgs) {
+  await requireLoggedOutUser(request);
+
   const cookieHeader = request.headers.get("cookie");
   const session = await getSession(cookieHeader);
   const formData = await request.formData();
