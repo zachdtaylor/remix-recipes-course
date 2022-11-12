@@ -50,12 +50,12 @@ const deleteShelfItemSchema = z.object({
 });
 
 export async function action({ request }: ActionFunctionArgs) {
-  await requireLoggedInUser(request);
+  const user = await requireLoggedInUser(request);
 
   const formData = await request.formData();
   switch (formData.get("_action")) {
     case "createShelf": {
-      return createShelf();
+      return createShelf(user.id);
     }
     case "deleteShelf": {
       return validateForm(
@@ -77,7 +77,7 @@ export async function action({ request }: ActionFunctionArgs) {
       return validateForm(
         formData,
         createShelfItemSchema,
-        (data) => createShelfItem(data.shelfId, data.itemName),
+        (data) => createShelfItem(user.id, data.shelfId, data.itemName),
         (errors) => json({ errors }, { status: 400 })
       );
     }

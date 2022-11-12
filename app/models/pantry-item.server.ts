@@ -1,9 +1,10 @@
 import db from "~/db.server";
 import { handleDelete } from "./utils";
 
-export function createShelfItem(shelfId: string, name: string) {
+export function createShelfItem(userId: string, shelfId: string, name: string) {
   return db.pantryItem.create({
     data: {
+      userId,
       shelfId,
       name,
     },
