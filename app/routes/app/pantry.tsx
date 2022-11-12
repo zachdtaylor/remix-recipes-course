@@ -10,7 +10,11 @@ import React from "react";
 import { z } from "zod";
 import { DeleteButton, ErrorMessage, PrimaryButton } from "~/components/forms";
 import { PlusIcon, SaveIcon, SearchIcon, TrashIcon } from "~/components/icons";
-import { createShelfItem, deleteShelfItem } from "~/models/pantry-item.server";
+import {
+  createShelfItem,
+  deleteShelfItem,
+  getShelfItem,
+} from "~/models/pantry-item.server";
 import {
   createShelf,
   deleteShelf,
@@ -110,7 +114,16 @@ export const action: ActionFunction = async ({ request }) => {
       return validateForm(
         formData,
         deleteShelfItemSchema,
-        (data) => deleteShelfItem(data.itemId),
+        async (data) => {
+          const item = await getShelfItem(data.itemId);
+          if (item !== null && item.userId !== user.id) {
+            throw json(
+              { message: "This item is not yours, so you cannot delete it" },
+              { status: 401 }
+            );
+          }
+          return deleteShelfItem(data.itemId);
+        },
         (errors) => json({ errors }, { status: 400 })
       );
     }
