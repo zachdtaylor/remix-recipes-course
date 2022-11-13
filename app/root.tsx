@@ -1,4 +1,9 @@
-import type { ErrorBoundaryComponent, MetaFunction } from "@remix-run/node";
+import {
+  ErrorBoundaryComponent,
+  json,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
 import { LinksFunction } from "@remix-run/node";
 
 import {
@@ -11,6 +16,7 @@ import {
   Scripts,
   ScrollRestoration,
   useCatch,
+  useLoaderData,
   useResolvedPath,
   useTransition,
 } from "@remix-run/react";
@@ -25,6 +31,7 @@ import {
 } from "./components/icons";
 import { classNames } from "./utils/misc";
 import React from "react";
+import { getCurrentUser } from "./utils/auth.server";
 
 export const meta: MetaFunction = () => {
   return {
@@ -37,7 +44,14 @@ export const links: LinksFunction = () => {
   return [{ rel: "stylesheet", href: styles }];
 };
 
+export const loader: LoaderFunction = async ({ request }) => {
+  const user = await getCurrentUser(request);
+
+  return json({ isLoggedIn: user !== null });
+};
+
 export default function App() {
+  const data = useLoaderData();
   return (
     <html lang="en">
       <head>
@@ -60,9 +74,11 @@ export default function App() {
             <AppNavLink to="discover">
               <DiscoverIcon />
             </AppNavLink>
-            <AppNavLink to="app/pantry">
-              <RecipeBookIcon />
-            </AppNavLink>
+            {data.isLoggedIn ? (
+              <AppNavLink to="app/pantry">
+                <RecipeBookIcon />
+              </AppNavLink>
+            ) : null}
             <AppNavLink to="settings">
               <SettingsIcon />
             </AppNavLink>
