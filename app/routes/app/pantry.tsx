@@ -1,6 +1,7 @@
 import { ActionFunction, json, LoaderFunction } from "@remix-run/node";
 import {
   Form,
+  useCatch,
   useFetcher,
   useLoaderData,
   useSearchParams,
@@ -418,4 +419,17 @@ function useOptimisticItems(
 
 function createItemId() {
   return `${Math.round(Math.random() * 1_000_000)}`;
+}
+
+export function CatchBoundary() {
+  const caught = useCatch();
+
+  return (
+    <div className="bg-red-600 text-white rounded-md p-4">
+      <h1 className="mb-2">
+        {caught.status} - {caught.statusText}
+      </h1>
+      <p>{caught.data.message}</p>
+    </div>
+  );
 }

@@ -10,6 +10,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useCatch,
   useResolvedPath,
   useTransition,
 } from "@remix-run/react";
@@ -138,3 +139,30 @@ export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
     </html>
   );
 };
+
+export function CatchBoundary() {
+  const caught = useCatch();
+  return (
+    <html>
+      <head>
+        <title>Whoops!</title>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <div className="p-4">
+          <h1 className="text-2xl pb-3">
+            {caught.status} - {caught.statusText}
+          </h1>
+          <p>You're seeing this page because an error occurred.</p>
+          <p className="my-4 font-bold">{caught.data.message}</p>
+          <Link to="/" className="text-primary">
+            Take me home
+          </Link>
+        </div>
+      </body>
+    </html>
+  );
+}
