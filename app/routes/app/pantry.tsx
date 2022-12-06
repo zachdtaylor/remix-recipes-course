@@ -1,4 +1,9 @@
-import { ActionFunction, json, LoaderFunction } from "@remix-run/node";
+import {
+  ActionFunction,
+  json,
+  LoaderArgs,
+  LoaderFunction,
+} from "@remix-run/node";
 import {
   Form,
   useCatch,
@@ -27,11 +32,7 @@ import { requireLoggedInUser } from "~/utils/auth.server";
 import { classNames, useIsHydrated, useServerLayoutEffect } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 
-type LoaderData = {
-  shelves: Awaited<ReturnType<typeof getAllShelves>>;
-};
-
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderArgs) => {
   const user = await requireLoggedInUser(request);
 
   const url = new URL(request.url);
@@ -135,7 +136,7 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function Pantry() {
-  const data = useLoaderData() as LoaderData;
+  const data = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
   const transition = useTransition();
   const createShelfFetcher = useFetcher();
@@ -201,7 +202,11 @@ export default function Pantry() {
 }
 
 type ShelfProps = {
-  shelf: LoaderData["shelves"][number];
+  shelf: {
+    items: RenderedItem[];
+    id: string;
+    name: string;
+  };
 };
 function Shelf({ shelf }: ShelfProps) {
   const deleteShelfFetcher = useFetcher();
