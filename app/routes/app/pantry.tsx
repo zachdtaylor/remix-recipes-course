@@ -14,7 +14,12 @@ import {
 } from "@remix-run/react";
 import React from "react";
 import { z } from "zod";
-import { DeleteButton, ErrorMessage, PrimaryButton } from "~/components/forms";
+import {
+  DeleteButton,
+  ErrorMessage,
+  PrimaryButton,
+  SearchBar,
+} from "~/components/forms";
 import { PlusIcon, SaveIcon, SearchIcon, TrashIcon } from "~/components/icons";
 import {
   createShelfItem,
@@ -137,12 +142,9 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function Pantry() {
   const data = useLoaderData<typeof loader>();
-  const [searchParams] = useSearchParams();
-  const transition = useTransition();
   const createShelfFetcher = useFetcher();
   const containerRef = React.useRef<HTMLUListElement>(null);
 
-  const isSearching = transition.submission?.formData.has("q");
   const isCreatingShelf =
     createShelfFetcher.submission?.formData.get("_action") === "createShelf";
 
@@ -154,25 +156,7 @@ export default function Pantry() {
 
   return (
     <div>
-      <Form
-        className={classNames(
-          "flex border-2 border-gray-300 rounded-md",
-          "focus-within:border-primary md:w-80",
-          isSearching ? "animate-pulse" : ""
-        )}
-      >
-        <button className="px-2 mr-1">
-          <SearchIcon />
-        </button>
-        <input
-          defaultValue={searchParams.get("q") ?? ""}
-          type="text"
-          name="q"
-          autoComplete="off"
-          placeholder="Search Shelves..."
-          className="w-full py-3 px-2 outline-none"
-        />
-      </Form>
+      <SearchBar placeholder="Search Shelves..." className="md:w-80" />
       <createShelfFetcher.Form method="post">
         <PrimaryButton
           name="_action"
