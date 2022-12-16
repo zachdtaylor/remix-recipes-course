@@ -25,6 +25,9 @@ export async function loader({ request }: Route.LoaderArgs) {
       },
     },
     select: { name: true, totalTime: true, imageUrl: true, id: true },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   return { recipes };
