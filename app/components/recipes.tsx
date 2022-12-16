@@ -1,4 +1,5 @@
 import { useParams } from "@remix-run/react";
+import React from "react";
 import { classNames } from "~/utils/misc";
 import { TimeIcon } from "./icons";
 
@@ -18,7 +19,7 @@ export function RecipeListWrapper({ children }: RecipeListWrapperProps) {
     <div
       className={classNames(
         "lg:block lg:w-1/3 lg:pr-4 overflow-auto",
-        params.id ? "hidden" : ""
+        params.recipeId ? "hidden" : ""
       )}
     >
       {children}
@@ -32,6 +33,37 @@ type RecipeDetailWrapperProps = {
 };
 export function RecipeDetailWrapper({ children }: RecipeDetailWrapperProps) {
   return <div className="lg:w-2/3 overflow-auto pr-4 pl-4">{children}</div>;
+}
+
+function delay<Args extends unknown[]>(
+  fn: (...args: Args) => void,
+  ms: number
+) {
+  let timeoutId: number | undefined;
+
+  const debounced = (...args: Args) => {
+    clearTimeout(timeoutId);
+    timeoutId = window.setTimeout(() => fn(...args), ms);
+  };
+
+  return debounced;
+}
+
+function useDelayedBool(value: boolean | undefined, delay: number) {
+  const [delayed, setDelayed] = React.useState(false);
+  const timeoutId = React.useRef<number>();
+  React.useEffect(() => {
+    if (value) {
+      timeoutId.current = window.setTimeout(() => {
+        setDelayed(true);
+      }, delay);
+    } else {
+      window.clearTimeout(timeoutId.current);
+      setDelayed(false);
+    }
+  }, [value]);
+
+  return delayed;
 }
 
 type RecipeCardProps = {
@@ -48,6 +80,7 @@ export function RecipeCard({
   isActive,
   isLoading,
 }: RecipeCardProps) {
+  const delayedLoading = useDelayedBool(isLoading, 500);
   return (
     <div
       className={classNames(
@@ -61,12 +94,16 @@ export function RecipeCard({
         <img src={imageUrl} className="object-cover h-full w-full" />
       </div>
       <div className="p-4 flex-grow">
-        <h3 className="font-semibold mb-1 text-left">{name}</h3>
+        <h3 className="font-semibold mb-1 text-left">
+          {name}
+          {delayedLoading ? "..." : ""}
+        </h3>
         <div
           className={classNames(
             "flex font-light",
             "group-hover:text-primary-light",
-            isActive ? "text-primary-light" : "text-gray-500"
+            isActive ? "text-primary-light" : "text-gray-500",
+            isLoading ? "text-gray-500" : ""
           )}
         >
           <TimeIcon />
