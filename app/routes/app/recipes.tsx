@@ -4,7 +4,13 @@ import {
   LoaderFunctionArgs,
   redirect,
 } from "@remix-run/node";
-import { Form, NavLink, Outlet, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  NavLink,
+  Outlet,
+  useLoaderData,
+  useLocation,
+} from "@remix-run/react";
 import { PrimaryButton, SearchBar } from "~/components/forms";
 import { PlusIcon } from "~/components/icons";
 import {
@@ -51,11 +57,15 @@ export async function action({ request }: ActionFunctionArgs) {
     },
   });
 
-  return redirect(`/app/recipes/${recipe.id}`);
+  const url = new URL(request.url);
+  url.pathname = `/app/recipes/${recipe.id}`;
+
+  return redirect(url.toString());
 }
 
 export default function Recipes() {
   const data = useLoaderData<typeof loader>();
+  const location = useLocation();
 
   return (
     <RecipePageWrapper>
@@ -72,7 +82,10 @@ export default function Recipes() {
         <ul>
           {data?.recipes.map((recipe) => (
             <li className="my-4" key={recipe.id}>
-              <NavLink reloadDocument to={recipe.id}>
+              <NavLink
+                reloadDocument
+                to={{ pathname: recipe.id, search: location.search }}
+              >
                 {({ isActive }) => (
                   <RecipeCard
                     name={recipe.name}
