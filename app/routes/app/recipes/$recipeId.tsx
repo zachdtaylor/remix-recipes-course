@@ -5,7 +5,7 @@ import db from "~/db.server";
 export async function loader({ params }: LoaderFunctionArgs) {
   const recipe = await db.recipe.findUnique({ where: { id: params.recipeId } });
 
-  return json({ recipe });
+  return json({ recipe }, { headers: { "Cache-Control": "max-age=10" } });
 }
 
 export default function RecipeDetail() {
