@@ -82,7 +82,10 @@ export default function Recipes() {
             const isLoading = navigation.location?.pathname.endsWith(recipe.id);
             return (
               <li className="my-4" key={recipe.id}>
-                <NavLink to={{ pathname: recipe.id, search: location.search }}>
+                <NavLink
+                  to={{ pathname: recipe.id, search: location.search }}
+                  prefetch="intent"
+                >
                   {({ isActive }) => (
                     <RecipeCard
                       name={recipe.name}
