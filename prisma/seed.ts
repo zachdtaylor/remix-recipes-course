@@ -68,12 +68,12 @@ function getRecipes(userId: string) {
         "Place roast in slow cooker and sprinkle onion soup mix over the roast. Add water and beef broth. Cook on high for 4-6 hours or low for 8-10. Serve on rolls with swiss cheese.",
       ingredients: {
         create: [
-          { amount: "", name: "Beef roast" },
+          { amount: "", name: "beef roast" },
           { amount: "1 pkg", name: "dry onion soup mix" },
           { amount: "2 cans", name: "beef broth" },
           { amount: "2 cans", name: "water" },
-          { amount: "", name: "Sliced swiss cheese" },
-          { amount: "", name: "Hoagie buns" },
+          { amount: "", name: "sliced swiss cheese" },
+          { amount: "", name: "hoagie buns" },
         ],
       },
     },

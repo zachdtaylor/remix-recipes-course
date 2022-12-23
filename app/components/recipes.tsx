@@ -113,14 +113,3 @@ export function RecipeCard({
     </div>
   );
 }
-
-type IngredientsWrapperProps = {
-  children: React.ReactNode;
-};
-export function IngredientsWrapper({ children }: IngredientsWrapperProps) {
-  return (
-    <div className="grid grid-cols-[30%_auto_min-content] my-4 gap-2">
-      {children}
-    </div>
-  );
-}
