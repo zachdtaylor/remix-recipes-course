@@ -96,7 +96,7 @@ export default function RecipeDetail() {
               <Input
                 type="text"
                 autoComplete="off"
-                name="ingredientAmount"
+                name="ingredientAmounts[]"
                 defaultValue={ingredient.amount ?? ""}
               />
               <ErrorMessage></ErrorMessage>
@@ -105,7 +105,7 @@ export default function RecipeDetail() {
               <Input
                 type="text"
                 autoComplete="off"
-                name="ingredientName"
+                name="ingredientNames[]"
                 defaultValue={ingredient.name}
               />
               <ErrorMessage></ErrorMessage>
