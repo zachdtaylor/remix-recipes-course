@@ -30,11 +30,25 @@ export async function loader({ params }: LoaderArgs) {
   return json({ recipe }, { headers: { "Cache-Control": "max-age=10" } });
 }
 
-const saveRecipeSchema = z.object({
-  name: z.string().min(1, "Name cannot be blank"),
-  totalTime: z.string().min(1, "Total time cannot be blank"),
-  instructions: z.string().min(1, "Instructions cannot be blank"),
-});
+const saveRecipeSchema = z
+  .object({
+    name: z.string().min(1, "Name cannot be blank"),
+    totalTime: z.string().min(1, "Total time cannot be blank"),
+    instructions: z.string().min(1, "Instructions cannot be blank"),
+    ingredientIds: z
+      .array(z.string().min(1, "Ingredient ID is missing"))
+      .optional(),
+    ingredientAmounts: z.array(z.string().nullable()).optional(),
+    ingredientNames: z
+      .array(z.string().min(1, "Name cannot be blank"))
+      .optional(),
+  })
+  .refine(
+    (data) =>
+      data.ingredientIds?.length === data.ingredientAmounts?.length &&
+      data.ingredientIds?.length === data.ingredientNames?.length,
+    { message: "Ingredient arrays must all be the same length" }
+  );
 
 export async function action({ request, params }: ActionArgs) {
   const formData = await request.formData();
@@ -45,7 +59,22 @@ export async function action({ request, params }: ActionArgs) {
       return validateForm(
         formData,
         saveRecipeSchema,
-        (data) => db.recipe.update({ where: { id: recipeId }, data }),
+        ({ ingredientIds, ingredientNames, ingredientAmounts, ...data }) =>
+          db.recipe.update({
+            where: { id: recipeId },
+            data: {
+              ...data,
+              ingredients: {
+                updateMany: ingredientIds?.map((id, index) => ({
+                  where: { id },
+                  data: {
+                    amount: ingredientAmounts?.[index],
+                    name: ingredientNames?.[index],
+                  },
+                })),
+              },
+            },
+          }),
         (errors) => json({ errors }, { status: 400 })
       );
     }
@@ -92,6 +121,7 @@ export default function RecipeDetail() {
         <div></div>
         {data.recipe?.ingredients.map((ingredient) => (
           <React.Fragment key={ingredient.id}>
+            <input type="hidden" name="ingredientIds[]" value={ingredient.id} />
             <div>
               <Input
                 type="text"
