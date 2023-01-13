@@ -7,7 +7,7 @@ import {
   Input,
   PrimaryButton,
 } from "~/components/form";
-import { TimeIcon, TrashIcon } from "~/components/icons";
+import { SaveIcon, TimeIcon, TrashIcon } from "~/components/icons";
 import React from "react";
 import classNames from "classnames";
 import { z } from "zod";
@@ -26,6 +26,9 @@ export async function loader({ params }: Route.LoaderArgs) {
           id: true,
           amount: true,
           name: true,
+        },
+        orderBy: {
+          createdAt: "asc",
         },
       },
     },
@@ -54,6 +57,11 @@ const saveRecipeSchema = z
     { message: "Ingredient arrays must all be the same length" }
   );
 
+const createIngredientSchema = z.object({
+  newIngredientAmount: z.string().nullable(),
+  newIngredientName: z.string().min(1, "Name cannot be blank"),
+});
+
 export async function action({ request, params }: Route.ActionArgs) {
   const formData = await request.formData();
   const recipeId = params.recipeId;
@@ -77,6 +85,21 @@ export async function action({ request, params }: Route.ActionArgs) {
                   },
                 })),
               },
+            },
+          }),
+        (errors) => data({ errors }, { status: 400 })
+      );
+    }
+    case "createIngredient": {
+      return validateForm(
+        formData,
+        createIngredientSchema,
+        ({ newIngredientAmount, newIngredientName }) =>
+          db.ingredient.create({
+            data: {
+              recipeId,
+              amount: newIngredientAmount,
+              name: newIngredientName,
             },
           }),
         (errors) => data({ errors }, { status: 400 })
@@ -149,6 +172,27 @@ export default function RecipeDetail() {
             </button>
           </React.Fragment>
         ))}
+        <div>
+          <Input
+            type="text"
+            autoComplete="off"
+            name="newIngredientAmount"
+            className="border-b-gray-200"
+          />
+          <ErrorMessage></ErrorMessage>
+        </div>
+        <div>
+          <Input
+            type="text"
+            autoComplete="off"
+            name="newIngredientName"
+            className="border-b-gray-200"
+          />
+          <ErrorMessage></ErrorMessage>
+        </div>
+        <button name="_action" value="createIngredient">
+          <SaveIcon />
+        </button>
       </div>
       <label
         htmlFor="instructions"
