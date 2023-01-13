@@ -1,6 +1,12 @@
 import db from "~/db.server";
 import { Route } from "./+types/$recipeId";
-import { data, Form, useActionData, useLoaderData } from "react-router";
+import {
+  data,
+  Form,
+  redirect,
+  useActionData,
+  useLoaderData,
+} from "react-router";
 import {
   DeleteButton,
   ErrorMessage,
@@ -12,6 +18,7 @@ import React from "react";
 import classNames from "classnames";
 import { z } from "zod";
 import { validateForm } from "~/utils/validation";
+import { handleDelete } from "~/models/utils";
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
   return loaderHeaders;
@@ -104,6 +111,10 @@ export async function action({ request, params }: Route.ActionArgs) {
           }),
         (errors) => data({ errors }, { status: 400 })
       );
+    }
+    case "deleteRecipe": {
+      await handleDelete(() => db.recipe.delete({ where: { id: recipeId } }));
+      return redirect("/app/recipes");
     }
     default: {
       return null;
@@ -229,7 +240,9 @@ export default function RecipeDetail() {
       <ErrorMessage>{actionDataErrors?.instructions}</ErrorMessage>
       <hr className="my-4" />
       <div className="flex justify-between">
-        <DeleteButton>Delete this Recipe</DeleteButton>
+        <DeleteButton name="_action" value="deleteRecipe">
+          Delete this Recipe
+        </DeleteButton>
         <PrimaryButton name="_action" value="saveRecipe">
           <div className="flex flex-col justify-center h-full">Save</div>
         </PrimaryButton>
