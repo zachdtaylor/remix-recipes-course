@@ -1,4 +1,9 @@
-import { ActionFunctionArgs, LoaderFunctionArgs, json } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  json,
+  redirect,
+} from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import classNames from "classnames";
 import React from "react";
@@ -11,6 +16,7 @@ import {
 } from "~/components/forms";
 import { SaveIcon, TimeIcon, TrashIcon } from "~/components/icons";
 import db from "~/db.server";
+import { handleDelete } from "~/models/utils";
 import { validateForm } from "~/utils/validation";
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -100,6 +106,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
           }),
         (errors) => json({ errors }, { status: 400 })
       );
+    }
+    case "deleteRecipe": {
+      await handleDelete(() => db.recipe.delete({ where: { id: recipeId } }));
+      return redirect("/app/recipes");
     }
     default: {
       return null;
@@ -222,7 +232,9 @@ export default function RecipeDetail() {
       <ErrorMessage>{actionData?.errors?.instructions}</ErrorMessage>
       <hr className="my-4" />
       <div className="flex justify-between">
-        <DeleteButton>Delete this Recipe</DeleteButton>
+        <DeleteButton name="_action" value="deleteRecipe">
+          Delete this Recipe
+        </DeleteButton>
         <PrimaryButton name="_action" value="saveRecipe">
           <div className="flex flex-col justify-center h-full">Save</div>
         </PrimaryButton>
