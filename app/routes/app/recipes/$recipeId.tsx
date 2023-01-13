@@ -1,5 +1,5 @@
 import { ActionArgs, json, LoaderArgs, redirect } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import { Form, useActionData, useCatch, useLoaderData } from "@remix-run/react";
 import React from "react";
 import { z } from "zod";
 import {
@@ -11,10 +11,12 @@ import {
 import { SaveIcon, TimeIcon, TrashIcon } from "~/components/icons";
 import db from "~/db.server";
 import { handleDelete } from "~/models/utils";
+import { requireLoggedInUser } from "~/utils/auth.server";
 import { classNames } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 
-export async function loader({ params }: LoaderArgs) {
+export async function loader({ request, params }: LoaderArgs) {
+  const user = await requireLoggedInUser(request);
   const recipe = await db.recipe.findUnique({
     where: { id: params.recipeId },
     include: {
@@ -30,6 +32,20 @@ export async function loader({ params }: LoaderArgs) {
       },
     },
   });
+
+  if (recipe === null) {
+    throw json(
+      { message: "A recipe with that id does not exist" },
+      { status: 404 }
+    );
+  }
+
+  if (recipe.userId !== user.id) {
+    throw json(
+      { message: "You are not authorized to view this recipe" },
+      { status: 401 }
+    );
+  }
 
   return json({ recipe }, { headers: { "Cache-Control": "max-age=10" } });
 }
@@ -245,5 +261,18 @@ export default function RecipeDetail() {
         </PrimaryButton>
       </div>
     </Form>
+  );
+}
+
+export function CatchBoundary() {
+  const caught = useCatch();
+
+  return (
+    <div className="bg-red-600 text-white rounded-md p-4">
+      <h1 className="mb-2">
+        {caught.status} {caught.statusText ? `- ${caught.statusText}` : ""}
+      </h1>
+      <p>{caught.data.message}</p>
+    </div>
   );
 }
