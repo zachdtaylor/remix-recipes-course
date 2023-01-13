@@ -1,6 +1,6 @@
 import db from "~/db.server";
 import { Route } from "./+types/$recipeId";
-import { data, Form, useLoaderData } from "react-router";
+import { data, Form, useActionData, useLoaderData } from "react-router";
 import {
   DeleteButton,
   ErrorMessage,
@@ -113,6 +113,10 @@ export async function action({ request, params }: Route.ActionArgs) {
 
 export default function RecipeDetail() {
   const data = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
+
+  const actionDataErrors =
+    actionData && "errors" in actionData ? actionData.errors : null;
 
   return (
     <Form method="post" reloadDocument>
@@ -125,8 +129,9 @@ export default function RecipeDetail() {
           className="text-2xl font-extrabold"
           name="name"
           defaultValue={data.recipe?.name}
+          error={!!actionDataErrors?.name}
         />
-        <ErrorMessage></ErrorMessage>
+        <ErrorMessage>{actionDataErrors?.name}</ErrorMessage>
       </div>
       <div className="flex">
         <TimeIcon />
@@ -138,15 +143,16 @@ export default function RecipeDetail() {
             autoComplete="off"
             name="totalTime"
             defaultValue={data.recipe?.totalTime}
+            error={!!actionDataErrors?.totalTime}
           />
-          <ErrorMessage></ErrorMessage>
+          <ErrorMessage>{actionDataErrors?.totalTime}</ErrorMessage>
         </div>
       </div>
       <div className="grid grid-cols-[30%_auto_min-content] my-4 gap-2">
         <h2 className="font-bold text-sm pb-1">Amount</h2>
         <h2 className="font-bold text-sm pb-1">Name</h2>
         <div></div>
-        {data.recipe?.ingredients.map((ingredient) => (
+        {data.recipe?.ingredients.map((ingredient, idx) => (
           <React.Fragment key={ingredient.id}>
             <input type="hidden" name="ingredientIds[]" value={ingredient.id} />
             <div>
@@ -155,8 +161,11 @@ export default function RecipeDetail() {
                 autoComplete="off"
                 name="ingredientAmounts[]"
                 defaultValue={ingredient.amount ?? ""}
+                error={!!actionDataErrors?.[`ingredientAmounts.${idx}`]}
               />
-              <ErrorMessage></ErrorMessage>
+              <ErrorMessage>
+                {actionDataErrors?.[`ingredientAmounts.${idx}`]}
+              </ErrorMessage>
             </div>
             <div>
               <Input
@@ -164,8 +173,11 @@ export default function RecipeDetail() {
                 autoComplete="off"
                 name="ingredientNames[]"
                 defaultValue={ingredient.name}
+                error={!!actionDataErrors?.[`ingredientNames.${idx}`]}
               />
-              <ErrorMessage></ErrorMessage>
+              <ErrorMessage>
+                {actionDataErrors?.[`ingredientNames.${idx}`]}
+              </ErrorMessage>
             </div>
             <button>
               <TrashIcon />
@@ -178,8 +190,9 @@ export default function RecipeDetail() {
             autoComplete="off"
             name="newIngredientAmount"
             className="border-b-gray-200"
+            error={!!actionDataErrors?.newIngredientAmount}
           />
-          <ErrorMessage></ErrorMessage>
+          <ErrorMessage>{actionDataErrors?.newIngredientAmount}</ErrorMessage>
         </div>
         <div>
           <Input
@@ -187,8 +200,9 @@ export default function RecipeDetail() {
             autoComplete="off"
             name="newIngredientName"
             className="border-b-gray-200"
+            error={!!actionDataErrors?.newIngredientName}
           />
-          <ErrorMessage></ErrorMessage>
+          <ErrorMessage>{actionDataErrors?.newIngredientName}</ErrorMessage>
         </div>
         <button name="_action" value="createIngredient">
           <SaveIcon />
@@ -208,10 +222,11 @@ export default function RecipeDetail() {
         defaultValue={data.recipe?.instructions}
         className={classNames(
           "w-full h-56 rounded-md outline-none",
-          "focus:border-2 focus:p-3 focus:border-primary duration-300"
+          "focus:border-2 focus:p-3 focus:border-primary duration-300",
+          actionDataErrors?.instructions ? "border-2 border-red-500 p-3" : ""
         )}
       />
-      <ErrorMessage></ErrorMessage>
+      <ErrorMessage>{actionDataErrors?.instructions}</ErrorMessage>
       <hr className="my-4" />
       <div className="flex justify-between">
         <DeleteButton>Delete this Recipe</DeleteButton>
