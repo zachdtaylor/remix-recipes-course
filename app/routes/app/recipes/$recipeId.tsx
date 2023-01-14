@@ -76,8 +76,25 @@ const createIngredientSchema = z.object({
 });
 
 export async function action({ request, params }: ActionArgs) {
-  const formData = await request.formData();
+  const user = await requireLoggedInUser(request);
   const recipeId = String(params.recipeId);
+  const recipe = await db.recipe.findUnique({ where: { id: recipeId } });
+
+  if (recipe === null) {
+    throw json(
+      { message: "A recipe with that id does not exist" },
+      { status: 404 }
+    );
+  }
+
+  if (recipe.userId !== user.id) {
+    throw json(
+      { message: "You are not authorized to make changes this recipe" },
+      { status: 401 }
+    );
+  }
+
+  const formData = await request.formData();
   const _action = formData.get("_action");
 
   if (typeof _action === "string" && _action.includes("deleteIngredient")) {
