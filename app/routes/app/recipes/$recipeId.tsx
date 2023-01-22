@@ -1,5 +1,11 @@
 import { ActionArgs, json, LoaderArgs, redirect } from "@remix-run/node";
-import { Form, useActionData, useCatch, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useCatch,
+  useFetcher,
+  useLoaderData,
+} from "@remix-run/react";
 import React from "react";
 import { z } from "zod";
 import {
@@ -156,6 +162,36 @@ export async function action({ request, params }: ActionArgs) {
 export default function RecipeDetail() {
   const data = useLoaderData<typeof loader>();
   const actionData = useActionData();
+  const saveNameFetcher = useFetcher();
+  const saveTotalTimeFetcher = useFetcher();
+  const saveInstructionsFetcher = useFetcher();
+
+  const saveName = (name: string) =>
+    saveNameFetcher.submit(
+      {
+        _action: "saveName",
+        name,
+      },
+      { method: "post" }
+    );
+
+  const saveTotalTime = (totalTime: string) =>
+    saveTotalTimeFetcher.submit(
+      {
+        _action: "saveTotalTime",
+        totalTime,
+      },
+      { method: "post" }
+    );
+
+  const saveInstructions = (instructions: string) =>
+    saveInstructionsFetcher.submit(
+      {
+        _action: "saveInstructions",
+        instructions,
+      },
+      { method: "post" }
+    );
 
   return (
     <Form method="post" reloadDocument>
@@ -168,9 +204,14 @@ export default function RecipeDetail() {
           className="text-2xl font-extrabold"
           name="name"
           defaultValue={data.recipe?.name}
-          error={!!actionData?.errors?.name}
+          error={
+            !!(saveNameFetcher?.data?.errors?.name || actionData?.errors?.name)
+          }
+          onChange={(e) => saveName(e.target.value)}
         />
-        <ErrorMessage>{actionData?.errors?.name}</ErrorMessage>
+        <ErrorMessage>
+          {saveNameFetcher?.data?.errors?.name || actionData?.errors?.name}
+        </ErrorMessage>
       </div>
       <div className="flex">
         <TimeIcon />
@@ -182,9 +223,18 @@ export default function RecipeDetail() {
             autoComplete="off"
             name="totalTime"
             defaultValue={data.recipe?.totalTime}
-            error={!!actionData?.errors?.totalTime}
+            error={
+              !!(
+                saveTotalTimeFetcher?.data?.errors?.totalTime ||
+                actionData?.errors?.totalTime
+              )
+            }
+            onChange={(e) => saveTotalTime(e.target.value)}
           />
-          <ErrorMessage>{actionData?.errors?.totalTime}</ErrorMessage>
+          <ErrorMessage>
+            {saveTotalTimeFetcher?.data?.errors?.totalTime ||
+              actionData?.errors?.totalTime}
+          </ErrorMessage>
         </div>
       </div>
       <div className="grid grid-cols-[30%_auto_min-content] my-4 gap-2">
@@ -262,12 +312,19 @@ export default function RecipeDetail() {
         className={classNames(
           "w-full h-56 rounded-md outline-none",
           "focus:border-2 focus:p-3 focus:border-primary duration-300",
-          !!actionData?.errors?.instructions
+          !!(
+            saveInstructionsFetcher?.data?.errors?.instructions ||
+            actionData?.errors?.instructions
+          )
             ? "border-2 border-red-500 p-3"
             : ""
         )}
+        onChange={(e) => saveInstructions(e.target.value)}
       />
-      <ErrorMessage>{actionData?.errors?.instructions}</ErrorMessage>
+      <ErrorMessage>
+        {saveInstructionsFetcher?.data?.errors?.instructions ||
+          actionData?.errors?.instructions}
+      </ErrorMessage>
       <hr className="my-4" />
       <div className="flex justify-between">
         <DeleteButton name="_action" value="deleteRecipe">
