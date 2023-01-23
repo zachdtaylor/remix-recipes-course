@@ -68,15 +68,27 @@ const saveInstructionsSchema = z.object({
   instructions: z.string().min(1, "Instructions cannot be blank"),
 });
 
+const ingredientId = z.string().min(1, "Ingredient ID is missing");
+
+const ingredientAmount = z.string().nullable();
+
+const ingredientName = z.string().min(1, "Name cannot be blank");
+
+const saveIngredientAmountSchema = z.object({
+  amount: ingredientAmount,
+  id: ingredientId,
+});
+
+const saveIngredientNameSchema = z.object({
+  name: ingredientName,
+  id: ingredientId,
+});
+
 const saveRecipeSchema = z
   .object({
-    ingredientIds: z
-      .array(z.string().min(1, "Ingredient ID is missing"))
-      .optional(),
-    ingredientAmounts: z.array(z.string().nullable()).optional(),
-    ingredientNames: z
-      .array(z.string().min(1, "Name cannot be blank"))
-      .optional(),
+    ingredientIds: z.array(ingredientId).optional(),
+    ingredientAmounts: z.array(ingredientAmount).optional(),
+    ingredientNames: z.array(ingredientName).optional(),
   })
   .and(saveNameSchema)
   .and(saveTotalTimeSchema)
@@ -186,6 +198,24 @@ export async function action({ request, params }: ActionArgs) {
         formData,
         saveInstructionsSchema,
         (data) => db.recipe.update({ where: { id: recipeId }, data }),
+        (errors) => json({ errors }, { status: 400 })
+      );
+    }
+    case "saveIngredientAmount": {
+      return validateForm(
+        formData,
+        saveIngredientAmountSchema,
+        ({ id, amount }) =>
+          db.ingredient.update({ where: { id }, data: { amount } }),
+        (errors) => json({ errors }, { status: 400 })
+      );
+    }
+    case "saveIngredientName": {
+      return validateForm(
+        formData,
+        saveIngredientNameSchema,
+        ({ id, name }) =>
+          db.ingredient.update({ where: { id }, data: { name } }),
         (errors) => json({ errors }, { status: 400 })
       );
     }
