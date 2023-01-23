@@ -62,11 +62,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   return json({ recipe }, { headers: { "Cache-Control": "max-age=10" } });
 }
 
+const saveNameSchema = z.object({
+  name: z.string().min(1, "Name cannot be blank"),
+});
+
+const saveTotalTimeSchema = z.object({
+  totalTime: z.string().min(1, "Total time cannot be blank"),
+});
+
+const saveInstructionsSchema = z.object({
+  instructions: z.string().min(1, "Instructions cannot be blank"),
+});
+
 const saveRecipeSchema = z
   .object({
-    name: z.string().min(1, "Name cannot be blank"),
-    totalTime: z.string().min(1, "Total time cannot be blank"),
-    instructions: z.string().min(1, "Instructions cannot be blank"),
     ingredientIds: z
       .array(z.string().min(1, "Ingredient ID is missing"))
       .optional(),
@@ -75,6 +84,9 @@ const saveRecipeSchema = z
       .array(z.string().min(1, "Name cannot be blank"))
       .optional(),
   })
+  .and(saveNameSchema)
+  .and(saveTotalTimeSchema)
+  .and(saveInstructionsSchema)
   .refine(
     (data) =>
       data.ingredientIds?.length === data.ingredientAmounts?.length &&
@@ -158,6 +170,30 @@ export async function action({ request, params }: ActionFunctionArgs) {
     case "deleteRecipe": {
       await handleDelete(() => db.recipe.delete({ where: { id: recipeId } }));
       return redirect("/app/recipes");
+    }
+    case "saveName": {
+      return validateForm(
+        formData,
+        saveNameSchema,
+        (data) => db.recipe.update({ where: { id: recipeId }, data }),
+        (errors) => json({ errors }, { status: 400 })
+      );
+    }
+    case "saveTotalTime": {
+      return validateForm(
+        formData,
+        saveTotalTimeSchema,
+        (data) => db.recipe.update({ where: { id: recipeId }, data }),
+        (errors) => json({ errors }, { status: 400 })
+      );
+    }
+    case "saveInstructions": {
+      return validateForm(
+        formData,
+        saveInstructionsSchema,
+        (data) => db.recipe.update({ where: { id: recipeId }, data }),
+        (errors) => json({ errors }, { status: 400 })
+      );
     }
     default: {
       return null;
