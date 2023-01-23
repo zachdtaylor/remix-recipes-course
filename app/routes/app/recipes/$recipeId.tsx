@@ -330,6 +330,29 @@ function IngredientRow({
   name,
   nameError,
 }: IngredientRowProps) {
+  const saveAmountFetcher = useFetcher();
+  const saveNameFetcher = useFetcher();
+
+  const saveAmount = (amount: string) =>
+    saveAmountFetcher.submit(
+      {
+        _action: "saveIngredientAmount",
+        amount,
+        id,
+      },
+      { method: "post" }
+    );
+
+  const saveName = (name: string) =>
+    saveNameFetcher.submit(
+      {
+        _action: "saveIngredientName",
+        name,
+        id,
+      },
+      { method: "post" }
+    );
+
   return (
     <React.Fragment>
       <input type="hidden" name="ingredientIds[]" value={id} />
@@ -339,9 +362,12 @@ function IngredientRow({
           autoComplete="off"
           name="ingredientAmounts[]"
           defaultValue={amount ?? ""}
-          error={!!amountError}
+          error={!!(saveAmountFetcher.data?.errors?.amount ?? amountError)}
+          onChange={(e) => saveAmount(e.target.value)}
         />
-        <ErrorMessage>{amountError}</ErrorMessage>
+        <ErrorMessage>
+          {saveAmountFetcher.data?.errors?.amount ?? amountError}
+        </ErrorMessage>
       </div>
       <div>
         <Input
@@ -349,9 +375,12 @@ function IngredientRow({
           autoComplete="off"
           name="ingredientNames[]"
           defaultValue={name}
-          error={!!nameError}
+          error={!!(saveNameFetcher.data?.errors?.name ?? nameError)}
+          onChange={(e) => saveName(e.target.value)}
         />
-        <ErrorMessage>{nameError}</ErrorMessage>
+        <ErrorMessage>
+          {saveNameFetcher.data?.errors?.name ?? nameError}
+        </ErrorMessage>
       </div>
       <button name="_action" value={`deleteIngredient.${id}`}>
         <TrashIcon />
