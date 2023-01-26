@@ -18,7 +18,7 @@ import { SaveIcon, TimeIcon, TrashIcon } from "~/components/icons";
 import db from "~/db.server";
 import { handleDelete } from "~/models/utils";
 import { requireLoggedInUser } from "~/utils/auth.server";
-import { classNames } from "~/utils/misc";
+import { classNames, useDebouncedFunction } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 
 export async function loader({ request, params }: LoaderArgs) {
@@ -232,32 +232,41 @@ export default function RecipeDetail() {
   const saveTotalTimeFetcher = useFetcher();
   const saveInstructionsFetcher = useFetcher();
 
-  const saveName = (name: string) =>
-    saveNameFetcher.submit(
-      {
-        _action: "saveName",
-        name,
-      },
-      { method: "post" }
-    );
+  const saveName = useDebouncedFunction(
+    (name: string) =>
+      saveNameFetcher.submit(
+        {
+          _action: "saveName",
+          name,
+        },
+        { method: "post" }
+      ),
+    1000
+  );
 
-  const saveTotalTime = (totalTime: string) =>
-    saveTotalTimeFetcher.submit(
-      {
-        _action: "saveTotalTime",
-        totalTime,
-      },
-      { method: "post" }
-    );
+  const saveTotalTime = useDebouncedFunction(
+    (totalTime: string) =>
+      saveTotalTimeFetcher.submit(
+        {
+          _action: "saveTotalTime",
+          totalTime,
+        },
+        { method: "post" }
+      ),
+    1000
+  );
 
-  const saveInstructions = (instructions: string) =>
-    saveInstructionsFetcher.submit(
-      {
-        _action: "saveInstructions",
-        instructions,
-      },
-      { method: "post" }
-    );
+  const saveInstructions = useDebouncedFunction(
+    (instructions: string) =>
+      saveInstructionsFetcher.submit(
+        {
+          _action: "saveInstructions",
+          instructions,
+        },
+        { method: "post" }
+      ),
+    1000
+  );
 
   return (
     <Form method="post" reloadDocument>
@@ -399,25 +408,31 @@ function IngredientRow({
   const saveAmountFetcher = useFetcher();
   const saveNameFetcher = useFetcher();
 
-  const saveAmount = (amount: string) =>
-    saveAmountFetcher.submit(
-      {
-        _action: "saveIngredientAmount",
-        amount,
-        id,
-      },
-      { method: "post" }
-    );
+  const saveAmount = useDebouncedFunction(
+    (amount: string) =>
+      saveAmountFetcher.submit(
+        {
+          _action: "saveIngredientAmount",
+          amount,
+          id,
+        },
+        { method: "post" }
+      ),
+    1000
+  );
 
-  const saveName = (name: string) =>
-    saveNameFetcher.submit(
-      {
-        _action: "saveIngredientName",
-        name,
-        id,
-      },
-      { method: "post" }
-    );
+  const saveName = useDebouncedFunction(
+    (name: string) =>
+      saveNameFetcher.submit(
+        {
+          _action: "saveIngredientName",
+          name,
+          id,
+        },
+        { method: "post" }
+      ),
+    1000
+  );
 
   return (
     <React.Fragment>
