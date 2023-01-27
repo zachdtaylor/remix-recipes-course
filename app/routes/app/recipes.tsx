@@ -3,6 +3,7 @@ import {
   Form,
   NavLink,
   Outlet,
+  useFetchers,
   useLoaderData,
   useLocation,
   useTransition,
@@ -63,6 +64,7 @@ export default function Recipes() {
   const data = useLoaderData<typeof loader>();
   const location = useLocation();
   const transition = useTransition();
+  const fetchers = useFetchers();
 
   return (
     <RecipePageWrapper>
@@ -79,6 +81,28 @@ export default function Recipes() {
         <ul>
           {data?.recipes.map((recipe) => {
             const isLoading = transition.location?.pathname.endsWith(recipe.id);
+
+            const optimisticData = new Map();
+
+            for (const fetcher of fetchers) {
+              if (fetcher.submission?.action?.includes(recipe.id)) {
+                if (fetcher.submission.formData.get("_action") === "saveName") {
+                  optimisticData.set(
+                    "name",
+                    fetcher.submission.formData.get("name")
+                  );
+                }
+                if (
+                  fetcher.submission.formData.get("_action") === "saveTotalTime"
+                ) {
+                  optimisticData.set(
+                    "totalTime",
+                    fetcher.submission.formData.get("totalTime")
+                  );
+                }
+              }
+            }
+
             return (
               <li className="my-4" key={recipe.id}>
                 <NavLink
@@ -87,8 +111,10 @@ export default function Recipes() {
                 >
                   {({ isActive }) => (
                     <RecipeCard
-                      name={recipe.name}
-                      totalTime={recipe.totalTime}
+                      name={optimisticData.get("name") ?? recipe.name}
+                      totalTime={
+                        optimisticData.get("totalTime") ?? recipe.totalTime
+                      }
                       imageUrl={recipe.imageUrl}
                       isActive={isActive}
                       isLoading={isLoading}
