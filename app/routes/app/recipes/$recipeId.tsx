@@ -375,6 +375,12 @@ export default function RecipeDetail() {
                 amount: e.target.value,
               }))
             }
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                createIngredient();
+              }
+            }}
           />
           <ErrorMessage>
             {createIngredientFetcher.data?.errors?.newIngredientAmount ??
@@ -400,6 +406,12 @@ export default function RecipeDetail() {
                 name: e.target.value,
               }))
             }
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                createIngredient();
+              }
+            }}
           />
           <ErrorMessage>
             {createIngredientFetcher.data?.errors?.newIngredientName ??
