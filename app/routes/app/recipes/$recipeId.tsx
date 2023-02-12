@@ -460,6 +460,18 @@ export default function RecipeDetail() {
         {saveInstructionsFetcher?.data?.errors?.instructions ||
           actionData?.errors?.instructions}
       </ErrorMessage>
+      <label
+        htmlFor="image"
+        className="block font-bold text-sm pb-2 w-fit mt-4"
+      >
+        Image
+      </label>
+      <input
+        id="image"
+        type="file"
+        name="image"
+        key={`${data.recipe?.id}.image`}
+      />
       <hr className="my-4" />
       <div className="flex justify-between">
         <DeleteButton name="_action" value="deleteRecipe">
