@@ -1,4 +1,13 @@
-import { ActionArgs, json, LoaderArgs, redirect } from "@remix-run/node";
+import {
+  ActionArgs,
+  json,
+  LoaderArgs,
+  redirect,
+  unstable_composeUploadHandlers,
+  unstable_createFileUploadHandler,
+  unstable_createMemoryUploadHandler,
+  unstable_parseMultipartFormData,
+} from "@remix-run/node";
 import {
   Form,
   useActionData,
@@ -128,7 +137,16 @@ export async function action({ request, params }: ActionArgs) {
     );
   }
 
-  const formData = await request.formData();
+  let formData;
+  if (request.headers.get("Content-Type")?.includes("multipart/form-data")) {
+    const uploadHandler = unstable_composeUploadHandlers(
+      unstable_createFileUploadHandler(),
+      unstable_createMemoryUploadHandler()
+    );
+    formData = await unstable_parseMultipartFormData(request, uploadHandler);
+  } else {
+    formData = await request.formData();
+  }
   const _action = formData.get("_action");
 
   if (typeof _action === "string" && _action.includes("deleteIngredient")) {
