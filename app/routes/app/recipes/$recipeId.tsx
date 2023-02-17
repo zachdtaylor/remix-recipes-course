@@ -140,7 +140,7 @@ export async function action({ request, params }: ActionArgs) {
   let formData;
   if (request.headers.get("Content-Type")?.includes("multipart/form-data")) {
     const uploadHandler = unstable_composeUploadHandlers(
-      unstable_createFileUploadHandler(),
+      unstable_createFileUploadHandler({ directory: "public/images" }),
       unstable_createMemoryUploadHandler()
     );
     formData = await unstable_parseMultipartFormData(request, uploadHandler);
