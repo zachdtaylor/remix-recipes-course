@@ -61,6 +61,7 @@ function useDelayedBool(value: boolean | undefined, delay: number) {
       window.clearTimeout(timeoutId.current);
       setDelayed(false);
     }
+    return () => window.clearTimeout(timeoutId.current);
   }, [value]);
 
   return delayed;
