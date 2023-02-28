@@ -22,6 +22,8 @@ import {
 } from "@remix-run/react";
 
 import styles from "./tailwind.css";
+import reachDialogStyles from "@reach/dialog/styles.css";
+
 import {
   DiscoverIcon,
   HomeIcon,
@@ -42,7 +44,10 @@ export const meta: MetaFunction = () => {
 };
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: styles }];
+  return [
+    { rel: "stylesheet", href: reachDialogStyles },
+    { rel: "stylesheet", href: styles },
+  ];
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
