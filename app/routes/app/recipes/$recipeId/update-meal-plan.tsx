@@ -1,9 +1,34 @@
 import { Dialog } from "@reach/dialog";
+import { ActionArgs, redirect } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
 import { DeleteButton, IconInput, PrimaryButton } from "~/components/forms";
 import { XIcon } from "~/components/icons";
+import db from "~/db.server";
+import { canChangeRecipe } from "~/utils/abilities.server";
 import { classNames } from "~/utils/misc";
 import { useRecipeContext } from "../$recipeId";
+
+export async function action({ request, params }: ActionArgs) {
+  const recipeId = String(params.recipeId);
+  await canChangeRecipe(request, recipeId);
+
+  const formData = await request.formData();
+
+  switch (formData.get("_action")) {
+    case "updateMealPlan": {
+    }
+    case "removeFromMealPlan": {
+      await db.recipe.update({
+        where: { id: recipeId },
+        data: { mealPlanMultiplier: null },
+      });
+      return redirect("..");
+    }
+    default: {
+      return null;
+    }
+  }
+}
 
 export default function UpdateMealPlanModal() {
   const { recipeName, mealPlanMultiplier } = useRecipeContext();
