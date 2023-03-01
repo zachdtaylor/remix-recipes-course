@@ -3,8 +3,10 @@ import { Form, Link } from "@remix-run/react";
 import { DeleteButton, IconInput, PrimaryButton } from "~/components/forms";
 import { XIcon } from "~/components/icons";
 import { classNames } from "~/utils/misc";
+import { useRecipeContext } from "../$recipeId";
 
 export default function UpdateMealPlanModal() {
+  const { recipeName, mealPlanMultiplier } = useRecipeContext();
   return (
     <Dialog
       isOpen
@@ -20,18 +22,20 @@ export default function UpdateMealPlanModal() {
         </Link>
       </div>
       <Form method="post" reloadDocument>
-        <h2 className="mb-2">Recipe Name</h2>
+        <h2 className="mb-2">{recipeName}</h2>
         <IconInput
           icon={<XIcon />}
-          defaultValue={1}
+          defaultValue={mealPlanMultiplier ?? 1}
           type="number"
           autoComplete="off"
           name="mealPlanMultiplier"
         />
         <div className="flex justify-end gap-4 mt-8">
-          <DeleteButton name="_action" value="removeFromMealPlan">
-            Remove from Meal Plan
-          </DeleteButton>
+          {mealPlanMultiplier !== null ? (
+            <DeleteButton name="_action" value="removeFromMealPlan">
+              Remove from Meal Plan
+            </DeleteButton>
+          ) : null}
           <PrimaryButton name="_action" value="updateMealPlan">
             Save
           </PrimaryButton>
