@@ -1,13 +1,26 @@
 import { Dialog } from "@reach/dialog";
-import { ActionArgs, redirect } from "@remix-run/node";
-import { Form, Link } from "@remix-run/react";
-import { DeleteButton, IconInput, PrimaryButton } from "~/components/forms";
+import { ActionArgs, json, redirect } from "@remix-run/node";
+import { Form, Link, useActionData } from "@remix-run/react";
+import { z } from "zod";
+import {
+  DeleteButton,
+  ErrorMessage,
+  IconInput,
+  PrimaryButton,
+} from "~/components/forms";
 import { XIcon } from "~/components/icons";
 import db from "~/db.server";
 import { canChangeRecipe } from "~/utils/abilities.server";
 import { classNames } from "~/utils/misc";
+import { validateForm } from "~/utils/validation";
 import { useRecipeContext } from "../$recipeId";
 
+const updateMealPlanSchema = z.object({
+  mealPlanMultiplier: z.preprocess(
+    (value) => parseInt(String(value)),
+    z.number().min(1)
+  ),
+});
 export async function action({ request, params }: ActionArgs) {
   const recipeId = String(params.recipeId);
   await canChangeRecipe(request, recipeId);
@@ -16,6 +29,18 @@ export async function action({ request, params }: ActionArgs) {
 
   switch (formData.get("_action")) {
     case "updateMealPlan": {
+      return validateForm(
+        formData,
+        updateMealPlanSchema,
+        async ({ mealPlanMultiplier }) => {
+          await db.recipe.update({
+            where: { id: recipeId },
+            data: { mealPlanMultiplier },
+          });
+          return redirect("..");
+        },
+        (errors) => json({ errors }, { status: 400 })
+      );
     }
     case "removeFromMealPlan": {
       await db.recipe.update({
@@ -32,6 +57,7 @@ export async function action({ request, params }: ActionArgs) {
 
 export default function UpdateMealPlanModal() {
   const { recipeName, mealPlanMultiplier } = useRecipeContext();
+  const actionData = useActionData();
   return (
     <Dialog
       isOpen
@@ -55,6 +81,7 @@ export default function UpdateMealPlanModal() {
           autoComplete="off"
           name="mealPlanMultiplier"
         />
+        <ErrorMessage>{actionData?.errors?.mealPlanMultiplier}</ErrorMessage>
         <div className="flex justify-end gap-4 mt-8">
           {mealPlanMultiplier !== null ? (
             <DeleteButton name="_action" value="removeFromMealPlan">
