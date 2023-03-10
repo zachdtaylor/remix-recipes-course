@@ -28,6 +28,7 @@ import {
 import { formDataValueAsString } from "~/utils/forms";
 import { mealPlanModalIsOpeningOrClosing } from "~/utils/revalidation";
 import classNames from "classnames";
+import { useBuildSearchParams } from "~/utils/misc";
 
 export function shouldRevalidate(arg: ShouldRevalidateFunctionArgs) {
   return !mealPlanModalIsOpeningOrClosing(arg);
@@ -84,6 +85,7 @@ export async function action({ request }: Route.ActionArgs) {
 
 export default function Recipes() {
   const data = useLoaderData<typeof loader>();
+  const buildSearchParams = useBuildSearchParams();
   const [searchParams] = useSearchParams();
   const mealPlanOnlyFilterOn = searchParams.get("filter") === "mealPlanOnly";
 
@@ -94,7 +96,10 @@ export default function Recipes() {
           <SearchBar placeholder="Search Recipes..." className="flex-grow" />
           <Link
             reloadDocument
-            to={mealPlanOnlyFilterOn ? "?filter=" : "?filter=mealPlanOnly"}
+            to={buildSearchParams(
+              "filter",
+              mealPlanOnlyFilterOn ? "" : "mealPlanOnly"
+            )}
             className={classNames(
               "flex flex-col justify-center border-2 border-primary rounded-md px-2",
               {

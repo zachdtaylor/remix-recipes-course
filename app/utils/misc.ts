@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect } from "react";
+import { useSearchParams } from "react-router";
 
 export function isRunningOnServer() {
   return typeof window === "undefined";
@@ -32,4 +33,14 @@ export function useDebouncedFunction<T extends Array<any>>(
   };
 
   return debouncedFn;
+}
+
+export function useBuildSearchParams() {
+  const [searchParams] = useSearchParams();
+
+  return (name: string, value: string) => {
+    searchParams.set(name, value);
+
+    return `?${searchParams.toString()}`;
+  };
 }
