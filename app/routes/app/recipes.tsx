@@ -26,6 +26,7 @@ import {
 } from "~/components/recipes";
 import db from "~/db.server";
 import { requireLoggedInUser } from "~/utils/auth.server";
+import { useBuildSearchParams } from "~/utils/misc";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await requireLoggedInUser(request);
@@ -81,6 +82,7 @@ export default function Recipes() {
   const location = useLocation();
   const navigation = useNavigation();
   const fetchers = useFetchers();
+  const buildSearchParams = useBuildSearchParams();
   const [searchParams] = useSearchParams();
   const mealPlanOnlyFilterOn = searchParams.get("filter") === "mealPlanOnly";
 
@@ -91,7 +93,10 @@ export default function Recipes() {
           <SearchBar placeholder="Search Recipes..." className="flex-grow" />
           <Link
             reloadDocument
-            to={mealPlanOnlyFilterOn ? "?filter=" : "?filter=mealPlanOnly"}
+            to={buildSearchParams(
+              "filter",
+              mealPlanOnlyFilterOn ? "" : "mealPlanOnly"
+            )}
             className={classNames(
               "flex flex-col justify-center border-2 border-primary rounded-md px-2",
               mealPlanOnlyFilterOn ? "text-white bg-primary" : "text-primary"
