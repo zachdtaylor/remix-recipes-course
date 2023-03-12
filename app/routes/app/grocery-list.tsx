@@ -112,5 +112,12 @@ function GroceryListItem({ item }: { item: GroceryListItem }) {
 }
 
 export default function GroceryList() {
-  return <div>Grocery List</div>;
+  const data = useLoaderData<typeof loader>();
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      {data.groceryList.map((item) => (
+        <GroceryListItem key={item.id} item={item} />
+      ))}
+    </div>
+  );
 }
