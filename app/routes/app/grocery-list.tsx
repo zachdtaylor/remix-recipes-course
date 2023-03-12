@@ -33,6 +33,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
         },
       },
     },
+    include: {
+      recipe: {
+        select: {
+          name: true,
+          mealPlanMultiplier: true,
+        },
+      },
+    },
   });
 
   const pantryItems = await db.pantryItem.findMany({
@@ -45,6 +53,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
         isMatch(ingredient.name, pantryItem.name)
       )
   );
+
+  const groceryListItems = missingIngredients.map((ingredient) => {
+    return {
+      id: ingredient.id,
+      name: ingredient.name,
+      uses: [
+        {
+          id: ingredient.recipeId,
+          amount: ingredient.amount,
+          recipeName: ingredient.recipe.name,
+          multiplier: ingredient.recipe.mealPlanMultiplier,
+        },
+      ],
+    };
+  });
 }
 
 function GroceryListItem({ item }: { item: GroceryListItem }) {
