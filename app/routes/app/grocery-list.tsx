@@ -85,6 +85,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return { groceryList: Object.values(groceryListItems) };
 }
 
+function getGroceryTripShelfName() {
+  const date = new Date().toLocaleDateString("en-us", {
+    month: "short",
+    day: "numeric",
+  });
+  return `Grocery Trip - ${date}`;
+}
+
 const checkOffItemSchema = z.object({
   name: z.string(),
 });
@@ -98,7 +106,20 @@ export async function action({ request }: ActionFunctionArgs) {
       return validateForm(
         formData,
         checkOffItemSchema,
-        () => {},
+        async ({ name }) => {
+          const shelfName = getGroceryTripShelfName();
+          let shoppingTripShelf = await db.pantryShelf.findFirst({
+            where: { userId: user.id, name: shelfName },
+          });
+          if (shoppingTripShelf === null) {
+            shoppingTripShelf = await db.pantryShelf.create({
+              data: { userId: user.id, name: shelfName },
+            });
+          }
+          return db.pantryItem.create({
+            data: { userId: user.id, name, shelfId: shoppingTripShelf.id },
+          });
+        },
         (errors) => json({ errors }, { status: 400 })
       );
     }
