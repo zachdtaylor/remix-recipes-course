@@ -1,5 +1,5 @@
 import { LoaderArgs } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import { CheckCircleIcon } from "~/components/icons";
 import db from "~/db.server";
 import { requireLoggedInUser } from "~/utils/auth.server";
@@ -33,6 +33,14 @@ export async function loader({ request }: LoaderArgs) {
         },
       },
     },
+    include: {
+      recipe: {
+        select: {
+          name: true,
+          mealPlanMultiplier: true,
+        },
+      },
+    },
   });
 
   const pantryItems = await db.pantryItem.findMany({
@@ -45,6 +53,34 @@ export async function loader({ request }: LoaderArgs) {
         isMatch(ingredient.name, pantryItem.name)
       )
   );
+
+  const groceryListItems = missingIngredients.reduce<{
+    [key: string]: GroceryListItem;
+  }>((groceryListItemsMapSoFar, ingredient) => {
+    if (ingredient.recipe.mealPlanMultiplier === null) {
+      throw new Error("multiplier was unexpectedly null");
+    }
+    const ingredientName = ingredient.name.toLowerCase();
+    const existing = groceryListItemsMapSoFar[ingredientName] ?? { uses: [] };
+    return {
+      ...groceryListItemsMapSoFar,
+      [ingredientName]: {
+        id: ingredient.id,
+        name: ingredientName,
+        uses: [
+          ...existing.uses,
+          {
+            id: ingredient.recipeId,
+            amount: ingredient.amount,
+            recipeName: ingredient.recipe.name,
+            multiplier: ingredient.recipe.mealPlanMultiplier,
+          },
+        ],
+      },
+    };
+  }, {});
+
+  return { groceryList: Object.values(groceryListItems) };
 }
 
 function GroceryListItem({ item }: { item: GroceryListItem }) {
