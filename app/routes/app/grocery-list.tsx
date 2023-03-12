@@ -1,8 +1,10 @@
-import { LoaderArgs } from "@remix-run/node";
+import { ActionArgs, json, LoaderArgs } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
+import { z } from "zod";
 import { CheckCircleIcon } from "~/components/icons";
 import db from "~/db.server";
 import { requireLoggedInUser } from "~/utils/auth.server";
+import { validateForm } from "~/utils/validation";
 
 type GroceryListItem = {
   id: string;
@@ -83,6 +85,29 @@ export async function loader({ request }: LoaderArgs) {
   return { groceryList: Object.values(groceryListItems) };
 }
 
+const checkOffItemSchema = z.object({
+  name: z.string(),
+});
+
+export async function action({ request }: ActionArgs) {
+  const user = await requireLoggedInUser(request);
+  const formData = await request.formData();
+
+  switch (formData.get("_action")) {
+    case "checkOffItem": {
+      return validateForm(
+        formData,
+        checkOffItemSchema,
+        () => {},
+        (errors) => json({ errors }, { status: 400 })
+      );
+    }
+    default: {
+      return null;
+    }
+  }
+}
+
 function GroceryListItem({ item }: { item: GroceryListItem }) {
   const fetcher = useFetcher();
 
@@ -99,6 +124,7 @@ function GroceryListItem({ item }: { item: GroceryListItem }) {
         </ul>
       </div>
       <fetcher.Form method="post" className="flex flex-col justify-center">
+        <input type="hidden" name="name" value={item.name} />
         <button
           name="_action"
           value="checkOffItem"
