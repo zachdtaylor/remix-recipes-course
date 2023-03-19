@@ -16,7 +16,7 @@ import {
   useSearchParams,
 } from "@remix-run/react";
 import classNames from "classnames";
-import { PrimaryButton, SearchBar } from "~/components/forms";
+import { DeleteButton, PrimaryButton, SearchBar } from "~/components/forms";
 import { CalendarIcon, PlusIcon } from "~/components/icons";
 import {
   RecipeCard,
@@ -60,21 +60,38 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
   const user = await requireLoggedInUser(request);
+  const formData = await request.formData();
 
-  const recipe = await db.recipe.create({
-    data: {
-      userId: user.id,
-      name: "New Recipe",
-      totalTime: "0 min",
-      imageUrl: "https://via.placeholder.com/150?text=Remix+Recipes",
-      instructions: "",
-    },
-  });
+  switch (formData.get("_action")) {
+    case "createRecipe": {
+      const recipe = await db.recipe.create({
+        data: {
+          userId: user.id,
+          name: "New Recipe",
+          totalTime: "0 min",
+          imageUrl: "https://via.placeholder.com/150?text=Remix+Recipes",
+          instructions: "",
+        },
+      });
 
-  const url = new URL(request.url);
-  url.pathname = `/app/recipes/${recipe.id}`;
+      const url = new URL(request.url);
+      url.pathname = `/app/recipes/${recipe.id}`;
 
-  return redirect(url.toString());
+      return redirect(url.toString());
+    }
+    case "clearMealPlan": {
+      await db.recipe.updateMany({
+        where: {
+          userId: user.id,
+        },
+        data: { mealPlanMultiplier: null },
+      });
+      return redirect("/app/recipes");
+    }
+    default: {
+      return null;
+    }
+  }
 }
 
 export default function Recipes() {
@@ -106,12 +123,26 @@ export default function Recipes() {
           </Link>
         </div>
         <Form method="post" className="mt-4" reloadDocument>
-          <PrimaryButton className="w-full">
-            <div className="flex w-full justify-center">
-              <PlusIcon />
-              <span className="ml-2">Create New Recipe</span>
-            </div>
-          </PrimaryButton>
+          {mealPlanOnlyFilterOn ? (
+            <DeleteButton
+              name="_action"
+              value="clearMealPlan"
+              className="w-full"
+            >
+              Clear Plan
+            </DeleteButton>
+          ) : (
+            <PrimaryButton
+              name="_action"
+              value="createRecipe"
+              className="w-full"
+            >
+              <div className="flex w-full justify-center">
+                <PlusIcon />
+                <span className="ml-2">Create New Recipe</span>
+              </div>
+            </PrimaryButton>
+          )}
         </Form>
         <ul>
           {data?.recipes.map((recipe) => {
