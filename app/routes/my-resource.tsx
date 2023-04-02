@@ -1,5 +1,11 @@
 export function loader() {
-  const data = { message: "Hello!" };
+  const data = `
+    .my-class {
+      color: #abc123;
+    }
+  `;
 
-  return Response.json(data);
+  return new Response(data, {
+    headers: { "content-type": "text/css" },
+  });
 }
