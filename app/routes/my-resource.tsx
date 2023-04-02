@@ -1,7 +1,11 @@
-import { json } from "@remix-run/node";
-
 export function loader() {
-  const data = { message: "Hello from the resource route!" };
+  const data = `
+    .my-class {
+      color: #abc123;
+    }
+  `;
 
-  return json(data);
+  return new Response(data, {
+    headers: { "content-type": "text/css" },
+  });
 }
