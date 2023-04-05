@@ -9,3 +9,5 @@ export const sessionCookie = createCookie("remix-recipes__session", {
   httpOnly: true,
   secure: true,
 });
+
+export const themeCookie = createCookie("remix-recipes__theme");
