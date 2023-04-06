@@ -2,7 +2,7 @@ import { z } from "zod";
 import { themeCookie } from "~/cookies";
 import { validateForm } from "~/utils/validation";
 import { Route } from "./+types/app";
-import { data, Form, useLoaderData } from "react-router";
+import { data, Form, useActionData, useLoaderData } from "react-router";
 import { PrimaryButton } from "~/components/form";
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -23,15 +23,19 @@ export async function action({ request }: Route.ActionArgs) {
     formData,
     themeSchema,
     async ({ theme }) =>
-      data("ok", {
-        headers: { "Set-Cookie": await themeCookie.serialize(theme) },
-      }),
-    (errors) => data({ errors }, { status: 400 })
+      data(
+        { theme, errors: null },
+        {
+          headers: { "Set-Cookie": await themeCookie.serialize(theme) },
+        }
+      ),
+    (errors) => data({ theme: null, errors }, { status: 400 })
   );
 }
 
 export default function App() {
   const data = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   return (
     <Form reloadDocument method="post">
       <div className="mb-4 flex flex-col">
@@ -40,7 +44,7 @@ export default function App() {
           id="theme"
           name="theme"
           className="p-2 mt-2 border-2 border-gray-200 rounded-md w-full md:w-64"
-          defaultValue={data.theme}
+          defaultValue={actionData?.theme ?? data.theme}
         >
           <option value="red">Red</option>
           <option value="orange">Orange</option>
