@@ -75,9 +75,6 @@ export default function App() {
           )}
         >
           <ul className="flex md:flex-col">
-            <AppNavLink to="/">
-              <HomeIcon />
-            </AppNavLink>
             <AppNavLink to="discover">
               <DiscoverIcon />
             </AppNavLink>
