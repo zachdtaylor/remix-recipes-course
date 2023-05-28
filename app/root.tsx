@@ -79,7 +79,7 @@ export default function App() {
               <DiscoverIcon />
             </AppNavLink>
             {data.isLoggedIn ? (
-              <AppNavLink to="app/recipes">
+              <AppNavLink to="app">
                 <RecipeBookIcon />
               </AppNavLink>
             ) : null}
