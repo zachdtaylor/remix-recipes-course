@@ -5,6 +5,7 @@ import {
   DiscoverRecipeHeader,
 } from "~/components/discover";
 import db from "~/db.server";
+import { hash } from "~/utils/cryptography.server";
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const recipe = await db.recipe.findUnique({
@@ -29,7 +30,9 @@ export async function loader({ params }: LoaderFunctionArgs) {
     );
   }
 
-  return json({ recipe });
+  const etag = hash(JSON.stringify(recipe));
+
+  return json({ recipe }, { headers: { etag } });
 }
 
 export default function DiscoverRecipe() {
