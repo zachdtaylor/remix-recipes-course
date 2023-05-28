@@ -7,7 +7,7 @@ import {
 import db from "~/db.server";
 import { hash } from "~/utils/cryptography.server";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const recipe = await db.recipe.findUnique({
     where: { id: params.recipeId },
     include: {
@@ -32,7 +32,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
   const etag = hash(JSON.stringify(recipe));
 
-  return json({ recipe }, { headers: { etag } });
+  if (etag === request.headers.get("if-none-match")) {
+    return new Response(null, { status: 304 });
+  }
+
+  return json({ recipe }, { headers: { etag, "cache-control": "max-age=5" } });
 }
 
 export default function DiscoverRecipe() {
