@@ -36,7 +36,15 @@ export async function loader({ params, request }: LoaderArgs) {
     return new Response(null, { status: 304 });
   }
 
-  return json({ recipe }, { headers: { etag, "cache-control": "max-age=5" } });
+  return json(
+    { recipe },
+    {
+      headers: {
+        etag,
+        "cache-control": "max-age=5, stale-while-revalidate=10",
+      },
+    }
+  );
 }
 
 export default function DiscoverRecipe() {
