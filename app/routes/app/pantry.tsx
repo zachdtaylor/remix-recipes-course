@@ -1,5 +1,10 @@
-import { ActionFunction, json, LoaderArgs } from "@remix-run/node";
-import { useCatch, useFetcher, useLoaderData } from "@remix-run/react";
+import { ActionArgs, json, LoaderArgs } from "@remix-run/node";
+import {
+  isRouteErrorResponse,
+  useFetcher,
+  useLoaderData,
+  useRouteError,
+} from "@remix-run/react";
 import React from "react";
 import { z } from "zod";
 import {
@@ -53,7 +58,7 @@ const deleteShelfItemSchema = z.object({
   itemId: z.string(),
 });
 
-export const action: ActionFunction = async ({ request }) => {
+export async function action({ request }: ActionArgs) {
   const user = await requireLoggedInUser(request);
 
   const formData = await request.formData();
@@ -127,7 +132,7 @@ export const action: ActionFunction = async ({ request }) => {
       return null;
     }
   }
-};
+}
 
 export default function Pantry() {
   const data = useLoaderData<typeof loader>();
@@ -135,7 +140,7 @@ export default function Pantry() {
   const containerRef = React.useRef<HTMLUListElement>(null);
 
   const isCreatingShelf =
-    createShelfFetcher.submission?.formData.get("_action") === "createShelf";
+    createShelfFetcher.formData?.get("_action") === "createShelf";
 
   React.useEffect(() => {
     if (!isCreatingShelf && containerRef.current) {
@@ -192,8 +197,8 @@ function Shelf({ shelf }: ShelfProps) {
   );
   const isHydrated = useIsHydrated();
   const isDeletingShelf =
-    deleteShelfFetcher.submission?.formData.get("_action") === "deleteShelf" &&
-    deleteShelfFetcher.submission?.formData.get("shelfId") === shelf.id;
+    deleteShelfFetcher.formData?.get("_action") === "deleteShelf" &&
+    deleteShelfFetcher.formData?.get("shelfId") === shelf.id;
   return isDeletingShelf ? null : (
     <li
       key={shelf.id}
@@ -335,7 +340,7 @@ type ShelfItemProps = {
 
 function ShelfItem({ shelfItem }: ShelfItemProps) {
   const deleteShelfItemFetcher = useFetcher();
-  const isDeletingItem = !!deleteShelfItemFetcher.submission;
+  const isDeletingItem = !!deleteShelfItemFetcher.formData;
   return isDeletingItem ? null : (
     <li className="py-2">
       <deleteShelfItemFetcher.Form method="post" className="flex">
@@ -394,15 +399,23 @@ function createItemId() {
   return `${Math.round(Math.random() * 1_000_000)}`;
 }
 
-export function CatchBoundary() {
-  const caught = useCatch();
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <div className="bg-red-600 text-white rounded-md p-4">
+        <h1 className="mb-2">
+          {error.status} {error.statusText ? `- ${error.statusText}` : ""}
+        </h1>
+        <p>{error.data.message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-red-600 text-white rounded-md p-4">
-      <h1 className="mb-2">
-        {caught.status} {caught.statusText ? `- ${caught.statusText}` : ""}
-      </h1>
-      <p>{caught.data.message}</p>
+      An unknown error occurred.
     </div>
   );
 }

@@ -10,6 +10,7 @@ import {
 } from "@remix-run/node";
 import {
   Form,
+  isRouteErrorResponse,
   Link,
   Outlet,
   useActionData,
@@ -17,6 +18,7 @@ import {
   useFetcher,
   useLoaderData,
   useOutletContext,
+  useRouteError,
 } from "@remix-run/react";
 import React from "react";
 import { z } from "zod";
@@ -663,15 +665,23 @@ function createItemId() {
   return `${Math.round(Math.random() * 1_000_000)}`;
 }
 
-export function CatchBoundary() {
-  const caught = useCatch();
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <div className="bg-red-600 text-white rounded-md p-4">
+        <h1 className="mb-2">
+          {error.status} {error.statusText ? `- ${error.statusText}` : ""}
+        </h1>
+        <p>{error.data.message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-red-600 text-white rounded-md p-4">
-      <h1 className="mb-2">
-        {caught.status} {caught.statusText ? `- ${caught.statusText}` : ""}
-      </h1>
-      <p>{caught.data.message}</p>
+      An unknown error occurred.
     </div>
   );
 }

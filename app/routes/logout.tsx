@@ -1,8 +1,7 @@
-import { json, LoaderFunction } from "@remix-run/node";
-import { Link } from "@remix-run/react";
+import { LoaderArgs, json } from "@remix-run/node";
 import { destroySession, getSession } from "~/sessions";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export async function loader({ request }: LoaderArgs) {
   const cookieHeader = request.headers.get("cookie");
   const session = await getSession(cookieHeader);
 
@@ -11,7 +10,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       "Set-Cookie": await destroySession(session),
     },
   });
-};
+}
 
 export default function Logout() {
   return (

@@ -1,10 +1,5 @@
-import {
-  ActionFunction,
-  json,
-  LoaderFunction,
-  redirect,
-} from "@remix-run/node";
-import { useActionData, useCatch } from "@remix-run/react";
+import { ActionArgs, json, LoaderArgs, redirect } from "@remix-run/node";
+import { useActionData } from "@remix-run/react";
 import { z } from "zod";
 import { ErrorMessage, PrimaryButton, PrimaryInput } from "~/components/forms";
 import { getMagicLinkPayload, invalidMagicLink } from "~/magic-links.server";
@@ -15,7 +10,7 @@ import { validateForm } from "~/utils/validation";
 
 const magicLinkMaxAge = 1000 * 60 * 10; // 10 minutes
 
-export const loader: LoaderFunction = async ({ request }) => {
+export async function loader({ request }: LoaderArgs) {
   const magicLinkPayload = getMagicLinkPayload(request);
 
   // 1. Validate expiration time
@@ -51,14 +46,14 @@ export const loader: LoaderFunction = async ({ request }) => {
       "Set-Cookie": await commitSession(session),
     },
   });
-};
+}
 
 const signUpSchema = z.object({
   firstName: z.string().min(1, "First name cannot be blank"),
   lastName: z.string().min(1, "Last name cannot be blank"),
 });
 
-export const action: ActionFunction = async ({ request }) => {
+export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
   return validateForm(
     formData,
@@ -93,7 +88,7 @@ export const action: ActionFunction = async ({ request }) => {
         { status: 400 }
       )
   );
-};
+}
 
 export default function ValidateMagicLink() {
   const actionData = useActionData();

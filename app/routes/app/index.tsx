@@ -1,5 +1,5 @@
-import { LoaderFunction, redirect } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 
-export const loader: LoaderFunction = () => {
+export function loader() {
   return redirect("/app/recipes");
-};
+}

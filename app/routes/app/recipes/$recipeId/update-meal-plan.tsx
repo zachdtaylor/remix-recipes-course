@@ -1,4 +1,4 @@
-import { Dialog } from "@reach/dialog";
+import ReactModal from "react-modal";
 import { ActionArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { z } from "zod";
@@ -55,44 +55,50 @@ export async function action({ request, params }: ActionArgs) {
   }
 }
 
+if (typeof window !== "undefined") {
+  ReactModal.setAppElement("body");
+}
+
 export default function UpdateMealPlanModal() {
   const { recipeName, mealPlanMultiplier } = useRecipeContext();
   const actionData = useActionData();
   return (
-    <Dialog
+    <ReactModal
       isOpen
       className={classNames(
-        "rounded-md p-4 m-4 w-[calc(100%-2rem)] h-[calc(100%-2rem)]",
+        "m-4 w-[calc(100%-2rem)] h-[calc(100%-2rem)]",
         "md:h-fit lg:w-1/2 md:mx-auto md:mt-24"
       )}
     >
-      <div className="flex justify-between mb-8">
-        <h1 className="text-lg font-bold">Update Meal Plan</h1>
-        <Link to="..">
-          <XIcon />
-        </Link>
-      </div>
-      <Form method="post" reloadDocument>
-        <h2 className="mb-2">{recipeName}</h2>
-        <IconInput
-          icon={<XIcon />}
-          defaultValue={mealPlanMultiplier ?? 1}
-          type="number"
-          autoComplete="off"
-          name="mealPlanMultiplier"
-        />
-        <ErrorMessage>{actionData?.errors?.mealPlanMultiplier}</ErrorMessage>
-        <div className="flex justify-end gap-4 mt-8">
-          {mealPlanMultiplier !== null ? (
-            <DeleteButton name="_action" value="removeFromMealPlan">
-              Remove from Meal Plan
-            </DeleteButton>
-          ) : null}
-          <PrimaryButton name="_action" value="updateMealPlan">
-            Save
-          </PrimaryButton>
+      <div className="p-4 rounded-md bg-white shadow-md">
+        <div className="flex justify-between mb-8">
+          <h1 className="text-lg font-bold">Update Meal Plan</h1>
+          <Link to="..">
+            <XIcon />
+          </Link>
         </div>
-      </Form>
-    </Dialog>
+        <Form method="post" reloadDocument>
+          <h2 className="mb-2">{recipeName}</h2>
+          <IconInput
+            icon={<XIcon />}
+            defaultValue={mealPlanMultiplier ?? 1}
+            type="number"
+            autoComplete="off"
+            name="mealPlanMultiplier"
+          />
+          <ErrorMessage>{actionData?.errors?.mealPlanMultiplier}</ErrorMessage>
+          <div className="flex justify-end gap-4 mt-8">
+            {mealPlanMultiplier !== null ? (
+              <DeleteButton name="_action" value="removeFromMealPlan">
+                Remove from Meal Plan
+              </DeleteButton>
+            ) : null}
+            <PrimaryButton name="_action" value="updateMealPlan">
+              Save
+            </PrimaryButton>
+          </div>
+        </Form>
+      </div>
+    </ReactModal>
   );
 }

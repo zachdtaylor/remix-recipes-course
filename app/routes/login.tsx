@@ -1,4 +1,4 @@
-import { ActionFunction, json, LoaderFunction } from "@remix-run/node";
+import { ActionArgs, LoaderArgs, json } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import { z } from "zod";
 import { ErrorMessage, PrimaryButton, PrimaryInput } from "~/components/forms";
@@ -8,16 +8,16 @@ import { validateForm } from "~/utils/validation";
 import { v4 as uuid } from "uuid";
 import { requireLoggedOutUser } from "~/utils/auth.server";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export async function loader({ request }: LoaderArgs) {
   await requireLoggedOutUser(request);
   return null;
-};
+}
 
 const loginSchema = z.object({
   email: z.string().email(),
 });
 
-export const action: ActionFunction = async ({ request }) => {
+export async function action({ request }: ActionArgs) {
   await requireLoggedOutUser(request);
 
   const cookieHeader = request.headers.get("cookie");
@@ -34,21 +34,24 @@ export const action: ActionFunction = async ({ request }) => {
       const link = generateMagicLink(email, nonce);
       await sendMagicLinkEmail(link, email);
 
-      return json("ok", {
-        headers: {
-          "Set-Cookie": await commitSession(session),
-        },
-      });
+      return json(
+        { success: true },
+        {
+          headers: {
+            "Set-Cookie": await commitSession(session),
+          },
+        }
+      );
     },
     (errors) => json({ errors, email: formData.get("email") }, { status: 400 })
   );
-};
+}
 
 export default function Login() {
   const actionData = useActionData();
   return (
     <div className="text-center mt-36">
-      {actionData === "ok" ? (
+      {actionData?.success ? (
         <div>
           <h1 className="text-2xl py-8">Yum!</h1>
           <p>

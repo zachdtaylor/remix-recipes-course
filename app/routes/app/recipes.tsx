@@ -7,8 +7,8 @@ import {
   useFetchers,
   useLoaderData,
   useLocation,
+  useNavigation,
   useSearchParams,
-  useTransition,
 } from "@remix-run/react";
 import { DeleteButton, PrimaryButton, SearchBar } from "~/components/forms";
 import { CalendarIcon, PlusIcon } from "~/components/icons";
@@ -91,7 +91,7 @@ export async function action({ request }: ActionArgs) {
 export default function Recipes() {
   const data = useLoaderData<typeof loader>();
   const location = useLocation();
-  const transition = useTransition();
+  const navigation = useNavigation();
   const fetchers = useFetchers();
   const buildSearchParams = useBuildSearchParams();
   const [searchParams] = useSearchParams();
@@ -140,24 +140,19 @@ export default function Recipes() {
         </Form>
         <ul>
           {data?.recipes.map((recipe) => {
-            const isLoading = transition.location?.pathname.endsWith(recipe.id);
+            const isLoading = navigation.location?.pathname.endsWith(recipe.id);
 
             const optimisticData = new Map();
 
             for (const fetcher of fetchers) {
-              if (fetcher.submission?.action?.includes(recipe.id)) {
-                if (fetcher.submission.formData.get("_action") === "saveName") {
-                  optimisticData.set(
-                    "name",
-                    fetcher.submission.formData.get("name")
-                  );
+              if (fetcher.formAction?.includes(recipe.id)) {
+                if (fetcher.formData.get("_action") === "saveName") {
+                  optimisticData.set("name", fetcher.formData.get("name"));
                 }
-                if (
-                  fetcher.submission.formData.get("_action") === "saveTotalTime"
-                ) {
+                if (fetcher.formData.get("_action") === "saveTotalTime") {
                   optimisticData.set(
                     "totalTime",
-                    fetcher.submission.formData.get("totalTime")
+                    fetcher.formData.get("totalTime")
                   );
                 }
               }

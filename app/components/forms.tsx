@@ -1,4 +1,4 @@
-import { Form, useSearchParams, useTransition } from "@remix-run/react";
+import { Form, useSearchParams, useNavigation } from "@remix-run/react";
 import type {
   ButtonHTMLAttributes,
   HTMLAttributes,
@@ -82,8 +82,8 @@ type SearchBarProps = {
 };
 export function SearchBar({ placeholder, className }: SearchBarProps) {
   const [searchParams] = useSearchParams();
-  const transition = useTransition();
-  const isSearching = transition.submission?.formData.has("q");
+  const navigation = useNavigation();
+  const isSearching = navigation.formData?.has("q");
   return (
     <Form
       className={classNames(

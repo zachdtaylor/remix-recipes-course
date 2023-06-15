@@ -1,12 +1,7 @@
-import {
-  ErrorBoundaryComponent,
-  json,
-  LoaderFunction,
-  MetaFunction,
-} from "@remix-run/node";
+import { LoaderArgs, json } from "@remix-run/node";
 import { LinksFunction } from "@remix-run/node";
-
 import {
+  isRouteErrorResponse,
   Link,
   Links,
   LiveReload,
@@ -15,18 +10,13 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useCatch,
   useLoaderData,
   useResolvedPath,
-  useTransition,
+  useRouteError,
+  useNavigation,
 } from "@remix-run/react";
-
-import styles from "./tailwind.css";
-import reachDialogStyles from "@reach/dialog/styles.css";
-
 import {
   DiscoverIcon,
-  HomeIcon,
   LoginIcon,
   LogoutIcon,
   RecipeBookIcon,
@@ -36,26 +26,27 @@ import { classNames } from "./utils/misc";
 import React from "react";
 import { getCurrentUser } from "./utils/auth.server";
 
-export const meta: MetaFunction = () => {
-  return {
-    title: "Remix Recipes",
-    description: "Welcome to the Remix Recipes app!",
-  };
-};
+import styles from "./tailwind.css";
+
+export function meta() {
+  return [
+    { title: "Remix Recipes" },
+    { description: "Welcome to the Remix Recipes app!" },
+  ];
+}
 
 export const links: LinksFunction = () => {
   return [
     { rel: "stylesheet", href: "/theme.css" },
-    { rel: "stylesheet", href: reachDialogStyles },
     { rel: "stylesheet", href: styles },
   ];
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
+export async function loader({ request }: LoaderArgs) {
   const user = await getCurrentUser(request);
 
   return json({ isLoggedIn: user !== null });
-};
+}
 
 export default function App() {
   const data = useLoaderData();
@@ -116,12 +107,12 @@ type AppNavLinkProps = {
 };
 function AppNavLink({ children, to }: AppNavLinkProps) {
   const path = useResolvedPath(to);
-  const transition = useTransition();
+  const navigation = useNavigation();
 
   const isLoading =
-    transition.state === "loading" &&
-    transition.location.pathname === path.pathname &&
-    transition.type === "normalLoad";
+    navigation.state === "loading" &&
+    navigation.location.pathname === path.pathname &&
+    navigation.formData === null;
 
   return (
     <li className="w-16">
@@ -142,7 +133,40 @@ function AppNavLink({ children, to }: AppNavLinkProps) {
   );
 }
 
-export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <html>
+        <head>
+          <title>Whoops!</title>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width,initial-scale=1" />
+          <Meta />
+          <Links />
+        </head>
+        <body>
+          <div className="p-4">
+            <h1 className="text-2xl pb-3">
+              {error.status} - {error.statusText}
+            </h1>
+            <p>You're seeing this page because an error occurred.</p>
+            <p className="my-4 font-bold">{error.data.message}</p>
+            <Link to="/" className="text-primary">
+              Take me home
+            </Link>
+          </div>
+        </body>
+      </html>
+    );
+  }
+
+  let errorMessage = "Unknown error";
+  if (error instanceof Error) {
+    errorMessage = error.message;
+  }
+
   return (
     <html>
       <head>
@@ -156,34 +180,7 @@ export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
         <div className="p-4">
           <h1 className="text-2xl pb-3">Whoops!</h1>
           <p>You're seeing this page because an unexpected error occurred.</p>
-          <p className="my-4 font-bold">{error.message}</p>
-          <Link to="/" className="text-primary">
-            Take me home
-          </Link>
-        </div>
-      </body>
-    </html>
-  );
-};
-
-export function CatchBoundary() {
-  const caught = useCatch();
-  return (
-    <html>
-      <head>
-        <title>Whoops!</title>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <div className="p-4">
-          <h1 className="text-2xl pb-3">
-            {caught.status} - {caught.statusText}
-          </h1>
-          <p>You're seeing this page because an error occurred.</p>
-          <p className="my-4 font-bold">{caught.data.message}</p>
+          <p className="my-4 font-bold">{errorMessage}</p>
           <Link to="/" className="text-primary">
             Take me home
           </Link>
