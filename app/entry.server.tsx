@@ -20,6 +20,13 @@ export default function handleRequest(
   responseHeaders: Headers,
   remixContext: EntryContext
 ) {
+  const ifNoneMatch = request.headers.get("if-none-match");
+  const etag = responseHeaders.get("etag");
+
+  if (ifNoneMatch !== null && etag !== null && etag === ifNoneMatch) {
+    return new Response(null, { status: 304, headers: responseHeaders });
+  }
+
   return isbot(request.headers.get("user-agent"))
     ? handleBotRequest(
         request,

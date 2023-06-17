@@ -1,14 +1,16 @@
-import { LoaderArgs, json } from "@remix-run/node";
+import { HeadersArgs, LoaderArgs, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import {
   DiscoverRecipeDetails,
   DiscoverRecipeHeader,
 } from "~/components/discover";
 import db from "~/db.server";
+import { getCurrentUser } from "~/utils/auth.server";
 import { hash } from "~/utils/cryptography.server";
 
-export function headers() {
+export function headers({ loaderHeaders }: HeadersArgs) {
   return {
+    etag: loaderHeaders.get("x-page-etag"),
     "Cache-Control": `max-age=3600, stale-while-revalidate=${3600 * 24 * 7}`,
   };
 }
@@ -42,11 +44,15 @@ export async function loader({ params, request }: LoaderArgs) {
     return new Response(null, { status: 304 });
   }
 
+  const user = await getCurrentUser(request);
+  const pageEtag = `${hash(user?.id ?? "anonymous")}.${etag}`;
+
   return json(
     { recipe },
     {
       headers: {
         etag,
+        "x-page-etag": pageEtag,
         "cache-control": "max-age=5, stale-while-revalidate=10",
       },
     }
