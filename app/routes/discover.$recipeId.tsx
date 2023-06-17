@@ -7,6 +7,12 @@ import {
 import db from "~/db.server";
 import { hash } from "~/utils/cryptography.server";
 
+export function headers() {
+  return {
+    "Cache-Control": `max-age=3600, stale-while-revalidate=${3600 * 24 * 7}`,
+  };
+}
+
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const recipe = await db.recipe.findUnique({
     where: { id: params.recipeId },
