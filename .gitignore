@@ -8,3 +8,6 @@ node_modules
 postgres-data
 
 tailwind.css
+/test-results/
+/playwright-report/
+/playwright/.cache/
