@@ -146,13 +146,13 @@ export default function Recipes() {
 
             for (const fetcher of fetchers) {
               if (fetcher.formAction?.includes(recipe.id)) {
-                if (fetcher.formData.get("_action") === "saveName") {
-                  optimisticData.set("name", fetcher.formData.get("name"));
+                if (fetcher.formData?.get("_action") === "saveName") {
+                  optimisticData.set("name", fetcher.formData?.get("name"));
                 }
-                if (fetcher.formData.get("_action") === "saveTotalTime") {
+                if (fetcher.formData?.get("_action") === "saveTotalTime") {
                   optimisticData.set(
                     "totalTime",
-                    fetcher.formData.get("totalTime")
+                    fetcher.formData?.get("totalTime")
                   );
                 }
               }
