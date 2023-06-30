@@ -12,7 +12,8 @@
     "dev:css": "npx tailwindcss -o ./app/tailwind.css --watch",
     "dev:remix": "cross-env NODE_ENV=development remix dev",
     "dev": "run-p dev:*",
-    "start": "cross-env NODE_ENV=production remix-serve build"
+    "start": "cross-env NODE_ENV=production remix-serve build",
+    "test:e2e": "INCLUDE_TEST_ROUTES=true npx playwright test"
   },
   "dependencies": {
     "@prisma/client": "^3.15.2",
