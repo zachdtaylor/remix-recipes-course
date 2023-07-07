@@ -1,5 +1,9 @@
 import { test, expect } from "@playwright/test";
 
+test.afterEach(async ({ page }) => {
+  await page.goto("/__tests/delete-user?email=test@example.com");
+});
+
 test("redirects actor to login if they are not logged in", async ({ page }) => {
   await page.goto("/app/pantry");
   await expect(page.getByRole("button", { name: /log in/i })).toBeVisible();
