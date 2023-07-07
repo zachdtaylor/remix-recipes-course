@@ -13,7 +13,8 @@
     "dev:remix": "cross-env NODE_ENV=development remix dev",
     "dev": "run-p dev:*",
     "start": "cross-env NODE_ENV=production remix-serve build",
-    "test:e2e": "INCLUDE_TEST_ROUTES=true npx playwright test"
+    "test:e2e": "INCLUDE_TEST_ROUTES=true npx playwright test",
+    "test:e2e:ui": "INCLUDE_TEST_ROUTES=true npx playwright test --ui"
   },
   "dependencies": {
     "@prisma/client": "^3.15.2",
