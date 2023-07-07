@@ -26,6 +26,7 @@ module.exports = {
           return;
         }
         route("__tests/login", "__test-routes__/login.tsx");
+        route("__tests/delete-user", "__test-routes__/delete-user.tsx");
       }
     }),
 };
