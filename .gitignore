@@ -11,3 +11,5 @@ tailwind.css
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+.production-secrets
