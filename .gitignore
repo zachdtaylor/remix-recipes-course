@@ -10,3 +10,5 @@ postgres-data/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+.production-secrets
