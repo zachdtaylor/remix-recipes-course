@@ -33,6 +33,7 @@
     "zod": "^3.17.10"
   },
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.2.16",
     "@playwright/test": "^1.35.1",
     "@remix-run/dev": "^1.18.0",
     "@types/cryptr": "^4.0.1",

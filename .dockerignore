@@ -1,0 +1,15 @@
+node_modules
+
+/.cache
+/build
+/public/build
+/public/images
+.env
+postgres-data
+
+tailwind.css
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+.production-secrets
