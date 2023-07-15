@@ -1,3 +1,12 @@
 a {
   padding: 1rem;
 }
+
+.header {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #323232;
+}
+
+.page-description-message {
+  margin-top: 1rem;
+}
