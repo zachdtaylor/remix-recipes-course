@@ -31,6 +31,7 @@ export function DiscoverListItem({ recipe }: DiscoverListItemProps) {
         <div className="h-48 overflow-hidden">
           <img
             src={recipe.imageUrl}
+            alt={`recipe named ${recipe.name}`}
             className="h-full w-full object-cover rounded-t-md"
           />
         </div>
@@ -58,7 +59,11 @@ type DiscoverRecipeHeaderProps = {
 export function DiscoverRecipeHeader({ recipe }: DiscoverRecipeHeaderProps) {
   return (
     <div className="relative">
-      <img src={recipe.imageUrl} className="h-44 w-full object-cover" />
+      <img
+        src={recipe.imageUrl}
+        alt={`recipe named ${recipe.name}`}
+        className="h-44 w-full object-cover"
+      />
       <div
         className={classNames(
           "absolute top-0 left-0 w-full h-full bg-[rgba(255,255,255,0.8)]",

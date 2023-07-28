@@ -35,20 +35,6 @@ export function RecipeDetailWrapper({ children }: RecipeDetailWrapperProps) {
   return <div className="lg:w-2/3 overflow-auto pr-4 pl-4">{children}</div>;
 }
 
-function delay<Args extends unknown[]>(
-  fn: (...args: Args) => void,
-  ms: number
-) {
-  let timeoutId: number | undefined;
-
-  const debounced = (...args: Args) => {
-    clearTimeout(timeoutId);
-    timeoutId = window.setTimeout(() => fn(...args), ms);
-  };
-
-  return debounced;
-}
-
 function useDelayedBool(value: boolean | undefined, delay: number) {
   const [delayed, setDelayed] = React.useState(false);
   const timeoutId = React.useRef<number>();
@@ -62,7 +48,7 @@ function useDelayedBool(value: boolean | undefined, delay: number) {
       setDelayed(false);
     }
     return () => window.clearTimeout(timeoutId.current);
-  }, [value]);
+  }, [value, delay]);
 
   return delayed;
 }
@@ -70,7 +56,6 @@ function useDelayedBool(value: boolean | undefined, delay: number) {
 type RecipeCardProps = {
   name: string;
   totalTime: string;
-  mealPlanMultiplier: number | null;
   imageUrl?: string;
   isActive?: boolean;
   isLoading?: boolean;
@@ -78,7 +63,6 @@ type RecipeCardProps = {
 export function RecipeCard({
   name,
   totalTime,
-  mealPlanMultiplier,
   imageUrl,
   isActive,
   isLoading,
@@ -94,14 +78,15 @@ export function RecipeCard({
       )}
     >
       <div className="w-14 h-14 rounded-full overflow-hidden my-4 ml-3">
-        <img src={imageUrl} className="object-cover h-full w-full" />
+        <img
+          src={imageUrl}
+          alt={`recipe named ${name}`}
+          className="object-cover h-full w-full"
+        />
       </div>
       <div className="p-4 flex-grow">
         <h3 className="font-semibold mb-1 text-left">
           {name}
-          {mealPlanMultiplier !== null ? (
-            <>&nbsp;(x{mealPlanMultiplier})</>
-          ) : null}
           {delayedLoading ? "..." : ""}
         </h3>
         <div
