@@ -1,10 +1,3 @@
-import type { LinksFunction } from "@remix-run/node";
-import headerStyles from "./header.css";
-
-export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: headerStyles }];
-};
-
 type HeaderProps = {
   children: string;
 };
