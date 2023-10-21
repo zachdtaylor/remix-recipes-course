@@ -9,6 +9,12 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import styles from "./tailwind.css";
+import {
+  DiscoverIcon,
+  HomeIcon,
+  RecipeBookIcon,
+  SettingsIcon,
+} from "./components/icons";
 
 export const meta: MetaFunction = () => {
   return [
@@ -31,25 +37,43 @@ export default function App() {
       <body className="flex h-screen">
         <nav className="bg-primary text-white">
           <ul className="flex flex-col">
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="discover">Discover</Link>
-            </li>
-            <li>
-              <Link to="app">App</Link>
-            </li>
-            <li>
-              <Link to="settings">Settings</Link>
-            </li>
+            <AppNavLink to="/">
+              <HomeIcon />
+            </AppNavLink>
+            <AppNavLink to="discover">
+              <DiscoverIcon />
+            </AppNavLink>
+            <AppNavLink to="app">
+              <RecipeBookIcon />
+            </AppNavLink>
+            <AppNavLink to="settings">
+              <SettingsIcon />
+            </AppNavLink>
           </ul>
         </nav>
-        <Outlet />
+        <div className="p-4">
+          <Outlet />
+        </div>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
       </body>
     </html>
+  );
+}
+
+type AppNavLinkProps = {
+  to: string;
+  children: React.ReactNode;
+};
+function AppNavLink({ to, children }: AppNavLinkProps) {
+  return (
+    <li className="w-16">
+      <Link to={to}>
+        <div className="py-4 flex justify-center hover:bg-primary-light">
+          {children}
+        </div>
+      </Link>
+    </li>
   );
 }
