@@ -28,12 +28,22 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
-        <nav>
-          <Link to="/">Home</Link>
-          <Link to="discover">Discover</Link>
-          <Link to="app">App</Link>
-          <Link to="settings">Settings</Link>
+      <body className="flex h-screen">
+        <nav className="bg-primary text-white">
+          <ul className="flex flex-col">
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="discover">Discover</Link>
+            </li>
+            <li>
+              <Link to="app">App</Link>
+            </li>
+            <li>
+              <Link to="settings">Settings</Link>
+            </li>
+          </ul>
         </nav>
         <Outlet />
         <ScrollRestoration />
