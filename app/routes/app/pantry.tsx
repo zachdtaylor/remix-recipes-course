@@ -1,4 +1,8 @@
-import { ActionArgs, json, LoaderArgs } from "@remix-run/node";
+import {
+  type ActionFunctionArgs,
+  json,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
 import {
   isRouteErrorResponse,
   useFetcher,
@@ -31,7 +35,7 @@ import { requireLoggedInUser } from "~/utils/auth.server";
 import { classNames, useIsHydrated, useServerLayoutEffect } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await requireLoggedInUser(request);
 
   const url = new URL(request.url);
@@ -58,7 +62,7 @@ const deleteShelfItemSchema = z.object({
   itemId: z.string(),
 });
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   const user = await requireLoggedInUser(request);
 
   const formData = await request.formData();
@@ -187,9 +191,9 @@ type ShelfProps = {
   };
 };
 function Shelf({ shelf }: ShelfProps) {
-  const deleteShelfFetcher = useFetcher();
-  const saveShelfNameFetcher = useFetcher();
-  const createShelfItemFetcher = useFetcher();
+  const deleteShelfFetcher = useFetcher<any>();
+  const saveShelfNameFetcher = useFetcher<any>();
+  const createShelfItemFetcher = useFetcher<any>();
   const createItemFormRef = React.useRef<HTMLFormElement>(null);
   const { renderedItems, addItem } = useOptimisticItems(
     shelf.items,
@@ -340,7 +344,7 @@ type ShelfItemProps = {
 };
 
 function ShelfItem({ shelfItem }: ShelfItemProps) {
-  const deleteShelfItemFetcher = useFetcher();
+  const deleteShelfItemFetcher = useFetcher<any>();
   const isDeletingItem = !!deleteShelfItemFetcher.formData;
   return isDeletingItem ? null : (
     <li className="py-2">

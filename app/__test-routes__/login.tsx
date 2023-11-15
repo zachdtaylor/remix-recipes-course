@@ -1,8 +1,8 @@
-import { LoaderArgs, redirect } from "@remix-run/node";
+import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { createUser, getUser } from "~/models/user.server";
 import { commitSession, getSession } from "~/sessions";
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const firstName = url.searchParams.get("firstName");
   const lastName = url.searchParams.get("lastName");

@@ -1,4 +1,8 @@
-import { ActionArgs, LoaderArgs, json } from "@remix-run/node";
+import {
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+  json,
+} from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import { z } from "zod";
 import { ErrorMessage, PrimaryButton, PrimaryInput } from "~/components/forms";
@@ -8,7 +12,7 @@ import { validateForm } from "~/utils/validation";
 import { v4 as uuid } from "uuid";
 import { requireLoggedOutUser } from "~/utils/auth.server";
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   await requireLoggedOutUser(request);
   return null;
 }
@@ -17,7 +21,7 @@ const loginSchema = z.object({
   email: z.string().email(),
 });
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   await requireLoggedOutUser(request);
 
   const cookieHeader = request.headers.get("cookie");
@@ -48,7 +52,7 @@ export async function action({ request }: ActionArgs) {
 }
 
 export default function Login() {
-  const actionData = useActionData();
+  const actionData = useActionData<any>();
   return (
     <div className="text-center mt-36">
       {actionData?.success ? (

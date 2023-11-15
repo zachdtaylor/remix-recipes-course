@@ -1,5 +1,8 @@
-import { LoaderArgs, json } from "@remix-run/node";
-import { LinksFunction } from "@remix-run/node";
+import {
+  type LinksFunction,
+  type LoaderFunctionArgs,
+  json,
+} from "@remix-run/node";
 import {
   isRouteErrorResponse,
   Link,
@@ -42,14 +45,14 @@ export const links: LinksFunction = () => {
   ];
 };
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getCurrentUser(request);
 
   return json({ isLoggedIn: user !== null });
 }
 
 export default function App() {
-  const data = useLoaderData();
+  const data = useLoaderData<typeof loader>();
   return (
     <html lang="en">
       <head>

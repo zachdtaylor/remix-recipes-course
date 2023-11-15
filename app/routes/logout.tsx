@@ -1,7 +1,7 @@
-import { LoaderArgs, json } from "@remix-run/node";
+import { type LoaderFunctionArgs, json } from "@remix-run/node";
 import { destroySession, getSession } from "~/sessions";
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const cookieHeader = request.headers.get("cookie");
   const session = await getSession(cookieHeader);
 

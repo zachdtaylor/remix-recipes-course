@@ -1,5 +1,5 @@
 import ReactModal from "react-modal";
-import { ActionArgs, json, redirect } from "@remix-run/node";
+import { type ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { z } from "zod";
 import {
@@ -21,7 +21,7 @@ const updateMealPlanSchema = z.object({
     z.number().min(1)
   ),
 });
-export async function action({ request, params }: ActionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
   const recipeId = String(params.recipeId);
   await canChangeRecipe(request, recipeId);
 
@@ -61,7 +61,7 @@ if (typeof window !== "undefined") {
 
 export default function UpdateMealPlanModal() {
   const { recipeName, mealPlanMultiplier } = useRecipeContext();
-  const actionData = useActionData();
+  const actionData = useActionData<typeof action>();
   return (
     <ReactModal
       isOpen

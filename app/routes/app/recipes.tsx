@@ -1,4 +1,9 @@
-import { ActionArgs, json, LoaderArgs, redirect } from "@remix-run/node";
+import {
+  type ActionFunctionArgs,
+  json,
+  type LoaderFunctionArgs,
+  redirect,
+} from "@remix-run/node";
 import {
   Form,
   Link,
@@ -22,7 +27,7 @@ import db from "~/db.server";
 import { requireLoggedInUser } from "~/utils/auth.server";
 import { classNames, useBuildSearchParams } from "~/utils/misc";
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const user = await requireLoggedInUser(request);
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
@@ -52,7 +57,7 @@ export async function loader({ request }: LoaderArgs) {
   return json({ recipes });
 }
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   const user = await requireLoggedInUser(request);
   const formData = await request.formData();
 
@@ -170,7 +175,6 @@ export default function Recipes() {
                       totalTime={
                         optimisticData.get("totalTime") ?? recipe.totalTime
                       }
-                      mealPlanMultiplier={recipe.mealPlanMultiplier}
                       imageUrl={recipe.imageUrl}
                       isActive={isActive}
                       isLoading={isLoading}

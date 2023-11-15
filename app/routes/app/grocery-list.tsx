@@ -1,4 +1,8 @@
-import { ActionArgs, json, LoaderArgs } from "@remix-run/node";
+import {
+  type ActionFunctionArgs,
+  json,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { z } from "zod";
 import { CheckCircleIcon } from "~/components/icons";
@@ -23,7 +27,7 @@ function isMatch(ingredientName: string, pantryItemName: string) {
   return lowerIngredientName === lowerPantryItemName;
 }
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const user = await requireLoggedInUser(request);
 
   const ingredients = await db.ingredient.findMany({
@@ -97,7 +101,7 @@ const checkOffItemSchema = z.object({
   name: z.string(),
 });
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   const user = await requireLoggedInUser(request);
   const formData = await request.formData();
 

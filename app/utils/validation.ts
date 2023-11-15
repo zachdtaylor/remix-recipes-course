@@ -1,4 +1,4 @@
-import { z } from "zod";
+import type { z } from "zod";
 
 type FieldErrors = { [key: string]: string };
 
@@ -21,11 +21,11 @@ function objectify(formData: FormData) {
   return formFields;
 }
 
-export function validateForm<T>(
+export function validateForm<T, R, E>(
   formData: FormData,
   zodSchema: z.Schema<T>,
-  successFn: (data: T) => unknown,
-  errorFn: (errors: FieldErrors) => unknown
+  successFn: (data: T) => R,
+  errorFn: (errors: FieldErrors) => E
 ) {
   const fields = objectify(formData);
   const result = zodSchema.safeParse(fields);

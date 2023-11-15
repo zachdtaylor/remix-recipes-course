@@ -1,4 +1,8 @@
-import { HeadersArgs, LoaderArgs, json } from "@remix-run/node";
+import {
+  type HeadersArgs,
+  type LoaderFunctionArgs,
+  json,
+} from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import {
   DiscoverRecipeDetails,
@@ -15,7 +19,7 @@ export function headers({ loaderHeaders }: HeadersArgs) {
   };
 }
 
-export async function loader({ params, request }: LoaderArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const recipe = await db.recipe.findUnique({
     where: { id: params.recipeId },
     include: {

@@ -1,4 +1,4 @@
-import { type LoaderArgs } from "@remix-run/node";
+import { type LoaderFunctionArgs } from "@remix-run/node";
 import { themeCookie } from "~/cookies";
 
 function getTheme(color: string) {
@@ -42,7 +42,7 @@ function getTheme(color: string) {
   }
 }
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const cookieHeader = request.headers.get("cookie");
   const cookieValue = await themeCookie.parse(cookieHeader);
 

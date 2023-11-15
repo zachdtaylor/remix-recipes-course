@@ -1,7 +1,7 @@
-import { LoaderArgs, redirect } from "@remix-run/node";
+import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { deleteUser } from "~/models/user.server";
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const email = url.searchParams.get("email");
 

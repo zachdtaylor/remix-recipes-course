@@ -117,7 +117,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
 }
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ error, className, ...props }, ref) => {
+  function Input({ error, className, ...props }, ref) {
     return (
       <input
         ref={ref}

@@ -1,7 +1,7 @@
 import {
-  ActionArgs,
+  type ActionFunctionArgs,
   json,
-  LoaderArgs,
+  type LoaderFunctionArgs,
   redirect,
   unstable_composeUploadHandlers,
   unstable_createFileUploadHandler,
@@ -14,7 +14,6 @@ import {
   Link,
   Outlet,
   useActionData,
-  useCatch,
   useFetcher,
   useLoaderData,
   useOutletContext,
@@ -45,7 +44,7 @@ import {
 } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 
-export async function loader({ request, params }: LoaderArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   const user = await requireLoggedInUser(request);
   const recipe = await db.recipe.findUnique({
     where: { id: params.recipeId },
@@ -130,7 +129,7 @@ const createIngredientSchema = z.object({
   newIngredientName: z.string().min(1, "Name cannot be blank"),
 });
 
-export async function action({ request, params }: ActionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
   const recipeId = String(params.recipeId);
   await canChangeRecipe(request, recipeId);
 
@@ -257,11 +256,11 @@ export function useRecipeContext() {
 
 export default function RecipeDetail() {
   const data = useLoaderData<typeof loader>();
-  const actionData = useActionData();
-  const saveNameFetcher = useFetcher();
-  const saveTotalTimeFetcher = useFetcher();
-  const saveInstructionsFetcher = useFetcher();
-  const createIngredientFetcher = useFetcher();
+  const actionData = useActionData<any>();
+  const saveNameFetcher = useFetcher<any>();
+  const saveTotalTimeFetcher = useFetcher<any>();
+  const saveInstructionsFetcher = useFetcher<any>();
+  const createIngredientFetcher = useFetcher<any>();
   const newIngredientAmountRef = React.useRef<HTMLInputElement>(null);
 
   const { renderedIngredients, addIngredient } = useOptimisticIngredients(
@@ -494,10 +493,8 @@ export default function RecipeDetail() {
           className={classNames(
             "w-full h-56 rounded-md outline-none",
             "focus:border-2 focus:p-3 focus:border-primary duration-300",
-            !!(
-              saveInstructionsFetcher?.data?.errors?.instructions ||
+            saveInstructionsFetcher?.data?.errors?.instructions ||
               actionData?.errors?.instructions
-            )
               ? "border-2 border-red-500 p-3"
               : ""
           )}
@@ -549,8 +546,8 @@ function IngredientRow({
   nameError,
   isOptimistic,
 }: IngredientRowProps) {
-  const saveAmountFetcher = useFetcher();
-  const saveNameFetcher = useFetcher();
+  const saveAmountFetcher = useFetcher<any>();
+  const saveNameFetcher = useFetcher<any>();
   const deleteIngredientFetcher = useFetcher();
 
   const saveAmount = useDebouncedFunction(
