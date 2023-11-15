@@ -1,4 +1,4 @@
-import type { z } from "zod";
+import type { ZodTypeDef, z } from "zod";
 
 type FieldErrors = { [key: string]: string };
 
@@ -21,10 +21,10 @@ function objectify(formData: FormData) {
   return formFields;
 }
 
-export function validateForm<T, R, E>(
+export function validateForm<Input, Output, R, E>(
   formData: FormData,
-  zodSchema: z.Schema<T>,
-  successFn: (data: T) => R,
+  zodSchema: z.Schema<Output, ZodTypeDef, Input>,
+  successFn: (data: Output) => R,
   errorFn: (errors: FieldErrors) => E
 ) {
   const fields = objectify(formData);
