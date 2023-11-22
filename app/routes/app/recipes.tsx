@@ -9,7 +9,6 @@ import {
   Link,
   NavLink,
   Outlet,
-  useFetchers,
   useLoaderData,
   useLocation,
   useNavigation,
@@ -25,6 +24,11 @@ import {
 } from "~/components/recipes";
 import db from "~/db.server";
 import { requireLoggedInUser } from "~/utils/auth.server";
+import { asString } from "~/utils/forms";
+import {
+  useSaveRecipeNameFetcher,
+  useSaveRecipeTotalTimeFetcher,
+} from "~/utils/hooks";
 import { classNames, useBuildSearchParams } from "~/utils/misc";
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -95,9 +99,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function Recipes() {
   const data = useLoaderData<typeof loader>();
-  const location = useLocation();
-  const navigation = useNavigation();
-  const fetchers = useFetchers();
   const buildSearchParams = useBuildSearchParams();
   const [searchParams] = useSearchParams();
   const mealPlanOnlyFilterOn = searchParams.get("filter") === "mealPlanOnly";
@@ -144,51 +145,54 @@ export default function Recipes() {
           )}
         </Form>
         <ul>
-          {data?.recipes.map((recipe) => {
-            const isLoading = navigation.location?.pathname.endsWith(recipe.id);
-
-            const optimisticData = new Map();
-
-            for (const fetcher of fetchers) {
-              if (fetcher.formAction?.includes(recipe.id)) {
-                if (fetcher.formData?.get("_action") === "saveName") {
-                  optimisticData.set("name", fetcher.formData?.get("name"));
-                }
-                if (fetcher.formData?.get("_action") === "saveTotalTime") {
-                  optimisticData.set(
-                    "totalTime",
-                    fetcher.formData?.get("totalTime")
-                  );
-                }
-              }
-            }
-
-            return (
-              <li className="my-4" key={recipe.id}>
-                <NavLink
-                  to={{ pathname: recipe.id, search: location.search }}
-                  prefetch="intent"
-                >
-                  {({ isActive }) => (
-                    <RecipeCard
-                      name={optimisticData.get("name") ?? recipe.name}
-                      totalTime={
-                        optimisticData.get("totalTime") ?? recipe.totalTime
-                      }
-                      imageUrl={recipe.imageUrl}
-                      isActive={isActive}
-                      isLoading={isLoading}
-                    />
-                  )}
-                </NavLink>
-              </li>
-            );
-          })}
+          {data?.recipes.map((recipe) => (
+            <RecipeListItem key={recipe.id} recipe={recipe} />
+          ))}
         </ul>
       </RecipeListWrapper>
       <RecipeDetailWrapper>
         <Outlet />
       </RecipeDetailWrapper>
     </RecipePageWrapper>
+  );
+}
+
+type RecipeListItemProps = {
+  recipe: {
+    id: string;
+    name: string;
+    totalTime: string;
+    imageUrl: string;
+  };
+};
+function RecipeListItem({ recipe }: RecipeListItemProps) {
+  const navigation = useNavigation();
+  const location = useLocation();
+  const isLoading = navigation.location?.pathname.endsWith(recipe.id);
+  const saveNameFetcher = useSaveRecipeNameFetcher(recipe.id);
+  const saveTotalTimeFetcher = useSaveRecipeTotalTimeFetcher(recipe.id);
+
+  const optimisticData = {
+    name: asString(saveNameFetcher.formData?.get("name")),
+    totalTime: asString(saveTotalTimeFetcher.formData?.get("totalTime")),
+  };
+
+  return (
+    <li className="my-4" key={recipe.id}>
+      <NavLink
+        to={{ pathname: recipe.id, search: location.search }}
+        prefetch="intent"
+      >
+        {({ isActive }) => (
+          <RecipeCard
+            name={optimisticData.name ?? recipe.name}
+            totalTime={optimisticData.totalTime ?? recipe.totalTime}
+            imageUrl={recipe.imageUrl}
+            isActive={isActive}
+            isLoading={isLoading}
+          />
+        )}
+      </NavLink>
+    </li>
   );
 }

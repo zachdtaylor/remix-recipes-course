@@ -17,6 +17,7 @@ import {
   useFetcher,
   useLoaderData,
   useOutletContext,
+  useParams,
   useRouteError,
 } from "@remix-run/react";
 import React from "react";
@@ -37,6 +38,10 @@ import db from "~/db.server";
 import { handleDelete } from "~/models/utils";
 import { canChangeRecipe } from "~/utils/abilities.server";
 import { requireLoggedInUser } from "~/utils/auth.server";
+import {
+  useSaveRecipeNameFetcher,
+  useSaveRecipeTotalTimeFetcher,
+} from "~/utils/hooks";
 import {
   classNames,
   useDebouncedFunction,
@@ -257,8 +262,9 @@ export function useRecipeContext() {
 export default function RecipeDetail() {
   const data = useLoaderData<typeof loader>();
   const actionData = useActionData<any>();
-  const saveNameFetcher = useFetcher<any>();
-  const saveTotalTimeFetcher = useFetcher<any>();
+  const params = useParams();
+  const saveNameFetcher = useSaveRecipeNameFetcher(params.recipeId);
+  const saveTotalTimeFetcher = useSaveRecipeTotalTimeFetcher(params.recipeId);
   const saveInstructionsFetcher = useFetcher<any>();
   const createIngredientFetcher = useFetcher<any>();
   const newIngredientAmountRef = React.useRef<HTMLInputElement>(null);
