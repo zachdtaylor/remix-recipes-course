@@ -27,6 +27,7 @@ export default function Pantry() {
   const navigation = useNavigation();
 
   const isSearching = navigation.formData?.has("q");
+  const isCreatingShelf = navigation.formData?.has("createShelf");
 
   return (
     <div>
@@ -49,10 +50,17 @@ export default function Pantry() {
           className="w-full py-3 px-2 outline-none rounded-md"
         />
       </Form>
-      <Form reloadDocument method="post">
-        <PrimaryButton className="mt-4 w-full md:w-fit">
+      <Form method="post">
+        <PrimaryButton
+          name="createShelf"
+          className={classNames("mt-4 w-full md:w-fit", {
+            "bg-primary-light": isCreatingShelf,
+          })}
+        >
           <PlusIcon />
-          <span className="pl-2">Create Shelf</span>
+          <span className="pl-2">
+            {isCreatingShelf ? "Creating Shelf" : "Create Shelf"}
+          </span>
         </PrimaryButton>
       </Form>
       <ul
