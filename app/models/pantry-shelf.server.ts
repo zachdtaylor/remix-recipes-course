@@ -15,5 +15,16 @@ export function getAllShelves(query: string | null) {
         },
       },
     },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}
+
+export function createShelf() {
+  return db.pantryShelf.create({
+    data: {
+      name: "New Shelf",
+    },
   });
 }
