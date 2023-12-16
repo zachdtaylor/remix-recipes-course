@@ -20,6 +20,7 @@ import { validateForm } from "~/utils/validation";
 import { z } from "zod";
 import { createShelfItem, deleteShelfItem } from "~/models/pantry-item.server";
 import React from "react";
+import { useServerLayoutEffect } from "~/utils/misc";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
@@ -320,7 +321,7 @@ function useOptimisticItems(savedItems: Array<RenderedItem>) {
     return a.name < b.name ? -1 : 1;
   });
 
-  React.useLayoutEffect(() => {
+  useServerLayoutEffect(() => {
     setOptimisticItems([]);
   }, [savedItems]);
 
