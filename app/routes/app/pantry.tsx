@@ -7,6 +7,7 @@ import {
   useSearchParams,
 } from "@remix-run/react";
 import classNames from "classnames";
+import React from "react";
 import { DeleteButton, PrimaryButton } from "~/components/form";
 import { PlusIcon, SearchIcon } from "~/components/icons";
 import {
@@ -45,9 +46,16 @@ export default function Pantry() {
   const data = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
   const navigation = useNavigation();
+  const containerRef = React.useRef<HTMLUListElement>(null);
 
   const isSearching = navigation.formData?.has("q");
   const isCreatingShelf = navigation.formData?.get("_action") === "createShelf";
+
+  React.useEffect(() => {
+    if (!isCreatingShelf && containerRef.current) {
+      containerRef.current.scrollLeft = 0;
+    }
+  }, [isCreatingShelf]);
 
   return (
     <div>
