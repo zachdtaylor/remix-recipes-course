@@ -8,6 +8,7 @@ import {
 } from "@remix-run/react";
 import classNames from "classnames";
 import React from "react";
+import { z } from "zod";
 import { DeleteButton, PrimaryButton } from "~/components/form";
 import { PlusIcon, SaveIcon, SearchIcon } from "~/components/icons";
 import {
@@ -16,6 +17,7 @@ import {
   getAllShelves,
   saveShelfName,
 } from "~/models/pantry-shelf.server";
+import { validateForm } from "~/utils/validation";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
@@ -24,7 +26,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({ shelves });
 }
 
-type FieldErrors = { [key: string]: string };
+const deleteShelfSchema = z.object({
+  shelfId: z.string(),
+});
+
+const saveShelfNameSchema = z.object({
+  shelfId: z.string(),
+  shelfName: z.string().min(1),
+});
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -33,33 +42,20 @@ export async function action({ request }: ActionFunctionArgs) {
       return createShelf();
     }
     case "deleteShelf": {
-      const shelfId = formData.get("shelfId");
-      if (typeof shelfId !== "string") {
-        return json({ errors: { shelfId: "Shelf ID must be a string" } });
-      }
-      return deleteShelf(shelfId);
+      return validateForm(
+        formData,
+        deleteShelfSchema,
+        (data) => deleteShelf(data.shelfId),
+        (errors) => json({ errors })
+      );
     }
     case "saveShelfName": {
-      const shelfId = formData.get("shelfId");
-      const shelfName = formData.get("shelfName");
-      const errors: FieldErrors = {};
-      if (
-        typeof shelfId === "string" &&
-        typeof shelfName === "string" &&
-        shelfName !== ""
-      ) {
-        return saveShelfName(shelfId, shelfName);
-      }
-      if (typeof shelfName !== "string") {
-        errors["shelfName"] = "Shelf name must be a string";
-      }
-      if (shelfName === "") {
-        errors["shelfName"] = "Shelf name cannot be blank";
-      }
-      if (typeof shelfId !== "string") {
-        errors["shelfId"] = "Shelf ID must be a string";
-      }
-      return json({ errors });
+      return validateForm(
+        formData,
+        saveShelfNameSchema,
+        (data) => saveShelfName(data.shelfId, data.shelfName),
+        (errors) => json({ errors })
+      );
     }
     default: {
       return null;
