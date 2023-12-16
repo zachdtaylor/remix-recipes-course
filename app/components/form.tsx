@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { type ButtonHTMLAttributes } from "react";
+import { HTMLAttributes, type ButtonHTMLAttributes } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
@@ -43,4 +43,11 @@ export function DeleteButton({ className, isLoading, ...props }: ButtonProps) {
       )}
     />
   );
+}
+
+interface ErrorMessageProps extends HTMLAttributes<HTMLParagraphElement> {}
+export function ErrorMessage({ className, ...props }: ErrorMessageProps) {
+  return props.children ? (
+    <p {...props} className={classNames("text-red-600 text-xs", className)} />
+  ) : null;
 }
