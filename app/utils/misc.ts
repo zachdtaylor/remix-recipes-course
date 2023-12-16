@@ -1,6 +1,6 @@
 import { SerializeFrom } from "@remix-run/node";
 import { useMatches } from "@remix-run/react";
-import React from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 
 export function useMatchesData<T>(id: string) {
   const matches = useMatches();
@@ -10,3 +10,11 @@ export function useMatchesData<T>(id: string) {
   );
   return route?.data as SerializeFrom<T> | undefined;
 }
+
+export function isRunningOnServer() {
+  return typeof window === "undefined";
+}
+
+export const useServerLayoutEffect = isRunningOnServer()
+  ? useEffect
+  : useLayoutEffect;
