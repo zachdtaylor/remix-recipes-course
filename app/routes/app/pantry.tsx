@@ -1,10 +1,9 @@
-import { PrismaClient } from "@prisma/client";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { getAllShelves } from "~/models/pantry-shelf.server";
 
 export async function loader() {
-  const db = new PrismaClient();
-  const shelves = await db.pantryShelf.findMany();
+  const shelves = await getAllShelves();
   return json({ shelves });
 }
 
