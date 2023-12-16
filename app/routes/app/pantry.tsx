@@ -45,11 +45,13 @@ export async function action({ request }: ActionFunctionArgs) {
 export default function Pantry() {
   const data = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
+  const createShelfFetcher = useFetcher();
   const navigation = useNavigation();
   const containerRef = React.useRef<HTMLUListElement>(null);
 
   const isSearching = navigation.formData?.has("q");
-  const isCreatingShelf = navigation.formData?.get("_action") === "createShelf";
+  const isCreatingShelf =
+    createShelfFetcher.formData?.get("_action") === "createShelf";
 
   React.useEffect(() => {
     if (!isCreatingShelf && containerRef.current) {
@@ -78,7 +80,7 @@ export default function Pantry() {
           className="w-full py-3 px-2 outline-none rounded-md"
         />
       </Form>
-      <Form method="post">
+      <createShelfFetcher.Form method="post">
         <PrimaryButton
           name="_action"
           value="createShelf"
@@ -90,7 +92,7 @@ export default function Pantry() {
             {isCreatingShelf ? "Creating Shelf" : "Create Shelf"}
           </span>
         </PrimaryButton>
-      </Form>
+      </createShelfFetcher.Form>
       <ul
         className={classNames(
           "flex gap-8 overflow-x-auto mt-4 pb-4",
