@@ -9,7 +9,7 @@ import {
 import classNames from "classnames";
 import React from "react";
 import { z } from "zod";
-import { DeleteButton, PrimaryButton } from "~/components/form";
+import { DeleteButton, ErrorMessage, PrimaryButton } from "~/components/form";
 import { PlusIcon, SaveIcon, SearchIcon } from "~/components/icons";
 import {
   createShelf,
@@ -46,7 +46,7 @@ export async function action({ request }: ActionFunctionArgs) {
         formData,
         deleteShelfSchema,
         (data) => deleteShelf(data.shelfId),
-        (errors) => json({ errors })
+        (errors) => json({ errors }, { status: 400 })
       );
     }
     case "saveShelfName": {
@@ -54,7 +54,7 @@ export async function action({ request }: ActionFunctionArgs) {
         formData,
         saveShelfNameSchema,
         (data) => saveShelfName(data.shelfId, data.shelfName),
-        (errors) => json({ errors })
+        (errors) => json({ errors }, { status: 400 })
       );
     }
     default: {
@@ -139,14 +139,14 @@ type ShelfProps = {
   };
 };
 function Shelf({ shelf }: ShelfProps) {
-  const deleteShelfFetcher = useFetcher();
+  const deleteShelfFetcher = useFetcher<any>();
   const saveShelfNameFetcher = useFetcher<any>();
 
   const isDeletingShelf =
     deleteShelfFetcher.formData?.get("_action") === "deleteShelf" &&
     deleteShelfFetcher.formData?.get("shelfId") === shelf.id;
 
-  return (
+  return isDeletingShelf ? null : (
     <li
       key={shelf.id}
       className={classNames(
@@ -172,14 +172,17 @@ function Shelf({ shelf }: ShelfProps) {
               }
             )}
           />
-          <span className="text-red-600 text-xs">
+          <ErrorMessage>
             {saveShelfNameFetcher.data?.errors?.shelfName}
-          </span>
+          </ErrorMessage>
         </div>
         <button name="_action" value="saveShelfName" className="ml-4">
           <SaveIcon />
         </button>
         <input type="hidden" name="shelfId" value={shelf.id} />
+        <ErrorMessage className="pl-2">
+          {saveShelfNameFetcher.data?.errors?.shelfId}
+        </ErrorMessage>
       </saveShelfNameFetcher.Form>
       <ul>
         {shelf.items.map((item) => (
@@ -190,6 +193,9 @@ function Shelf({ shelf }: ShelfProps) {
       </ul>
       <deleteShelfFetcher.Form method="post" className="pt-8">
         <input type="hidden" name="shelfId" value={shelf.id} />
+        <ErrorMessage className="pb-2">
+          {deleteShelfFetcher.data?.errors?.shelfId}
+        </ErrorMessage>
         <DeleteButton
           className="w-full"
           name="_action"
