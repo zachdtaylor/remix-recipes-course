@@ -5,15 +5,20 @@ import {
   useNavigation,
   useSearchParams,
 } from "react-router";
-import { getAllShelves } from "~/models/pantry-shelf.server";
+import { createShelf, getAllShelves } from "~/models/pantry-shelf.server";
 import { Route } from "./+types/pantry";
-import { SearchIcon } from "~/components/icons";
+import { PlusIcon, SearchIcon } from "~/components/icons";
+import { PrimaryButton } from "~/components/form";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
   const shelves = await getAllShelves(q);
   return { shelves };
+}
+
+export async function action() {
+  return createShelf();
 }
 
 export default function Pantry() {
@@ -44,9 +49,15 @@ export default function Pantry() {
           className="w-full py-3 px-2 outline-none rounded-md"
         />
       </Form>
+      <Form reloadDocument method="post">
+        <PrimaryButton className="mt-4 w-full md:w-fit">
+          <PlusIcon />
+          <span className="pl-2">Create Shelf</span>
+        </PrimaryButton>
+      </Form>
       <ul
         className={classNames(
-          "flex gap-8 overflow-x-auto mt-4",
+          "flex gap-8 overflow-x-auto mt-4 pb-4",
           "snap-x snap-mandatory md:snap-none"
         )}
       >
