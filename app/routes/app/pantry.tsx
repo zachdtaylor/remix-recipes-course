@@ -10,8 +10,8 @@ import classNames from "classnames";
 import React from "react";
 import { z } from "zod";
 import { DeleteButton, ErrorMessage, PrimaryButton } from "~/components/form";
-import { PlusIcon, SaveIcon, SearchIcon } from "~/components/icons";
-import { createShelfItem } from "~/models/pantry-item.server";
+import { PlusIcon, SaveIcon, SearchIcon, TrashIcon } from "~/components/icons";
+import { createShelfItem, deleteShelfItem } from "~/models/pantry-item.server";
 import {
   createShelf,
   deleteShelf,
@@ -41,6 +41,10 @@ const createShelfItemSchema = z.object({
   itemName: z.string().min(1, "Item name cannot be blank"),
 });
 
+const deleteShelfItemSchema = z.object({
+  itemId: z.string(),
+});
+
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   switch (formData.get("_action")) {
@@ -68,6 +72,14 @@ export async function action({ request }: ActionFunctionArgs) {
         formData,
         createShelfItemSchema,
         (data) => createShelfItem(data.shelfId, data.itemName),
+        (errors) => json({ errors }, { status: 400 })
+      );
+    }
+    case "deleteShelfItem": {
+      return validateForm(
+        formData,
+        deleteShelfItemSchema,
+        (data) => deleteShelfItem(data.itemId),
         (errors) => json({ errors }, { status: 400 })
       );
     }
@@ -229,9 +241,7 @@ function Shelf({ shelf }: ShelfProps) {
       </createShelfItemFetcher.Form>
       <ul>
         {shelf.items.map((item) => (
-          <li key={item.id} className="py-2">
-            {item.name}
-          </li>
+          <ShelfItem shelfItem={item} key={item.id} />
         ))}
       </ul>
       <deleteShelfFetcher.Form method="post" className="pt-8">
@@ -248,6 +258,31 @@ function Shelf({ shelf }: ShelfProps) {
           {isDeletingShelf ? "Deleting Shelf" : "Delete Shelf"}
         </DeleteButton>
       </deleteShelfFetcher.Form>
+    </li>
+  );
+}
+
+type ShelfItemProps = {
+  shelfItem: {
+    id: string;
+    name: string;
+  };
+};
+function ShelfItem({ shelfItem }: ShelfItemProps) {
+  const deleteShelfItemFetcher = useFetcher<any>();
+
+  return (
+    <li className="py-2">
+      <deleteShelfItemFetcher.Form method="post" className="flex">
+        <p className="w-full">{shelfItem.name}</p>
+        <button name="_action" value="deleteShelfItem">
+          <TrashIcon />
+        </button>
+        <input type="hidden" name="itemId" value={shelfItem.id} />
+        <ErrorMessage className="pl-2">
+          {deleteShelfItemFetcher.data?.errors?.itemId}
+        </ErrorMessage>
+      </deleteShelfItemFetcher.Form>
     </li>
   );
 }
