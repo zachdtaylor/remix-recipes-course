@@ -14,11 +14,11 @@ import {
   saveShelfName,
 } from "~/models/pantry-shelf.server";
 import { Route } from "./+types/pantry";
-import { PlusIcon, SaveIcon, SearchIcon } from "~/components/icons";
+import { PlusIcon, SaveIcon, SearchIcon, TrashIcon } from "~/components/icons";
 import { DeleteButton, ErrorMessage, PrimaryButton } from "~/components/form";
 import { validateForm } from "~/utils/validation";
 import { z } from "zod";
-import { createShelfItem } from "~/models/pantry-item.server";
+import { createShelfItem, deleteShelfItem } from "~/models/pantry-item.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
@@ -39,6 +39,10 @@ const saveShelfNameSchema = z.object({
 const createShelfItemSchema = z.object({
   shelfId: z.string(),
   itemName: z.string().min(1, "Item name cannot be blank"),
+});
+
+const deleteShelfItemSchema = z.object({
+  itemId: z.string(),
 });
 
 export async function action({ request }: Route.ActionArgs) {
@@ -68,6 +72,14 @@ export async function action({ request }: Route.ActionArgs) {
         formData,
         createShelfItemSchema,
         (data) => createShelfItem(data.shelfId, data.itemName),
+        (errors) => data({ errors }, { status: 400 })
+      );
+    }
+    case "deleteShelfItem": {
+      return validateForm(
+        formData,
+        deleteShelfItemSchema,
+        (data) => deleteShelfItem(data.itemId),
         (errors) => data({ errors }, { status: 400 })
       );
     }
@@ -222,9 +234,7 @@ function Shelf({ shelf }: ShelfProps) {
       </createShelfItemFetcher.Form>
       <ul>
         {shelf.items.map((item) => (
-          <li key={item.id} className="py-2">
-            {item.name}
-          </li>
+          <ShelfItem shelfItem={item} key={item.id} />
         ))}
       </ul>
       <deleteShelfFetcher.Form method="post" className="pt-8">
@@ -241,6 +251,31 @@ function Shelf({ shelf }: ShelfProps) {
           {isDeletingShelf ? "Deleting Shelf" : "Delete Shelf"}
         </DeleteButton>
       </deleteShelfFetcher.Form>
+    </li>
+  );
+}
+
+type ShelfItemProps = {
+  shelfItem: {
+    id: string;
+    name: string;
+  };
+};
+function ShelfItem({ shelfItem }: ShelfItemProps) {
+  const deleteShelfItemFetcher = useFetcher<any>();
+
+  return (
+    <li className="py-2">
+      <deleteShelfItemFetcher.Form method="post" className="flex">
+        <p className="w-full">{shelfItem.name}</p>
+        <button name="_action" value="deleteShelfItem">
+          <TrashIcon />
+        </button>
+        <input type="hidden" name="itemId" value={shelfItem.id} />
+        <ErrorMessage className="pl-2">
+          {deleteShelfItemFetcher.data?.errors?.itemId}
+        </ErrorMessage>
+      </deleteShelfItemFetcher.Form>
     </li>
   );
 }
