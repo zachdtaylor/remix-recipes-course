@@ -7,6 +7,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useMatches,
   useNavigation,
   useResolvedPath,
 } from "@remix-run/react";
@@ -18,6 +19,7 @@ import {
   SettingsIcon,
 } from "./components/icons";
 import classNames from "classnames";
+import React from "react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -29,6 +31,10 @@ export const meta: MetaFunction = () => {
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 export default function App() {
+  const matches = useMatches();
+  React.useEffect(() => {
+    console.log(matches);
+  }, [matches]);
   return (
     <html lang="en">
       <head>
