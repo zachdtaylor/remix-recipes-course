@@ -44,6 +44,9 @@ module.exports = {
           { name: "NavLink", linkAttribute: "to" },
         ],
       },
+      rules: {
+        "react/no-unescaped-entities": "off",
+      },
     },
 
     // Typescript
