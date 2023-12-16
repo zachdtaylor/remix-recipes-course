@@ -28,3 +28,11 @@ export function createShelf() {
     },
   });
 }
+
+export function deleteShelf(shelfId: string) {
+  return db.pantryShelf.delete({
+    where: {
+      id: shelfId,
+    },
+  });
+}

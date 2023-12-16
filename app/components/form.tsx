@@ -1,11 +1,9 @@
 import classNames from "classnames";
-import React from "react";
+import { type ButtonHTMLAttributes } from "react";
 
-type ButtonProps = {
-  children: React.ReactNode;
-  className?: string;
-  name?: string;
-};
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  isLoading?: boolean;
+}
 export function Button({ children, className, ...props }: ButtonProps) {
   return (
     <button
@@ -20,11 +18,29 @@ export function Button({ children, className, ...props }: ButtonProps) {
   );
 }
 
-export function PrimaryButton({ className, ...props }: ButtonProps) {
+export function PrimaryButton({ className, isLoading, ...props }: ButtonProps) {
   return (
     <Button
       {...props}
-      className={classNames("bg-primary text-white", className)}
+      className={classNames(
+        "bg-primary text-white",
+        { "bg-primary-light": isLoading },
+        className
+      )}
+    />
+  );
+}
+
+export function DeleteButton({ className, isLoading, ...props }: ButtonProps) {
+  return (
+    <Button
+      {...props}
+      className={classNames(
+        "border-2 border-red-600 text-red-600",
+        "hover:bg-red-600 hover:text-white",
+        { "border-red-400 text-red-400": isLoading },
+        className
+      )}
     />
   );
 }
