@@ -170,7 +170,10 @@ function Shelf({ shelf }: ShelfProps) {
   const saveShelfNameFetcher = useFetcher<any>();
   const createShelfItemFetcher = useFetcher<any>();
   const createItemFormRef = React.useRef<HTMLFormElement>(null);
-  const { renderedItems, addItem } = useOptimisticItems(shelf.items);
+  const { renderedItems, addItem } = useOptimisticItems(
+    shelf.items,
+    createShelfItemFetcher.state
+  );
 
   const isDeletingShelf =
     deleteShelfFetcher.formData?.get("_action") === "deleteShelf" &&
@@ -291,8 +294,9 @@ type ShelfItemProps = {
 };
 function ShelfItem({ shelfItem }: ShelfItemProps) {
   const deleteShelfItemFetcher = useFetcher<any>();
+  const isDeletingItem = !!deleteShelfItemFetcher.formData;
 
-  return (
+  return isDeletingItem ? null : (
     <li className="py-2">
       <deleteShelfItemFetcher.Form method="post" className="flex">
         <p className="w-full">{shelfItem.name}</p>
@@ -315,7 +319,10 @@ type RenderedItem = {
   name: string;
   isOptimistic?: boolean;
 };
-function useOptimisticItems(savedItems: Array<RenderedItem>) {
+function useOptimisticItems(
+  savedItems: Array<RenderedItem>,
+  createShelfItemState: "idle" | "submitting" | "loading"
+) {
   const [optimisticItems, setOptimisticItems] = React.useState<
     Array<RenderedItem>
   >([]);
@@ -328,8 +335,10 @@ function useOptimisticItems(savedItems: Array<RenderedItem>) {
   });
 
   useServerLayoutEffect(() => {
-    setOptimisticItems([]);
-  }, [savedItems]);
+    if (createShelfItemState === "idle") {
+      setOptimisticItems([]);
+    }
+  }, [createShelfItemState]);
 
   const addItem = (name: string) => {
     setOptimisticItems((items) => [
