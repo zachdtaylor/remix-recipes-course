@@ -5,6 +5,12 @@ import { z } from "zod";
 import { ErrorMessage, PrimaryButton } from "~/components/forms";
 import { validateForm } from "~/utils/validation";
 
+export function headers() {
+  return {
+    "Set-Cookie": "remix-recipes-cookie=myValue",
+  };
+}
+
 const loginSchema = z.object({
   email: z.string().email(),
 });
