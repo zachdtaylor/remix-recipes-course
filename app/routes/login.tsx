@@ -3,11 +3,11 @@ import { Route } from "./+types/login";
 import { validateForm } from "~/utils/validation";
 import { z } from "zod";
 import { data, useActionData } from "react-router";
+import { getUser } from "~/models/user.server";
 
-export function headers() {
-  return {
-    "Set-Cookie": "remix-recipes-cookie=myValue",
-  };
+export async function loader({ request }: Route.LoaderArgs) {
+  const cookieHeader = request.headers.get("cookie");
+  return null;
 }
 
 const loginSchema = z.object({
@@ -20,7 +20,25 @@ export async function action({ request }: Route.ActionArgs) {
   return validateForm(
     formData,
     loginSchema,
-    ({ email }) => {},
+    async ({ email }) => {
+      const user = await getUser(email);
+
+      if (user === null) {
+        return data(
+          { errors: { email: "User with this email does not exist" } },
+          { status: 404 }
+        );
+      }
+
+      return data(
+        { user },
+        {
+          headers: {
+            "Set-Cookie": `remix-recipes__userId=${user.id}; HttpOnly; Secure`,
+          },
+        }
+      );
+    },
     (errors) =>
       data(
         { errors, email: formData.get("email")?.toString() },
@@ -32,6 +50,13 @@ export async function action({ request }: Route.ActionArgs) {
 export default function Login() {
   const actionData = useActionData<typeof action>();
 
+  const defaultValue =
+    actionData !== undefined && "email" in actionData ? actionData?.email : "";
+  const emailError =
+    actionData !== undefined && "errors" in actionData
+      ? actionData?.errors.email
+      : "";
+
   return (
     <div className="text-center mt-36">
       <h1 className="text-3xl mb-8">Remix Recipes</h1>
@@ -42,10 +67,10 @@ export default function Login() {
             name="email"
             placeholder="Email"
             autoComplete="off"
-            defaultValue={actionData?.email}
+            defaultValue={defaultValue}
             className="w-full outline-none border-2 border-gray-200 focus:border-primary rounded-md p-2"
           />
-          <ErrorMessage>{actionData?.errors?.email}</ErrorMessage>
+          <ErrorMessage>{emailError}</ErrorMessage>
         </div>
         <PrimaryButton className="w-1/3 mx-auto">Log In</PrimaryButton>
       </form>
