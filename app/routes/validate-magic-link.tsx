@@ -1,9 +1,11 @@
 import { getMagicLinkPayload, invalidMagicLink } from "~/magic-links.server";
+import { commitSession, getSession } from "~/sessions";
 import { Route } from "./+types/validate-magic-link";
+import { data } from "react-router";
 
 const magicLinkMaxAge = 1000 * 60 * 10; // 10 minutes
 
-export function loader({ request }: Route.LoaderArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const magicLinkPayload = getMagicLinkPayload(request);
   console.log(magicLinkPayload);
 
@@ -16,6 +18,19 @@ export function loader({ request }: Route.LoaderArgs) {
   }
 
   // 2. Validate nonce
+  const cookieHeader = request.headers.get("cookie");
+  const session = await getSession(cookieHeader);
 
-  return new Response("ok");
+  if (session.get("nonce") !== magicLinkPayload.nonce) {
+    throw invalidMagicLink("invalid nonce");
+  }
+
+  return data(
+    { ok: true },
+    {
+      headers: {
+        "Set-Cookie": await commitSession(session),
+      },
+    }
+  );
 }

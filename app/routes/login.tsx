@@ -3,7 +3,7 @@ import { Route } from "./+types/login";
 import { validateForm } from "~/utils/validation";
 import { z } from "zod";
 import { data, useActionData } from "react-router";
-import { getSession } from "~/sessions";
+import { commitSession, getSession } from "~/sessions";
 import { v4 as uuid } from "uuid";
 import { generateMagicLink } from "~/magic-links.server";
 
@@ -28,9 +28,19 @@ export async function action({ request }: Route.ActionArgs) {
     loginSchema,
     async ({ email }) => {
       const nonce = uuid();
+      session.flash("nonce", nonce);
+
       const link = generateMagicLink(email, nonce);
       console.log(link);
-      return { ok: true };
+
+      return data(
+        { ok: true },
+        {
+          headers: {
+            "Set-Cookie": await commitSession(session),
+          },
+        }
+      );
     },
     (errors) =>
       data(
