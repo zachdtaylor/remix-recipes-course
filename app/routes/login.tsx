@@ -3,7 +3,7 @@ import { useActionData } from "@remix-run/react";
 import classNames from "classnames";
 import { z } from "zod";
 import { ErrorMessage, PrimaryButton } from "~/components/forms";
-import { getSession } from "~/sessions";
+import { commitSession, getSession } from "~/sessions";
 import { validateForm } from "~/utils/validation";
 import { v4 as uuid } from "uuid";
 import { generateMagicLink } from "~/magic-links.server";
@@ -29,9 +29,16 @@ export async function action({ request }: ActionFunctionArgs) {
     loginSchema,
     async ({ email }) => {
       const nonce = uuid();
+      session.flash("nonce", nonce);
+
       const link = generateMagicLink(email, nonce);
       console.log(link);
-      return json("ok");
+
+      return json("ok", {
+        headers: {
+          "Set-Cookie": await commitSession(session),
+        },
+      });
     },
     (errors) => json({ errors, email: formData.get("email") }, { status: 400 })
   );
