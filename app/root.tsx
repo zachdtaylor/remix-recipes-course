@@ -7,9 +7,9 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
+  useLoaderData,
   useNavigation,
   useResolvedPath,
-  useRouteError,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -22,6 +22,7 @@ import {
   SettingsIcon,
 } from "./components/icons";
 import classNames from "classnames";
+import { getCurrentUser } from "./utils/auth.server";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -44,6 +45,12 @@ export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
 
+export async function loader({ request }: Route.LoaderArgs) {
+  const user = await getCurrentUser(request);
+
+  return { isLoggedIn: user !== null };
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -63,6 +70,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const data = useLoaderData<typeof loader>();
   return (
     <>
       <nav className="bg-primary text-white md:w-16 flex justify-between md:flex-col">
@@ -73,9 +81,11 @@ export default function App() {
           <AppNavLink to="discover">
             <DiscoverIcon />
           </AppNavLink>
-          <AppNavLink to="app/pantry">
-            <RecipeBookIcon />
-          </AppNavLink>
+          {data.isLoggedIn ? (
+            <AppNavLink to="app/pantry">
+              <RecipeBookIcon />
+            </AppNavLink>
+          ) : null}
           <AppNavLink to="settings">
             <SettingsIcon />
           </AppNavLink>
