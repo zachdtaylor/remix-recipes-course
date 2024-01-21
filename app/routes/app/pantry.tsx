@@ -21,8 +21,11 @@ import { z } from "zod";
 import { createShelfItem, deleteShelfItem } from "~/models/pantry-item.server";
 import React from "react";
 import { useIsHydrated, useServerLayoutEffect } from "~/utils/misc";
+import { requireLoggedInUser } from "~/utils/auth.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
+  await requireLoggedInUser(request);
+
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
   const shelves = await getAllShelves(q);
@@ -48,6 +51,8 @@ const deleteShelfItemSchema = z.object({
 });
 
 export async function action({ request }: Route.ActionArgs) {
+  await requireLoggedInUser(request);
+
   const formData = await request.formData();
   switch (formData.get("_action")) {
     case "createShelf": {
