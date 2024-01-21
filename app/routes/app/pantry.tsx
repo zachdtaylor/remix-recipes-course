@@ -24,11 +24,11 @@ import { useIsHydrated, useServerLayoutEffect } from "~/utils/misc";
 import { requireLoggedInUser } from "~/utils/auth.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  await requireLoggedInUser(request);
+  const user = await requireLoggedInUser(request);
 
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
-  const shelves = await getAllShelves(q);
+  const shelves = await getAllShelves(user.id, q);
   return { shelves };
 }
 

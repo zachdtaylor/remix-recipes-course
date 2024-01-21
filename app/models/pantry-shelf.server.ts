@@ -1,9 +1,10 @@
 import db from "~/db.server";
 import { handleDelete } from "./utils";
 
-export function getAllShelves(query: string | null) {
+export function getAllShelves(userId: string, query: string | null) {
   return db.pantryShelf.findMany({
     where: {
+      userId,
       name: {
         contains: query ?? "",
         mode: "insensitive",
