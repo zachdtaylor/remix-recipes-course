@@ -24,6 +24,7 @@ import {
   DiscoverIcon,
   HomeIcon,
   LoginIcon,
+  LogoutIcon,
   RecipeBookIcon,
   SettingsIcon,
 } from "./components/icons";
@@ -80,9 +81,15 @@ export default function App() {
             </AppNavLink>
           </ul>
           <ul>
-            <AppNavLink to="/login">
-              <LoginIcon />
-            </AppNavLink>
+            {data.isLoggedIn ? (
+              <AppNavLink to="/logout">
+                <LogoutIcon />
+              </AppNavLink>
+            ) : (
+              <AppNavLink to="/login">
+                <LoginIcon />
+              </AppNavLink>
+            )}
           </ul>
         </nav>
         <div className="p-4 w-full md:w-[calc(100%-4rem)]">
