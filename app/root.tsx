@@ -1,4 +1,9 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import {
+  json,
+  type LinksFunction,
+  type LoaderFunctionArgs,
+  type MetaFunction,
+} from "@remix-run/node";
 import {
   Link,
   Links,
@@ -9,6 +14,7 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
+  useLoaderData,
   useNavigation,
   useResolvedPath,
   useRouteError,
@@ -23,6 +29,7 @@ import {
 } from "./components/icons";
 import classNames from "classnames";
 import React from "react";
+import { getCurrentUser } from "./utils/auth.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -33,7 +40,14 @@ export const meta: MetaFunction = () => {
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
+export async function loader({ request }: LoaderFunctionArgs) {
+  const user = await getCurrentUser(request);
+
+  return json({ isLoggedIn: user !== null });
+}
+
 export default function App() {
+  const data = useLoaderData<typeof loader>();
   return (
     <html lang="en">
       <head>
@@ -56,9 +70,11 @@ export default function App() {
             <AppNavLink to="discover">
               <DiscoverIcon />
             </AppNavLink>
-            <AppNavLink to="app/pantry">
-              <RecipeBookIcon />
-            </AppNavLink>
+            {data.isLoggedIn ? (
+              <AppNavLink to="app/pantry">
+                <RecipeBookIcon />
+              </AppNavLink>
+            ) : null}
             <AppNavLink to="settings">
               <SettingsIcon />
             </AppNavLink>
