@@ -1,14 +1,15 @@
 import { requireLoggedInUser } from "~/utils/auth.server";
 import { Route } from "./+types/recipes";
 import db from "~/db.server";
-import { NavLink, Outlet, useLoaderData } from "react-router";
+import { Form, NavLink, Outlet, redirect, useLoaderData } from "react-router";
 import {
   RecipeCard,
   RecipeDetailWrapper,
   RecipeListWrapper,
   RecipePageWrapper,
 } from "~/components/recipes";
-import { SearchBar } from "~/components/form";
+import { PrimaryButton, SearchBar } from "~/components/form";
+import { PlusIcon } from "~/components/icons";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await requireLoggedInUser(request);
@@ -29,6 +30,22 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { recipes };
 }
 
+export async function action({ request }: Route.ActionArgs) {
+  const user = await requireLoggedInUser(request);
+
+  const recipe = await db.recipe.create({
+    data: {
+      userId: user.id,
+      name: "New Recipe",
+      totalTime: "0 min",
+      imageUrl: "https://placehold.co/150?text=Remix+Recipes",
+      instructions: "",
+    },
+  });
+
+  return redirect(`/app/recipes/${recipe.id}`);
+}
+
 export default function Recipes() {
   const data = useLoaderData<typeof loader>();
 
@@ -36,6 +53,14 @@ export default function Recipes() {
     <RecipePageWrapper>
       <RecipeListWrapper>
         <SearchBar placeholder="Search Recipes..." />
+        <Form method="post" className="mt-4" reloadDocument>
+          <PrimaryButton className="w-full">
+            <div className="flex w-full justify-center">
+              <PlusIcon />
+              <span className="ml-2">Create New Recipe</span>
+            </div>
+          </PrimaryButton>
+        </Form>
         <ul>
           {data?.recipes.map((recipe) => (
             <li className="my-4" key={recipe.id}>
