@@ -46,7 +46,7 @@ function getRecipes(userId: string) {
       userId,
       name: "Buttermilk Pancakes",
       totalTime: "15 min",
-      imageUrl: "https://via.placeholder.com/150?text=Remix+Recipes",
+      imageUrl: "https://placehold.co/150?text=Remix+Recipes",
       instructions:
         "Whisk together salt, baking powder, baking soda, four and sugar. In a separate bowl, combine eggs and buttermilk and drizzle in butter. With wooden spoon, combine wet and dry ingredients until just moistened.",
       ingredients: {
@@ -66,7 +66,7 @@ function getRecipes(userId: string) {
       userId,
       name: "French Dip Sandwiches",
       totalTime: "4-10 hrs (crockpot)",
-      imageUrl: "https://via.placeholder.com/150?text=Remix+Recipes",
+      imageUrl: "https://placehold.co/150?text=Remix+Recipes",
       instructions:
         "Place roast in slow cooker and sprinkle onion soup mix over the roast. Add water and beef broth. Cook on high for 4-6 hours or low for 8-10. Serve on rolls with swiss cheese.",
       ingredients: {
@@ -84,7 +84,7 @@ function getRecipes(userId: string) {
       userId,
       name: "Shepherds Pie",
       totalTime: "40 min",
-      imageUrl: "https://via.placeholder.com/150?text=Remix+Recipes",
+      imageUrl: "https://placehold.co/150?text=Remix+Recipes",
       instructions:
         "Brown ground beef with onion. Add brown sugar, vinegar, tomato soup and mustard. Pour into baking dish and top with mashed potatoes. Sprinkle with grated cheese and bake at 350 for 30 minutes.",
       ingredients: {
@@ -104,7 +104,7 @@ function getRecipes(userId: string) {
       userId,
       name: "Chicken Alfredo",
       totalTime: "90 min",
-      imageUrl: "https://via.placeholder.com/150?text=Remix+Recipes",
+      imageUrl: "https://placehold.co/150?text=Remix+Recipes",
       instructions:
         "Melt butter in large pan. Add garlic and cook for 30 seconds. Whisk in flour and stir for another 30 seconds. Add cream cheese and stir until it starts to melt down. Pour in cream and parmesan and whisk until cream cheese is incorporated. Once the sauce has thickened, season with salt and pepper.\n\nCut chicken into thin pieces. In a shallow dish combine flour, 1 tsp salt and 1 tsp pepper. In another dish beat eggs. In a third dish combine bread crumbs and parmesan. Working with one piece at a time, dredge in flour, then egg, then bread crumb/parmesan mixture. Cover and place in a baking dish and bake at 350 for 50-60 minutes.\n\n(Sausage can also be added to this alfredo for a variation)",
       ingredients: {
