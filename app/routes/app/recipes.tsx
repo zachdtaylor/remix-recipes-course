@@ -1,5 +1,6 @@
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { NavLink, Outlet, useLoaderData } from "@remix-run/react";
+import { SearchBar } from "~/components/forms";
 import {
   RecipeCard,
   RecipeDetailWrapper,
@@ -26,6 +27,7 @@ export default function Recipes() {
   return (
     <RecipePageWrapper>
       <RecipeListWrapper>
+        <SearchBar placeholder="Search Recipes..." />
         <ul>
           {data?.recipes.map((recipe) => (
             <li className="my-4" key={recipe.id}>
