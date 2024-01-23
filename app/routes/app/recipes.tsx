@@ -8,6 +8,7 @@ import {
   RecipeListWrapper,
   RecipePageWrapper,
 } from "~/components/recipes";
+import { SearchBar } from "~/components/form";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await requireLoggedInUser(request);
@@ -26,6 +27,7 @@ export default function Recipes() {
   return (
     <RecipePageWrapper>
       <RecipeListWrapper>
+        <SearchBar placeholder="Search Recipes..." />
         <ul>
           {data?.recipes.map((recipe) => (
             <li className="my-4" key={recipe.id}>
