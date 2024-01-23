@@ -12,9 +12,17 @@ import { SearchBar } from "~/components/form";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await requireLoggedInUser(request);
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q");
 
   const recipes = await db.recipe.findMany({
-    where: { userId: user.id },
+    where: {
+      userId: user.id,
+      name: {
+        contains: q ?? "",
+        mode: "insensitive",
+      },
+    },
     select: { name: true, totalTime: true, imageUrl: true, id: true },
   });
 
