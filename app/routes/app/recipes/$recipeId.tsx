@@ -1,9 +1,15 @@
 import db from "~/db.server";
 import { Route } from "./+types/$recipeId";
 import { data, Form, useLoaderData } from "react-router";
-import { ErrorMessage, Input } from "~/components/form";
+import {
+  DeleteButton,
+  ErrorMessage,
+  Input,
+  PrimaryButton,
+} from "~/components/form";
 import { TimeIcon, TrashIcon } from "~/components/icons";
 import React from "react";
+import classNames from "classnames";
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
   return loaderHeaders;
@@ -86,6 +92,31 @@ export default function RecipeDetail() {
             </button>
           </React.Fragment>
         ))}
+      </div>
+      <label
+        htmlFor="instructions"
+        className="block font-bold text-sm pb-2 w-fit"
+      >
+        Instructions
+      </label>
+      <textarea
+        key={data.recipe?.id}
+        id="instructions"
+        name="instructions"
+        placeholder="Instructions go here"
+        defaultValue={data.recipe?.instructions}
+        className={classNames(
+          "w-full h-56 rounded-md outline-none",
+          "focus:border-2 focus:p-3 focus:border-primary duration-300"
+        )}
+      />
+      <ErrorMessage></ErrorMessage>
+      <hr className="my-4" />
+      <div className="flex justify-between">
+        <DeleteButton>Delete this Recipe</DeleteButton>
+        <PrimaryButton>
+          <div className="flex flex-col justify-center h-full">Save</div>
+        </PrimaryButton>
       </div>
     </Form>
   );
