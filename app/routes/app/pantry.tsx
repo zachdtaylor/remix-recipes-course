@@ -11,6 +11,7 @@ import { z } from "zod";
 import {
   DeleteButton,
   ErrorMessage,
+  Input,
   PrimaryButton,
   SearchBar,
 } from "~/components/forms";
@@ -213,21 +214,15 @@ function Shelf({ shelf }: ShelfProps) {
     >
       <saveShelfNameFetcher.Form method="post" className="flex">
         <div className="w-full mb-2 peer">
-          <input
+          <Input
             type="text"
             required
             defaultValue={shelf.name}
             name="shelfName"
             placeholder="Shelf Name"
             autoComplete="off"
-            className={classNames(
-              "text-2xl font-extrabold w-full outline-none",
-              "border-b-2 focus:border-b-primary border-b-background",
-              {
-                "border-b-red-600":
-                  saveShelfNameFetcher.data?.errors?.shelfName,
-              }
-            )}
+            className="text-2xl font-extrabold"
+            error={!!saveShelfNameFetcher.data?.errors?.shelfName}
             onChange={(event) =>
               event.target.value !== "" &&
               saveShelfNameFetcher.submit(
