@@ -4,7 +4,13 @@ import {
   json,
   redirect,
 } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  isRouteErrorResponse,
+  useActionData,
+  useLoaderData,
+  useRouteError,
+} from "@remix-run/react";
 import classNames from "classnames";
 import React from "react";
 import { z } from "zod";
@@ -17,9 +23,11 @@ import {
 import { SaveIcon, TimeIcon, TrashIcon } from "~/components/icons";
 import db from "~/db.server";
 import { handleDelete } from "~/models/utils";
+import { requireLoggedInUser } from "~/utils/auth.server";
 import { validateForm } from "~/utils/validation";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const user = await requireLoggedInUser(request);
   const recipe = await db.recipe.findUnique({
     where: { id: params.recipeId },
     include: {
@@ -35,6 +43,20 @@ export async function loader({ params }: LoaderFunctionArgs) {
       },
     },
   });
+
+  if (recipe === null) {
+    throw json(
+      { message: "A recipe with that id does not exist" },
+      { status: 404 }
+    );
+  }
+
+  if (recipe.userId !== user.id) {
+    throw json(
+      { message: "You are not authorized to view this recipe" },
+      { status: 401 }
+    );
+  }
 
   return json({ recipe }, { headers: { "Cache-Control": "max-age=10" } });
 }
@@ -248,5 +270,26 @@ export default function RecipeDetail() {
         </PrimaryButton>
       </div>
     </Form>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <div className="bg-red-600 text-white rounded-md p-4">
+        <h1 className="mb-2">
+          {error.status} - {error.statusText}
+        </h1>
+        <p>{error.data.message}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-red-600 text-white rounded-md p-4">
+      <h1 className="mb-2">An unexpected error occurred.</h1>
+    </div>
   );
 }
