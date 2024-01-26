@@ -3,9 +3,11 @@ import { Route } from "./+types/$recipeId";
 import {
   data,
   Form,
+  isRouteErrorResponse,
   redirect,
   useActionData,
   useLoaderData,
+  useRouteError,
 } from "react-router";
 import {
   DeleteButton,
@@ -19,12 +21,14 @@ import classNames from "classnames";
 import { z } from "zod";
 import { validateForm } from "~/utils/validation";
 import { handleDelete } from "~/models/utils";
+import { requireLoggedInUser } from "~/utils/auth.server";
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
   return loaderHeaders;
 }
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
+  const user = await requireLoggedInUser(request);
   const recipe = await db.recipe.findUnique({
     where: { id: params.recipeId },
     include: {
@@ -40,6 +44,20 @@ export async function loader({ params }: Route.LoaderArgs) {
       },
     },
   });
+
+  if (recipe === null) {
+    throw data(
+      { message: "A recipe with that id does not exist" },
+      { status: 404 }
+    );
+  }
+
+  if (recipe.userId !== user.id) {
+    throw data(
+      { message: "You are not authorized to view this recipe" },
+      { status: 401 }
+    );
+  }
 
   return data({ recipe }, { headers: { "Cache-Control": "max-age=5" } });
 }
@@ -258,5 +276,24 @@ export default function RecipeDetail() {
         </PrimaryButton>
       </div>
     </Form>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <div className="bg-red-600 text-white rounded-md p-4">
+        <h1 className="mb-2">{error.status}</h1>
+        <p>{error.data.message}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-red-600 text-white rounded-md p-4">
+      <h1 className="mb-2">An unexpected error occurred.</h1>
+    </div>
   );
 }
