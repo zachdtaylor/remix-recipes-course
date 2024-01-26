@@ -10,6 +10,8 @@ import {
 import { TimeIcon, TrashIcon } from "~/components/icons";
 import React from "react";
 import classNames from "classnames";
+import { z } from "zod";
+import { validateForm } from "~/utils/validation";
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
   return loaderHeaders;
@@ -30,6 +32,31 @@ export async function loader({ params }: Route.LoaderArgs) {
   });
 
   return data({ recipe }, { headers: { "Cache-Control": "max-age=5" } });
+}
+
+const saveRecipeSchema = z.object({
+  name: z.string().min(1, "Name cannot be blank"),
+  totalTime: z.string().min(1, "Total time cannot be blank"),
+  instructions: z.string().min(1, "Instructions cannot be blank"),
+});
+
+export async function action({ request, params }: Route.ActionArgs) {
+  const formData = await request.formData();
+  const recipeId = params.recipeId;
+
+  switch (formData.get("_action")) {
+    case "saveRecipe": {
+      return validateForm(
+        formData,
+        saveRecipeSchema,
+        (data) => db.recipe.update({ where: { id: recipeId }, data }),
+        (errors) => data({ errors }, { status: 400 })
+      );
+    }
+    default: {
+      return null;
+    }
+  }
 }
 
 export default function RecipeDetail() {
@@ -114,7 +141,7 @@ export default function RecipeDetail() {
       <hr className="my-4" />
       <div className="flex justify-between">
         <DeleteButton>Delete this Recipe</DeleteButton>
-        <PrimaryButton>
+        <PrimaryButton name="_action" value="saveRecipe">
           <div className="flex flex-col justify-center h-full">Save</div>
         </PrimaryButton>
       </div>
