@@ -245,36 +245,14 @@ export default function RecipeDetail() {
         <h2 className="font-bold text-sm pb-1">Name</h2>
         <div></div>
         {data.recipe?.ingredients.map((ingredient, idx) => (
-          <React.Fragment key={ingredient.id}>
-            <input type="hidden" name="ingredientIds[]" value={ingredient.id} />
-            <div>
-              <Input
-                type="text"
-                autoComplete="off"
-                name="ingredientAmounts[]"
-                defaultValue={ingredient.amount ?? ""}
-                error={!!actionData?.errors?.[`ingredientAmounts.${idx}`]}
-              />
-              <ErrorMessage>
-                {actionData?.errors?.[`ingredientAmounts.${idx}`]}
-              </ErrorMessage>
-            </div>
-            <div>
-              <Input
-                type="text"
-                autoComplete="off"
-                name="ingredientNames[]"
-                defaultValue={ingredient.name}
-                error={!!actionData?.errors?.[`ingredientNames.${idx}`]}
-              />
-              <ErrorMessage>
-                {actionData?.errors?.[`ingredientNames.${idx}`]}
-              </ErrorMessage>
-            </div>
-            <button name="_action" value={`deleteIngredient.${ingredient.id}`}>
-              <TrashIcon />
-            </button>
-          </React.Fragment>
+          <IngredientRow
+            key={ingredient.id}
+            id={ingredient.id}
+            amount={ingredient.amount}
+            name={ingredient.name}
+            amountError={actionData?.errors?.[`ingredientAmounts.${idx}`]}
+            nameError={actionData?.errors?.[`ingredientNames.${idx}`]}
+          />
         ))}
         <div>
           <Input
@@ -337,6 +315,50 @@ export default function RecipeDetail() {
         </PrimaryButton>
       </div>
     </Form>
+  );
+}
+
+type IngredientRowProps = {
+  id: string;
+  amount: string | null;
+  amountError?: string;
+  name: string;
+  nameError?: string;
+};
+function IngredientRow({
+  id,
+  amount,
+  amountError,
+  name,
+  nameError,
+}: IngredientRowProps) {
+  return (
+    <React.Fragment>
+      <input type="hidden" name="ingredientIds[]" value={id} />
+      <div>
+        <Input
+          type="text"
+          autoComplete="off"
+          name="ingredientAmounts[]"
+          defaultValue={amount ?? ""}
+          error={!!amountError}
+        />
+        <ErrorMessage>{amountError}</ErrorMessage>
+      </div>
+      <div>
+        <Input
+          type="text"
+          autoComplete="off"
+          name="ingredientNames[]"
+          defaultValue={name}
+          error={!!nameError}
+        />
+        <ErrorMessage>{nameError}</ErrorMessage>
+      </div>
+      <button name="_action" value={`deleteIngredient.${id}`}>
+        <TrashIcon />
+      </button>
+    </React.Fragment>
   );
 }
 
