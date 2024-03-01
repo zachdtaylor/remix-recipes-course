@@ -30,3 +30,17 @@ export function useIsHydrated() {
 
   return isHydrated;
 }
+
+export function useDebouncedFunction<T extends Array<any>>(
+  fn: (...args: T) => unknown,
+  time: number
+) {
+  const timeoutId = React.useRef<number>();
+
+  const debouncedFn = (...args: T) => {
+    window.clearTimeout(timeoutId.current);
+    timeoutId.current = window.setTimeout(() => fn(...args), time);
+  };
+
+  return debouncedFn;
+}
