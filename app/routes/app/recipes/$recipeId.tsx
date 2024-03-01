@@ -289,6 +289,7 @@ export default function RecipeDetail() {
 
   return (
     <Form method="post" reloadDocument>
+      <button name="_action" value="saveRecipe" className="hidden" />
       <div className="mb-2">
         <Input
           key={data.recipe?.id}
