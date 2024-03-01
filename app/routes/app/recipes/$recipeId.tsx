@@ -240,6 +240,11 @@ export default function RecipeDetail() {
   const saveInstructionsFetcher = useFetcher<any>();
   const createIngredientFetcher = useFetcher<any>();
 
+  const { renderedIngredients, addIngredient } = useOptimisticIngredients(
+    data.recipe.ingredients,
+    createIngredientFetcher.state
+  );
+
   const [createIngredientForm, setCreateIngredientForm] = React.useState({
     amount: "",
     name: "",
@@ -270,6 +275,7 @@ export default function RecipeDetail() {
   );
 
   const createIngredient = () => {
+    addIngredient(createIngredientForm.amount, createIngredientForm.name);
     createIngredientFetcher.submit(
       {
         _action: "createIngredient",
@@ -329,7 +335,7 @@ export default function RecipeDetail() {
         <h2 className="font-bold text-sm pb-1">Amount</h2>
         <h2 className="font-bold text-sm pb-1">Name</h2>
         <div></div>
-        {data.recipe?.ingredients.map((ingredient, idx) => (
+        {renderedIngredients.map((ingredient, idx) => (
           <IngredientRow
             key={ingredient.id}
             id={ingredient.id}
@@ -337,6 +343,7 @@ export default function RecipeDetail() {
             name={ingredient.name}
             amountError={actionData?.errors?.[`ingredientAmounts.${idx}`]}
             nameError={actionData?.errors?.[`ingredientNames.${idx}`]}
+            isOptimistic={ingredient.isOptimistic}
           />
         ))}
         <div>
@@ -445,6 +452,7 @@ type IngredientRowProps = {
   amountError?: string;
   name: string;
   nameError?: string;
+  isOptimistic?: boolean;
 };
 function IngredientRow({
   id,
@@ -452,6 +460,7 @@ function IngredientRow({
   amountError,
   name,
   nameError,
+  isOptimistic,
 }: IngredientRowProps) {
   const saveAmountFetcher = useFetcher<any>();
   const saveNameFetcher = useFetcher<any>();
@@ -493,6 +502,7 @@ function IngredientRow({
           defaultValue={amount ?? ""}
           error={!!(saveAmountFetcher.data?.errors?.amount ?? amountError)}
           onChange={(e) => saveAmount(e.target.value)}
+          disabled={isOptimistic}
         />
         <ErrorMessage>
           {saveAmountFetcher.data?.errors?.amount ?? amountError}
@@ -506,6 +516,7 @@ function IngredientRow({
           defaultValue={name}
           error={!!(saveNameFetcher.data?.errors?.name ?? nameError)}
           onChange={(e) => saveName(e.target.value)}
+          disabled={isOptimistic}
         />
         <ErrorMessage>
           {saveNameFetcher.data?.errors?.name ?? nameError}
