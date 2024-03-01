@@ -268,6 +268,7 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
   );
   const saveInstructionsFetcher = useFetcher<typeof action>();
   const createIngredientFetcher = useFetcher<any>();
+  const newIngredientAmountRef = React.useRef<HTMLInputElement>(null);
 
   const { renderedIngredients, addIngredient } = useOptimisticIngredients(
     data.recipe.ingredients,
@@ -314,6 +315,7 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
       { method: "post" }
     );
     setCreateIngredientForm({ amount: "", name: "" });
+    newIngredientAmountRef.current?.focus();
   };
 
   return (
@@ -378,6 +380,7 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
         ))}
         <div>
           <Input
+            ref={newIngredientAmountRef}
             type="text"
             autoComplete="off"
             name="newIngredientAmount"
