@@ -267,6 +267,12 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
     params.recipeId
   );
   const saveInstructionsFetcher = useFetcher<typeof action>();
+  const createIngredientFetcher = useFetcher<any>();
+
+  const [createIngredientForm, setCreateIngredientForm] = React.useState({
+    amount: "",
+    name: "",
+  });
 
   const saveName = useDebouncedFunction(
     (name: string) =>
@@ -291,6 +297,18 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
       ),
     1000
   );
+
+  const createIngredient = () => {
+    createIngredientFetcher.submit(
+      {
+        _action: "createIngredient",
+        newIngredientAmount: createIngredientForm.amount,
+        newIngredientName: createIngredientForm.name,
+      },
+      { method: "post" }
+    );
+    setCreateIngredientForm({ amount: "", name: "" });
+  };
 
   return (
     <Form method="post" reloadDocument>
@@ -356,9 +374,24 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
             autoComplete="off"
             name="newIngredientAmount"
             className="border-b-gray-200"
-            error={!!actionData?.errors?.newIngredientAmount}
+            error={
+              !!(
+                createIngredientFetcher.data?.errors?.newIngredientAmount ??
+                actionData?.errors?.newIngredientAmount
+              )
+            }
+            value={createIngredientForm.amount}
+            onChange={(e) =>
+              setCreateIngredientForm((values) => ({
+                ...values,
+                amount: e.target.value,
+              }))
+            }
           />
-          <ErrorMessage>{actionData?.errors?.newIngredientAmount}</ErrorMessage>
+          <ErrorMessage>
+            {createIngredientFetcher.data?.errors?.newIngredientAmount ??
+              actionData?.errors?.newIngredientAmount}
+          </ErrorMessage>
         </div>
         <div>
           <Input
@@ -366,11 +399,33 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
             autoComplete="off"
             name="newIngredientName"
             className="border-b-gray-200"
-            error={!!actionData?.errors?.newIngredientName}
+            error={
+              !!(
+                createIngredientFetcher.data?.errors?.newIngredientName ??
+                actionData?.errors?.newIngredientName
+              )
+            }
+            value={createIngredientForm.name}
+            onChange={(e) =>
+              setCreateIngredientForm((values) => ({
+                ...values,
+                name: e.target.value,
+              }))
+            }
           />
-          <ErrorMessage>{actionData?.errors?.newIngredientName}</ErrorMessage>
+          <ErrorMessage>
+            {createIngredientFetcher.data?.errors?.newIngredientName ??
+              actionData?.errors?.newIngredientName}
+          </ErrorMessage>
         </div>
-        <button name="_action" value="createIngredient">
+        <button
+          name="_action"
+          value="createIngredient"
+          onClick={(e) => {
+            e.preventDefault();
+            createIngredient();
+          }}
+        >
           <SaveIcon />
         </button>
       </div>
