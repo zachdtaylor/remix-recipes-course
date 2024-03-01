@@ -62,8 +62,6 @@ export async function action({ request }: Route.ActionArgs) {
 
 export default function Recipes() {
   const data = useLoaderData<typeof loader>();
-  const location = useLocation();
-  const navigation = useNavigation();
 
   return (
     <RecipePageWrapper>
@@ -78,32 +76,47 @@ export default function Recipes() {
           </PrimaryButton>
         </Form>
         <ul>
-          {data?.recipes.map((recipe) => {
-            const isLoading = navigation.location?.pathname.endsWith(recipe.id);
-            return (
-              <li className="my-4" key={recipe.id}>
-                <NavLink
-                  to={{ pathname: recipe.id, search: location.search }}
-                  prefetch="intent"
-                >
-                  {({ isActive }) => (
-                    <RecipeCard
-                      name={recipe.name}
-                      totalTime={recipe.totalTime}
-                      imageUrl={recipe.imageUrl}
-                      isActive={isActive}
-                      isLoading={isLoading}
-                    />
-                  )}
-                </NavLink>
-              </li>
-            );
-          })}
+          {data?.recipes.map((recipe) => (
+            <RecipeListItem key={recipe.id} recipe={recipe} />
+          ))}
         </ul>
       </RecipeListWrapper>
       <RecipeDetailWrapper>
         <Outlet />
       </RecipeDetailWrapper>
     </RecipePageWrapper>
+  );
+}
+
+type RecipeListItemProps = {
+  recipe: {
+    id: string;
+    name: string;
+    totalTime: string;
+    imageUrl: string;
+  };
+};
+function RecipeListItem({ recipe }: RecipeListItemProps) {
+  const navigation = useNavigation();
+  const location = useLocation();
+  const isLoading = navigation.location?.pathname.endsWith(recipe.id);
+
+  return (
+    <li className="my-4" key={recipe.id}>
+      <NavLink
+        to={{ pathname: recipe.id, search: location.search }}
+        prefetch="intent"
+      >
+        {({ isActive }) => (
+          <RecipeCard
+            name={recipe.name}
+            totalTime={recipe.totalTime}
+            imageUrl={recipe.imageUrl}
+            isActive={isActive}
+            isLoading={isLoading}
+          />
+        )}
+      </NavLink>
+    </li>
   );
 }
