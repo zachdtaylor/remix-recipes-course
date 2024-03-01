@@ -23,7 +23,7 @@ import { z } from "zod";
 import { validateForm } from "~/utils/validation";
 import { handleDelete } from "~/models/utils";
 import { requireLoggedInUser } from "~/utils/auth.server";
-import { useDebouncedFunction } from "~/utils/misc";
+import { useDebouncedFunction, useServerLayoutEffect } from "~/utils/misc";
 import {
   useSaveRecipeNameFetcher,
   useSaveRecipeTotalTimeFetcher,
@@ -546,6 +546,42 @@ function IngredientRow({
       </button>
     </React.Fragment>
   );
+}
+
+type RenderedIngredient = {
+  id: string;
+  name: string;
+  amount: string | null;
+  isOptimistic?: boolean;
+};
+function useOptimisticIngredients(
+  savedIngredients: Array<RenderedIngredient>,
+  createIngredientState: "idle" | "submitting" | "loading"
+) {
+  const [optimisticIngredients, setOptimisticIngredients] = React.useState<
+    Array<RenderedIngredient>
+  >([]);
+
+  const renderedIngredients = [...savedIngredients, ...optimisticIngredients];
+
+  useServerLayoutEffect(() => {
+    if (createIngredientState === "idle") {
+      setOptimisticIngredients([]);
+    }
+  }, [createIngredientState]);
+
+  const addIngredient = (amount: string | null, name: string) => {
+    setOptimisticIngredients((ingredients) => [
+      ...ingredients,
+      { id: createItemId(), name, amount, isOptimistic: true },
+    ]);
+  };
+
+  return { renderedIngredients, addIngredient };
+}
+
+function createItemId() {
+  return `${Math.round(Math.random() * 1_000_000)}`;
 }
 
 export function ErrorBoundary() {
