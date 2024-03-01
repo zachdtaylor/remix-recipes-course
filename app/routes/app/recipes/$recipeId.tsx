@@ -395,6 +395,12 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
                 amount: e.target.value,
               }))
             }
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                createIngredient();
+              }
+            }}
           />
           <ErrorMessage>
             {createIngredientFetcher.data?.errors?.newIngredientAmount ??
@@ -420,6 +426,12 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
                 name: e.target.value,
               }))
             }
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                createIngredient();
+              }
+            }}
           />
           <ErrorMessage>
             {createIngredientFetcher.data?.errors?.newIngredientName ??
