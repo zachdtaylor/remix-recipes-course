@@ -111,9 +111,12 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   if (typeof _action === "string" && _action.includes("deleteIngredient")) {
     const ingredientId = _action.split(".")[1];
-    return handleDelete(() =>
-      db.ingredient.delete({ where: { id: ingredientId } })
-    );
+    return {
+      data: handleDelete(() =>
+        db.ingredient.delete({ where: { id: ingredientId } })
+      ),
+      errors: null,
+    };
   }
 
   switch (_action) {
@@ -121,8 +124,8 @@ export async function action({ request, params }: Route.ActionArgs) {
       return validateForm(
         formData,
         saveRecipeSchema,
-        ({ ingredientIds, ingredientNames, ingredientAmounts, ...data }) =>
-          db.recipe.update({
+        ({ ingredientIds, ingredientNames, ingredientAmounts, ...data }) => ({
+          data: db.recipe.update({
             where: { id: recipeId },
             data: {
               ...data,
@@ -137,22 +140,26 @@ export async function action({ request, params }: Route.ActionArgs) {
               },
             },
           }),
-        (errors) => data({ errors }, { status: 400 })
+          errors: null,
+        }),
+        (errors) => data({ data: null, errors }, { status: 400 })
       );
     }
     case "createIngredient": {
       return validateForm(
         formData,
         createIngredientSchema,
-        ({ newIngredientAmount, newIngredientName }) =>
-          db.ingredient.create({
+        ({ newIngredientAmount, newIngredientName }) => ({
+          data: db.ingredient.create({
             data: {
               recipeId,
               amount: newIngredientAmount,
               name: newIngredientName,
             },
           }),
-        (errors) => data({ errors }, { status: 400 })
+          errors: null,
+        }),
+        (errors) => data({ data: null, errors }, { status: 400 })
       );
     }
     case "deleteRecipe": {
@@ -160,7 +167,7 @@ export async function action({ request, params }: Route.ActionArgs) {
       return redirect("/app/recipes");
     }
     default: {
-      return null;
+      return { data: null, errors: null };
     }
   }
 }
@@ -169,10 +176,7 @@ export default function RecipeDetail() {
   const data = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
-  const actionDataErrors =
-    actionData && typeof actionData !== "string" && "errors" in actionData
-      ? actionData.errors
-      : null;
+  const actionDataErrors = actionData?.errors;
 
   return (
     <Form method="post" reloadDocument>
