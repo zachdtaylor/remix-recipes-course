@@ -6,6 +6,7 @@ import {
   isRouteErrorResponse,
   redirect,
   useActionData,
+  useFetcher,
   useLoaderData,
   useRouteError,
 } from "react-router";
@@ -176,8 +177,24 @@ export async function action({ request, params }: Route.ActionArgs) {
 export default function RecipeDetail() {
   const data = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+  const saveNameFetcher = useFetcher<typeof action>();
+  const saveTotalTimeFetcher = useFetcher<typeof action>();
+  const saveInstructionsFetcher = useFetcher<typeof action>();
 
-  const actionDataErrors = actionData?.errors;
+  const saveName = (name: string) =>
+    saveNameFetcher.submit({ _action: "saveName", name }, { method: "post" });
+
+  const saveTotalTime = (totalTime: string) =>
+    saveTotalTimeFetcher.submit(
+      { _action: "saveTotalTime", totalTime },
+      { method: "post" }
+    );
+
+  const saveInstructions = (instructions: string) =>
+    saveInstructionsFetcher.submit(
+      { _action: "saveInstructions", instructions },
+      { method: "post" }
+    );
 
   return (
     <Form method="post" reloadDocument>
@@ -190,9 +207,14 @@ export default function RecipeDetail() {
           className="text-2xl font-extrabold"
           name="name"
           defaultValue={data.recipe?.name}
-          error={!!actionDataErrors?.name}
+          error={
+            !!(saveNameFetcher?.data?.errors?.name || actionData?.errors?.name)
+          }
+          onChange={(e) => saveName(e.target.value)}
         />
-        <ErrorMessage>{actionDataErrors?.name}</ErrorMessage>
+        <ErrorMessage>
+          {saveNameFetcher?.data?.errors?.name || actionData?.errors?.name}
+        </ErrorMessage>
       </div>
       <div className="flex">
         <TimeIcon />
@@ -204,9 +226,18 @@ export default function RecipeDetail() {
             autoComplete="off"
             name="totalTime"
             defaultValue={data.recipe?.totalTime}
-            error={!!actionDataErrors?.totalTime}
+            error={
+              !!(
+                saveTotalTimeFetcher?.data?.errors?.totalTime ||
+                actionData?.errors?.totalTime
+              )
+            }
+            onChange={(e) => saveTotalTime(e.target.value)}
           />
-          <ErrorMessage>{actionDataErrors?.totalTime}</ErrorMessage>
+          <ErrorMessage>
+            {saveTotalTimeFetcher?.data?.errors?.totalTime ||
+              actionData?.errors?.totalTime}
+          </ErrorMessage>
         </div>
       </div>
       <div className="grid grid-cols-[30%_auto_min-content] my-4 gap-2">
@@ -222,10 +253,10 @@ export default function RecipeDetail() {
                 autoComplete="off"
                 name="ingredientAmounts[]"
                 defaultValue={ingredient.amount ?? ""}
-                error={!!actionDataErrors?.[`ingredientAmounts.${idx}`]}
+                error={!!actionData?.errors?.[`ingredientAmounts.${idx}`]}
               />
               <ErrorMessage>
-                {actionDataErrors?.[`ingredientAmounts.${idx}`]}
+                {actionData?.errors?.[`ingredientAmounts.${idx}`]}
               </ErrorMessage>
             </div>
             <div>
@@ -234,10 +265,10 @@ export default function RecipeDetail() {
                 autoComplete="off"
                 name="ingredientNames[]"
                 defaultValue={ingredient.name}
-                error={!!actionDataErrors?.[`ingredientNames.${idx}`]}
+                error={!!actionData?.errors?.[`ingredientNames.${idx}`]}
               />
               <ErrorMessage>
-                {actionDataErrors?.[`ingredientNames.${idx}`]}
+                {actionData?.errors?.[`ingredientNames.${idx}`]}
               </ErrorMessage>
             </div>
             <button name="_action" value={`deleteIngredient.${ingredient.id}`}>
@@ -251,9 +282,9 @@ export default function RecipeDetail() {
             autoComplete="off"
             name="newIngredientAmount"
             className="border-b-gray-200"
-            error={!!actionDataErrors?.newIngredientAmount}
+            error={!!actionData?.errors?.newIngredientAmount}
           />
-          <ErrorMessage>{actionDataErrors?.newIngredientAmount}</ErrorMessage>
+          <ErrorMessage>{actionData?.errors?.newIngredientAmount}</ErrorMessage>
         </div>
         <div>
           <Input
@@ -261,9 +292,9 @@ export default function RecipeDetail() {
             autoComplete="off"
             name="newIngredientName"
             className="border-b-gray-200"
-            error={!!actionDataErrors?.newIngredientName}
+            error={!!actionData?.errors?.newIngredientName}
           />
-          <ErrorMessage>{actionDataErrors?.newIngredientName}</ErrorMessage>
+          <ErrorMessage>{actionData?.errors?.newIngredientName}</ErrorMessage>
         </div>
         <button name="_action" value="createIngredient">
           <SaveIcon />
@@ -284,10 +315,18 @@ export default function RecipeDetail() {
         className={classNames(
           "w-full h-56 rounded-md outline-none",
           "focus:border-2 focus:p-3 focus:border-primary duration-300",
-          actionDataErrors?.instructions ? "border-2 border-red-500 p-3" : ""
+          {
+            "border-2 border-red-500 p-3":
+              saveInstructionsFetcher?.data?.errors?.instructions ||
+              actionData?.errors?.instructions,
+          }
         )}
+        onChange={(e) => saveInstructions(e.target.value)}
       />
-      <ErrorMessage>{actionDataErrors?.instructions}</ErrorMessage>
+      <ErrorMessage>
+        {saveInstructionsFetcher?.data?.errors?.instructions ||
+          actionData?.errors?.instructions}
+      </ErrorMessage>
       <hr className="my-4" />
       <div className="flex justify-between">
         <DeleteButton name="_action" value="deleteRecipe">
