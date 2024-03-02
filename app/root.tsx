@@ -39,7 +39,10 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: "/theme.css" },
+  { rel: "stylesheet", href: styles },
+];
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getCurrentUser(request);
