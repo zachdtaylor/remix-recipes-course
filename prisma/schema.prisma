@@ -53,12 +53,13 @@ model PantryItem {
 }
 
 model Recipe {
-  id           String @id @default(cuid())
-  name         String
-  instructions String
-  totalTime    String
-  imageUrl     String
-  userId       String
+  id                 String @id @default(cuid())
+  name               String
+  instructions       String
+  totalTime          String
+  imageUrl           String
+  userId             String
+  mealPlanMultiplier Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
