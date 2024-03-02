@@ -6,15 +6,18 @@ import {
 } from "@remix-run/node";
 import {
   Form,
+  Link,
   NavLink,
   Outlet,
   useFetchers,
   useLoaderData,
   useLocation,
   useNavigation,
+  useSearchParams,
 } from "@remix-run/react";
+import classNames from "classnames";
 import { PrimaryButton, SearchBar } from "~/components/forms";
-import { PlusIcon } from "~/components/icons";
+import { CalendarIcon, PlusIcon } from "~/components/icons";
 import {
   RecipeCard,
   RecipeDetailWrapper,
@@ -76,11 +79,25 @@ export default function Recipes() {
   const location = useLocation();
   const navigation = useNavigation();
   const fetchers = useFetchers();
+  const [searchParams] = useSearchParams();
+  const mealPlanOnlyFilterOn = searchParams.get("filter") === "mealPlanOnly";
 
   return (
     <RecipePageWrapper>
       <RecipeListWrapper>
-        <SearchBar placeholder="Search Recipes..." />
+        <div className="flex gap-4">
+          <SearchBar placeholder="Search Recipes..." className="flex-grow" />
+          <Link
+            reloadDocument
+            to={mealPlanOnlyFilterOn ? "?filter=" : "?filter=mealPlanOnly"}
+            className={classNames(
+              "flex flex-col justify-center border-2 border-primary rounded-md px-2",
+              mealPlanOnlyFilterOn ? "text-white bg-primary" : "text-primary"
+            )}
+          >
+            <CalendarIcon />
+          </Link>
+        </div>
         <Form method="post" className="mt-4" reloadDocument>
           <PrimaryButton className="w-full">
             <div className="flex w-full justify-center">
