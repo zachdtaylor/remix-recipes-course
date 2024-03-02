@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import { CheckCircleIcon } from "~/components/icons";
 import db from "~/db.server";
 import { requireLoggedInUser } from "~/utils/auth.server";
@@ -112,5 +112,12 @@ function GroceryListItem({ item }: { item: GroceryListItem }) {
 }
 
 export default function GroceryList() {
-  return <div>Grocery List</div>;
+  const data = useLoaderData<typeof loader>();
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      {data.groceryList.map((item) => (
+        <GroceryListItem key={item.id} item={item} />
+      ))}
+    </div>
+  );
 }
