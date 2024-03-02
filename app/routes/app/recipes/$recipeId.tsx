@@ -31,6 +31,7 @@ import classNames from "classnames";
 import { z } from "zod";
 import { validateForm } from "~/utils/validation";
 import { handleDelete } from "~/models/utils";
+import { canChangeRecipe } from "~/utils/abilites.server";
 import { requireLoggedInUser } from "~/utils/auth.server";
 import { useDebouncedFunction, useServerLayoutEffect } from "~/utils/misc";
 import {
@@ -138,23 +139,8 @@ function actionData<T, E>(data: T, errors?: E) {
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const user = await requireLoggedInUser(request);
   const recipeId = params.recipeId;
-  const recipe = await db.recipe.findUnique({ where: { id: recipeId } });
-
-  if (recipe === null) {
-    throw data(
-      { message: "A recipe with that id does not exist" },
-      { status: 404 }
-    );
-  }
-
-  if (recipe.userId !== user.id) {
-    throw data(
-      { message: "You are not authorized to make changes this recipe" },
-      { status: 401 }
-    );
-  }
+  await canChangeRecipe(request, recipeId);
 
   const uploadHandler = async (fileUpload: FileUpload) => {
     if (fileUpload.fieldName === "image") {

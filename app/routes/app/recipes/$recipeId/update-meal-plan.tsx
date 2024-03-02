@@ -1,12 +1,37 @@
 import React from "react";
 import ReactModal from "react-modal";
-import { Form, Link } from "react-router";
+import { Form, Link, redirect } from "react-router";
 import { DeleteButton, IconInput, PrimaryButton } from "~/components/form";
 import { XIcon } from "~/components/icons";
 import { useRecipeContext } from "../$recipeId";
+import { canChangeRecipe } from "~/utils/abilites.server";
+import { Route } from "./+types/update-meal-plan";
+import db from "~/db.server";
 
 if (typeof window !== "undefined") {
   ReactModal.setAppElement("#root");
+}
+
+export async function action({ request, params }: Route.ActionArgs) {
+  const recipeId = String(params.recipeId);
+  await canChangeRecipe(request, recipeId);
+
+  const formData = await request.formData();
+
+  switch (formData.get("_action")) {
+    case "updateMealPlan": {
+    }
+    case "removeFromMealPlan": {
+      await db.recipe.update({
+        where: { id: recipeId },
+        data: { mealPlanMultiplier: null },
+      });
+      return redirect("..");
+    }
+    default: {
+      return null;
+    }
+  }
 }
 
 export default function UpdateMealPlan() {
