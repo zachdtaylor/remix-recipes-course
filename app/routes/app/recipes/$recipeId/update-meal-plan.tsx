@@ -3,9 +3,33 @@ import ReactModal from "react-modal";
 import { DeleteButton, IconInput, PrimaryButton } from "~/components/forms";
 import { XIcon } from "~/components/icons";
 import { useRecipeContext } from "../$recipeId";
+import { ActionFunctionArgs } from "@remix-run/node";
+import { canChangeRecipe } from "~/utils/abilites.server";
 
 if (typeof window !== "undefined") {
   ReactModal.setAppElement("body");
+}
+
+export async function action({ request, params }: ActionFunctionArgs) {
+  const recipeId = String(params.recipeId);
+  await canChangeRecipe(request, recipeId);
+
+  const formData = await request.formData();
+
+  switch (formData.get("_action")) {
+    case "updateMealPlan": {
+    }
+    case "removeFromMealPlan": {
+      await db.recipe.update({
+        where: { id: recipeId },
+        data: { mealPlanMultiplier: null },
+      });
+      return redirect("..");
+    }
+    default: {
+      return null;
+    }
+  }
 }
 
 export default function UpdateMealPlanModal() {
