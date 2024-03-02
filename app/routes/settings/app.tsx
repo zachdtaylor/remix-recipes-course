@@ -1,5 +1,27 @@
+import { ActionFunctionArgs, json } from "@remix-run/node";
 import { Form } from "@remix-run/react";
+import { z } from "zod";
 import { PrimaryButton } from "~/components/forms";
+import { themeCookie } from "~/cookies";
+import { validateForm } from "~/utils/validation";
+
+const themeSchema = z.object({
+  theme: z.string(),
+});
+
+export async function action({ request }: ActionFunctionArgs) {
+  const formData = await request.formData();
+
+  return validateForm(
+    formData,
+    themeSchema,
+    async ({ theme }) =>
+      json("ok", {
+        headers: { "Set-Cookie": await themeCookie.serialize(theme) },
+      }),
+    (errors) => json({ errors }, { status: 400 })
+  );
+}
 
 export default function App() {
   return (
