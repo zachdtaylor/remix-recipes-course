@@ -319,7 +319,7 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
   };
 
   return (
-    <Form method="post" reloadDocument>
+    <Form method="post" encType="multipart/form-data" reloadDocument>
       <button name="_action" value="saveRecipe" className="hidden" />
       <div className="mb-2">
         <Input
