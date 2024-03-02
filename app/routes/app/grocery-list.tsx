@@ -54,20 +54,33 @@ export async function loader({ request }: Route.LoaderArgs) {
       )
   );
 
-  const groceryListItems = missingIngredients.map((ingredient) => {
+  const groceryListItems = missingIngredients.reduce<{
+    [key: string]: GroceryListItem;
+  }>((groceryListItemsMapSoFar, ingredient) => {
+    if (ingredient.recipe.mealPlanMultiplier === null) {
+      throw new Error("multipler was unexpectedly null");
+    }
+    const ingredientName = ingredient.name.toLowerCase();
+    const existing = groceryListItemsMapSoFar[ingredientName] ?? { uses: [] };
     return {
-      id: ingredient.id,
-      name: ingredient.name,
-      uses: [
-        {
-          id: ingredient.recipeId,
-          amount: ingredient.amount,
-          recipeName: ingredient.recipe.name,
-          multiplier: ingredient.recipe.mealPlanMultiplier,
-        },
-      ],
+      ...groceryListItemsMapSoFar,
+      [ingredientName]: {
+        id: ingredient.id,
+        name: ingredientName,
+        uses: [
+          ...existing.uses,
+          {
+            id: ingredient.recipeId,
+            amount: ingredient.amount,
+            recipeName: ingredient.recipe.name,
+            multiplier: ingredient.recipe.mealPlanMultiplier,
+          },
+        ],
+      },
     };
-  });
+  }, {});
+
+  return { groceryList: Object.values(groceryListItems) };
 }
 
 function GroceryListItem({ item }: { item: GroceryListItem }) {
