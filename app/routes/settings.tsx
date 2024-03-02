@@ -1,26 +1,5 @@
-import { json } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
-
-export function loader() {
-  return json({ message: "Hello, there!" });
-}
+import { PageLayout } from "~/components/layout";
 
 export default function Settings() {
-  const data = useLoaderData<typeof loader>();
-  return (
-    <div>
-      <h1>Settings</h1>
-      <p>This is the settings page.</p>
-      <p>Message from loader: {data.message}</p>
-      <nav>
-        <Link to="app">App</Link>
-        <Link to="profile">Profile</Link>
-      </nav>
-      <Outlet />
-    </div>
-  );
-}
-
-export function ErrorBoundary() {
-  return <div>Something went wrong!</div>;
+  return <PageLayout title="Settings" links={[{ to: "app", label: "App" }]} />;
 }
