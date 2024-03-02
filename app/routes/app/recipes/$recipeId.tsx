@@ -10,6 +10,7 @@ import {
 } from "@remix-run/node";
 import {
   Form,
+  Link,
   Outlet,
   isRouteErrorResponse,
   useActionData,
@@ -26,7 +27,12 @@ import {
   Input,
   PrimaryButton,
 } from "~/components/forms";
-import { SaveIcon, TimeIcon, TrashIcon } from "~/components/icons";
+import {
+  CalendarIcon,
+  SaveIcon,
+  TimeIcon,
+  TrashIcon,
+} from "~/components/icons";
 import db from "~/db.server";
 import { handleDelete } from "~/models/utils";
 import { requireLoggedInUser } from "~/utils/auth.server";
@@ -313,22 +319,32 @@ export default function RecipeDetail() {
       <Outlet />
       <Form method="post" encType="multipart/form-data" reloadDocument>
         <button name="_action" value="saveRecipe" className="hidden" />
-        <div className="mb-2">
-          <Input
-            key={data.recipe?.id}
-            type="text"
-            placeholder="Recipe Name"
-            autoComplete="off"
-            className="text-2xl font-extrabold"
-            name="name"
-            defaultValue={data.recipe?.name}
-            error={
-              !!(
-                saveNameFetcher?.data?.errors?.name || actionData?.errors?.name
-              )
-            }
-            onChange={(e) => saveName(e.target.value)}
-          />
+        <div className="flex mb-2">
+          <Link
+            replace
+            to="update-meal-plan"
+            className="flex flex-col justify-center"
+          >
+            <CalendarIcon />
+          </Link>
+          <div className="ml-2 flex-grow">
+            <Input
+              key={data.recipe?.id}
+              type="text"
+              placeholder="Recipe Name"
+              autoComplete="off"
+              className="text-2xl font-extrabold"
+              name="name"
+              defaultValue={data.recipe?.name}
+              error={
+                !!(
+                  saveNameFetcher?.data?.errors?.name ||
+                  actionData?.errors?.name
+                )
+              }
+              onChange={(e) => saveName(e.target.value)}
+            />
+          </div>
           <ErrorMessage>
             {saveNameFetcher?.data?.errors?.name || actionData?.errors?.name}
           </ErrorMessage>
