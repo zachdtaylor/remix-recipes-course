@@ -16,6 +16,7 @@ import {
   useActionData,
   useFetcher,
   useLoaderData,
+  useOutletContext,
   useRouteError,
 } from "@remix-run/react";
 import classNames from "classnames";
@@ -257,6 +258,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
   }
 }
 
+export function useRecipeContext() {
+  return useOutletContext<{
+    recipeName?: string;
+    mealPlanMultiplier?: number | null;
+  }>();
+}
+
 export default function RecipeDetail() {
   const data = useLoaderData<typeof loader>();
   const actionData = useActionData<any>();
@@ -316,7 +324,12 @@ export default function RecipeDetail() {
 
   return (
     <>
-      <Outlet />
+      <Outlet
+        context={{
+          recipeName: data.recipe?.name,
+          mealPlanMultiplier: data.recipe?.mealPlanMultiplier,
+        }}
+      />
       <Form method="post" encType="multipart/form-data" reloadDocument>
         <button name="_action" value="saveRecipe" className="hidden" />
         <div className="flex mb-2">
