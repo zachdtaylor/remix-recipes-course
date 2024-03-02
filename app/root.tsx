@@ -114,7 +114,7 @@ function AppNavLink({ children, to }: AppNavLinkProps) {
   const isLoading =
     navigation.state === "loading" &&
     navigation.location.pathname === path.pathname &&
-    navigation.formData === null;
+    navigation.formData === undefined;
 
   return (
     <li className="w-16">
