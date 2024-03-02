@@ -1,5 +1,27 @@
-import { Form } from "react-router";
+import { z } from "zod";
+import { themeCookie } from "~/cookies";
+import { validateForm } from "~/utils/validation";
+import { Route } from "./+types/app";
+import { data, Form } from "react-router";
 import { PrimaryButton } from "~/components/form";
+
+const themeSchema = z.object({
+  theme: z.string(),
+});
+
+export async function action({ request }: Route.ActionArgs) {
+  const formData = await request.formData();
+
+  return validateForm(
+    formData,
+    themeSchema,
+    async ({ theme }) =>
+      data("ok", {
+        headers: { "Set-Cookie": await themeCookie.serialize(theme) },
+      }),
+    (errors) => data({ errors }, { status: 400 })
+  );
+}
 
 export default function App() {
   return (
