@@ -3,6 +3,7 @@ import { Route } from "./+types/recipes";
 import db from "~/db.server";
 import {
   Form,
+  Link,
   NavLink,
   Outlet,
   redirect,
@@ -10,6 +11,7 @@ import {
   useLoaderData,
   useLocation,
   useNavigation,
+  useSearchParams,
 } from "react-router";
 import {
   RecipeCard,
@@ -18,13 +20,14 @@ import {
   RecipePageWrapper,
 } from "~/components/recipes";
 import { PrimaryButton, SearchBar } from "~/components/form";
-import { PlusIcon } from "~/components/icons";
+import { CalendarIcon, PlusIcon } from "~/components/icons";
 import {
   useSaveRecipeNameFetcher,
   useSaveRecipeTotalTimeFetcher,
 } from "~/utils/hooks";
 import { formDataValueAsString } from "~/utils/forms";
 import { mealPlanModalIsOpeningOrClosing } from "~/utils/revalidation";
+import classNames from "classnames";
 
 export function shouldRevalidate(arg: ShouldRevalidateFunctionArgs) {
   return !mealPlanModalIsOpeningOrClosing(arg);
@@ -79,11 +82,28 @@ export async function action({ request }: Route.ActionArgs) {
 
 export default function Recipes() {
   const data = useLoaderData<typeof loader>();
+  const [searchParams] = useSearchParams();
+  const mealPlanOnlyFilterOn = searchParams.get("filter") === "mealPlanOnly";
 
   return (
     <RecipePageWrapper>
       <RecipeListWrapper>
-        <SearchBar placeholder="Search Recipes..." />
+        <div className="flex gap-4">
+          <SearchBar placeholder="Search Recipes..." className="flex-grow" />
+          <Link
+            reloadDocument
+            to={mealPlanOnlyFilterOn ? "?filter=" : "?filter=mealPlanOnly"}
+            className={classNames(
+              "flex flex-col justify-center border-2 border-primary rounded-md px-2",
+              {
+                "text-white bg-primary": mealPlanOnlyFilterOn,
+                "text-primary": !mealPlanOnlyFilterOn,
+              }
+            )}
+          >
+            <CalendarIcon />
+          </Link>
+        </div>
         <Form method="post" className="mt-4" reloadDocument>
           <PrimaryButton className="w-full">
             <div className="flex w-full justify-center">
