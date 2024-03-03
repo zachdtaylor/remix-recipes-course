@@ -1,9 +1,5 @@
-import { PageDescription } from "~/components/page-description";
+import { redirect } from "@remix-run/node";
 
-export default function Index() {
-  return (
-    <div>
-      <PageDescription header="Home" message="Welcome home!" />
-    </div>
-  );
+export function loader() {
+  return redirect("/discover");
 }
