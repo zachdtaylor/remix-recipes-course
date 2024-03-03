@@ -220,6 +220,7 @@ function Shelf({ shelf }: ShelfProps) {
             defaultValue={shelf.name}
             name="shelfName"
             placeholder="Shelf Name"
+            aria-label="Shelf name"
             autoComplete="off"
             className="text-2xl font-extrabold"
             error={!!saveShelfNameFetcher.data?.errors?.shelfName}
