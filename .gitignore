@@ -6,3 +6,7 @@ node_modules
 /public/images
 .env
 postgres-data/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
