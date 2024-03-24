@@ -7,7 +7,6 @@ import {
   isRouteErrorResponse,
   Link,
   Links,
-  LiveReload,
   Meta,
   NavLink,
   Outlet,
@@ -29,7 +28,9 @@ import { classNames } from "./utils/misc";
 import React from "react";
 import { getCurrentUser } from "./utils/auth.server";
 
-import styles from "./tailwind.css";
+import styles from "./tailwind.css?url";
+
+console.log(process.env);
 
 export function meta() {
   return [
@@ -98,7 +99,6 @@ export default function App() {
         </div>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   );
@@ -141,7 +141,7 @@ export function ErrorBoundary() {
 
   if (isRouteErrorResponse(error)) {
     return (
-      <html>
+      <html lang="en">
         <head>
           <title>Whoops!</title>
           <meta charSet="utf-8" />
@@ -171,7 +171,7 @@ export function ErrorBoundary() {
   }
 
   return (
-    <html>
+    <html lang="en">
       <head>
         <title>Whoops!</title>
         <meta charSet="utf-8" />
