@@ -6,6 +6,14 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import type { MetaFunction } from "@remix-run/node";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Remix Recipes" },
+    { name: "description", content: "Welcome to the Remix Recipes app!" },
+  ];
+};
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
