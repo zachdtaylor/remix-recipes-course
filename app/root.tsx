@@ -29,7 +29,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="flex h-screen">
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -41,11 +41,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <>
-      <nav>
-        <Link to="/">Home</Link>
-        <Link to="discover">Discover</Link>
-        <Link to="app">App</Link>
-        <Link to="settings">Settings</Link>
+      <nav className="bg-primary text-white">
+        <ul className="flex flex-col">
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          <li>
+            <Link to="discover">Discover</Link>
+          </li>
+          <li>
+            <Link to="app">App</Link>
+          </li>
+          <li>
+            <Link to="settings">Settings</Link>
+          </li>
+        </ul>
       </nav>
       <Outlet />
     </>
