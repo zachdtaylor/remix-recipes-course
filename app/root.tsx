@@ -7,7 +7,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
-import styles from "~/shared.css?url";
+import styles from "~/tailwind.css?url";
 
 export const meta: MetaFunction = () => {
   return [
