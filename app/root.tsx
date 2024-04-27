@@ -50,55 +50,64 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({ isLoggedIn: user !== null });
 }
 
-export default function App() {
-  const data = useLoaderData<typeof loader>();
+export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
       <body className="md:flex md:h-screen bg-background">
-        <nav
-          className={classNames(
-            "bg-primary text-white md:w-16",
-            "flex justify-between md:flex-col"
-          )}
-        >
-          <ul className="flex md:flex-col">
-            <AppNavLink to="discover">
-              <DiscoverIcon />
-            </AppNavLink>
-            {data.isLoggedIn ? (
-              <AppNavLink to="app">
-                <RecipeBookIcon />
-              </AppNavLink>
-            ) : null}
-            <AppNavLink to="settings">
-              <SettingsIcon />
-            </AppNavLink>
-          </ul>
-          <ul>
-            {data.isLoggedIn ? (
-              <AppNavLink to="/logout">
-                <LogoutIcon />
-              </AppNavLink>
-            ) : (
-              <AppNavLink to="/login">
-                <LoginIcon />
-              </AppNavLink>
-            )}
-          </ul>
-        </nav>
-        <div className="p-4 w-full md:w-[calc(100%-4rem)]">
-          <Outlet />
-        </div>
+        {children}
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
+  );
+}
+
+export default function App() {
+  const data = useLoaderData<typeof loader>();
+
+  return (
+    <>
+      <nav
+        className={classNames(
+          "bg-primary text-white md:w-16",
+          "flex justify-between md:flex-col"
+        )}
+      >
+        <ul className="flex md:flex-col">
+          <AppNavLink to="discover">
+            <DiscoverIcon />
+          </AppNavLink>
+          {data.isLoggedIn ? (
+            <AppNavLink to="app">
+              <RecipeBookIcon />
+            </AppNavLink>
+          ) : null}
+          <AppNavLink to="settings">
+            <SettingsIcon />
+          </AppNavLink>
+        </ul>
+        <ul>
+          {data.isLoggedIn ? (
+            <AppNavLink to="/logout">
+              <LogoutIcon />
+            </AppNavLink>
+          ) : (
+            <AppNavLink to="/login">
+              <LoginIcon />
+            </AppNavLink>
+          )}
+        </ul>
+      </nav>
+      <div className="p-4 w-full md:w-[calc(100%-4rem)]">
+        <Outlet />
+      </div>
+    </>
   );
 }
 
@@ -139,27 +148,16 @@ export function ErrorBoundary() {
 
   if (isRouteErrorResponse(error)) {
     return (
-      <html lang="en">
-        <head>
-          <title>Whoops!</title>
-          <meta charSet="utf-8" />
-          <meta name="viewport" content="width=device-width,initial-scale=1" />
-          <Meta />
-          <Links />
-        </head>
-        <body>
-          <div className="p-4">
-            <h1 className="text-2xl pb-3">
-              {error.status} - {error.statusText}
-            </h1>
-            <p>You're seeing this page because an error occurred.</p>
-            <p className="my-4 font-bold">{error.data.message}</p>
-            <Link to="/" className="text-primary">
-              Take me home
-            </Link>
-          </div>
-        </body>
-      </html>
+      <div className="p-4">
+        <h1 className="text-2xl pb-3">
+          {error.status} - {error.statusText}
+        </h1>
+        <p>You're seeing this page because an error occurred.</p>
+        <p className="my-4 font-bold">{error.data.message}</p>
+        <Link to="/" className="text-primary">
+          Take me home
+        </Link>
+      </div>
     );
   }
 
@@ -169,24 +167,13 @@ export function ErrorBoundary() {
   }
 
   return (
-    <html lang="en">
-      <head>
-        <title>Whoops!</title>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <div className="p-4">
-          <h1 className="text-2xl pb-3">Whoops!</h1>
-          <p>You're seeing this page because an unexpected error occurred.</p>
-          <p className="my-4 font-bold">{errorMessage}</p>
-          <Link to="/" className="text-primary">
-            Take me home
-          </Link>
-        </div>
-      </body>
-    </html>
+    <div className="p-4">
+      <h1 className="text-2xl pb-3">Whoops!</h1>
+      <p>You're seeing this page because an unexpected error occurred.</p>
+      <p className="my-4 font-bold">{errorMessage}</p>
+      <Link to="/" className="text-primary">
+        Take me home
+      </Link>
+    </div>
   );
 }
