@@ -30,8 +30,6 @@ import { getCurrentUser } from "./utils/auth.server";
 
 import styles from "./tailwind.css?url";
 
-console.log(process.env);
-
 export function meta() {
   return [
     { title: "Remix Recipes" },
