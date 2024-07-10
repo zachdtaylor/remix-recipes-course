@@ -1,5 +1,5 @@
 import { json } from "@remix-run/node";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useRouteError } from "@remix-run/react";
 
 export function loader() {
   return json({ message: "Hello, there!" });
@@ -19,4 +19,19 @@ export default function Settings() {
       <Outlet />
     </div>
   );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (error instanceof Error) {
+    return (
+      <div className="bg-red-300 border-2 border-red-600 rounded-md p-4">
+        <h1>Whoops, something went wrong.</h1>
+        <p>{error.message}</p>
+      </div>
+    );
+  }
+
+  return <div>An unexpected error occurred.</div>;
 }
