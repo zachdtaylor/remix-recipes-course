@@ -34,6 +34,7 @@ export default [
   ]),
   route("discover", "routes/discover.tsx"),
   route("discover/:recipeId", "routes/discover.$recipeId.tsx"),
+  route("recipe-image/:recipeId", "routes/recipe-image.tsx"),
   route("login", "routes/login.tsx"),
   route("logout", "routes/logout.tsx"),
   route("settings", "routes/settings.tsx", [

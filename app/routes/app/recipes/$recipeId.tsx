@@ -3,11 +3,8 @@ import {
   data,
   type LoaderFunctionArgs,
   redirect,
-  unstable_composeUploadHandlers,
-  unstable_createFileUploadHandler,
-  unstable_createMemoryUploadHandler,
-  unstable_parseMultipartFormData,
 } from "react-router";
+import { type FileUpload, parseFormData } from "@mjackson/form-data-parser";
 import {
   Form,
   isRouteErrorResponse,
@@ -43,6 +40,7 @@ import {
   useServerLayoutEffect,
 } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
+import { fileStorage, getStorageKey } from "~/recipe-image-storage.server";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const user = await requireLoggedInUser(request);
@@ -133,16 +131,25 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const recipeId = String(params.recipeId);
   await canChangeRecipe(request, recipeId);
 
+  async function uploadHandler(fileUpload: FileUpload) {
+    if (
+      fileUpload.fieldName === "image" &&
+      fileUpload.type.startsWith("image/")
+    ) {
+      const storageKey = getStorageKey(recipeId);
+
+      await fileStorage.set(storageKey, fileUpload);
+
+      return fileStorage.get(storageKey);
+    }
+  }
+
   let formData;
   if (request.headers.get("Content-Type")?.includes("multipart/form-data")) {
-    const uploadHandler = unstable_composeUploadHandlers(
-      unstable_createFileUploadHandler({ directory: "public/images" }),
-      unstable_createMemoryUploadHandler()
-    );
-    formData = await unstable_parseMultipartFormData(request, uploadHandler);
+    formData = await parseFormData(request, uploadHandler);
     const image = formData.get("image") as File;
     if (image.size !== 0) {
-      formData.set("imageUrl", `/images/${image.name}`);
+      formData.set("imageUrl", `/recipe-image/${recipeId}`);
     }
   } else {
     formData = await request.formData();
