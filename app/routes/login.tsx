@@ -1,9 +1,5 @@
-import {
-  type ActionFunctionArgs,
-  type LoaderFunctionArgs,
-  data,
-} from "@remix-run/node";
-import { useActionData } from "@remix-run/react";
+import { type ActionFunctionArgs, type LoaderFunctionArgs, data } from "react-router";
+import { useActionData } from "react-router";
 import { z } from "zod";
 import { ErrorMessage, PrimaryButton, PrimaryInput } from "~/components/forms";
 import { generateMagicLink, sendMagicLinkEmail } from "~/magic-links.server";

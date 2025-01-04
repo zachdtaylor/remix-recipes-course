@@ -1,4 +1,4 @@
-import { index, route, type RouteConfig } from "@remix-run/route-config";
+import { index, route, type RouteConfig } from "@react-router/dev/routes";
 
 const testRoutes = () => {
   if (process.env.INCLUDE_TEST_ROUTES) {

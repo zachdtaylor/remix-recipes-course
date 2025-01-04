@@ -1,7 +1,7 @@
 import Cryptr from "cryptr";
 import { renderToStaticMarkup } from "react-dom/server";
 import { sendEmail } from "./utils/emails.server";
-import { data } from "@remix-run/node";
+import { data } from "react-router";
 
 if (typeof process.env.MAGIC_LINK_SECRET !== "string") {
   throw new Error("Missing env: MAGIC_LINK_SECRET");

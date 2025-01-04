@@ -1,4 +1,4 @@
-import { createCookie } from "@remix-run/node";
+import { createCookie } from "react-router";
 
 if (typeof process.env.AUTH_COOKIE_SECRET !== "string") {
   throw new Error("Missing env: AUTH_COOKIE_SECRET");

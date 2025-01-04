@@ -1,4 +1,4 @@
-import { type LinksFunction, type LoaderFunctionArgs } from "@remix-run/node";
+import { type LinksFunction, type LoaderFunctionArgs } from "react-router";
 import {
   isRouteErrorResponse,
   Link,
@@ -12,7 +12,7 @@ import {
   useResolvedPath,
   useRouteError,
   useNavigation,
-} from "@remix-run/react";
+} from "react-router";
 import {
   DiscoverIcon,
   LoginIcon,

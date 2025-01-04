@@ -1,4 +1,4 @@
-import { NavLink as RemixNavLink, Outlet } from "@remix-run/react";
+import { NavLink as RemixNavLink, Outlet } from "react-router";
 import { classNames } from "~/utils/misc";
 
 type PageLayoutProps = {

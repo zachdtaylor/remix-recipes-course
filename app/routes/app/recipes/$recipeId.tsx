@@ -7,7 +7,7 @@ import {
   unstable_createFileUploadHandler,
   unstable_createMemoryUploadHandler,
   unstable_parseMultipartFormData,
-} from "@remix-run/node";
+} from "react-router";
 import {
   Form,
   isRouteErrorResponse,
@@ -18,7 +18,7 @@ import {
   useLoaderData,
   useOutletContext,
   useRouteError,
-} from "@remix-run/react";
+} from "react-router";
 import React from "react";
 import { z } from "zod";
 import {

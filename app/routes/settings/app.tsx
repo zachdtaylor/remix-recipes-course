@@ -1,9 +1,5 @@
-import {
-  type ActionFunctionArgs,
-  type LoaderFunctionArgs,
-  data,
-} from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import { type ActionFunctionArgs, type LoaderFunctionArgs, data } from "react-router";
+import { Form, useActionData, useLoaderData } from "react-router";
 import { z } from "zod";
 import { PrimaryButton } from "~/components/forms";
 import { themeCookie } from "~/cookies";

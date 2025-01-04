@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect } from "react";
-import { useLocation, useMatches } from "@remix-run/react";
+import { useLocation, useMatches } from "react-router";
 
 export function classNames(...names: Array<string | undefined>) {
   const className = names.reduce(

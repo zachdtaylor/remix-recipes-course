@@ -1,6 +1,6 @@
 import ReactModal from "react-modal";
-import { type ActionFunctionArgs, data, redirect } from "@remix-run/node";
-import { Form, Link, useActionData } from "@remix-run/react";
+import { type ActionFunctionArgs, data, redirect } from "react-router";
+import { Form, Link, useActionData } from "react-router";
 import { z } from "zod";
 import {
   DeleteButton,

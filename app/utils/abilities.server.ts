@@ -1,4 +1,4 @@
-import { data } from "@remix-run/node";
+import { data } from "react-router";
 import db from "~/db.server";
 import { requireLoggedInUser } from "./auth.server";
 

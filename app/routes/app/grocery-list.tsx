@@ -1,9 +1,5 @@
-import {
-  type ActionFunctionArgs,
-  data,
-  type LoaderFunctionArgs,
-} from "@remix-run/node";
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import { type ActionFunctionArgs, data, type LoaderFunctionArgs } from "react-router";
+import { useFetcher, useLoaderData } from "react-router";
 import { z } from "zod";
 import { CheckCircleIcon } from "~/components/icons";
 import db from "~/db.server";

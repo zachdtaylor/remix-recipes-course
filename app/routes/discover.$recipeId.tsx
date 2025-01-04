@@ -1,9 +1,5 @@
-import {
-  type HeadersArgs,
-  type LoaderFunctionArgs,
-  data,
-} from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { type HeadersArgs, type LoaderFunctionArgs, data } from "react-router";
+import { useLoaderData } from "react-router";
 import {
   DiscoverRecipeDetails,
   DiscoverRecipeHeader,
