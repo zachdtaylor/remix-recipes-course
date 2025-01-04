@@ -10,3 +10,7 @@ body {
     color-scheme: dark;
   }
 }
+
+a {
+  padding: 1rem;
+}

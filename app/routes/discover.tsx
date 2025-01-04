@@ -1,3 +1,10 @@
+import { Route } from "./+types/discover";
+import styles from "~/styles/index.css?url";
+
+export const links: Route.LinksFunction = () => {
+  return [{ rel: "stylesheet", href: styles }];
+};
+
 export default function Discover() {
   return (
     <div>
