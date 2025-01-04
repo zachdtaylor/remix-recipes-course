@@ -21,11 +21,11 @@ test("lets a user do a typical flow", async ({ page }) => {
   await shelfNameInput.fill("Dairy");
 
   const newItemInput = page.getByPlaceholder(/new item/i);
-  await newItemInput.type("Milk");
+  await newItemInput.fill("Milk");
   await newItemInput.press("Enter");
-  await newItemInput.type("Eggs");
+  await newItemInput.fill("Eggs");
   await newItemInput.press("Enter");
-  await newItemInput.type("Yogurt");
+  await newItemInput.fill("Yogurt");
   await newItemInput.press("Enter");
 
   await page.goto("/app/recipes");
