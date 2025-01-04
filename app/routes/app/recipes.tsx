@@ -1,6 +1,5 @@
 import {
   type ActionFunctionArgs,
-  json,
   type LoaderFunctionArgs,
   redirect,
 } from "@remix-run/node";
@@ -54,7 +53,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     },
   });
 
-  return json({ recipes });
+  return { recipes };
 }
 
 export async function action({ request }: ActionFunctionArgs) {

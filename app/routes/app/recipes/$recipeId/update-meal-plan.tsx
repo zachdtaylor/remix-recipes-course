@@ -1,5 +1,5 @@
 import ReactModal from "react-modal";
-import { type ActionFunctionArgs, json, redirect } from "@remix-run/node";
+import { type ActionFunctionArgs, data, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { z } from "zod";
 import {
@@ -39,7 +39,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
           });
           return redirect("..");
         },
-        (errors) => json({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 })
       );
     }
     case "removeFromMealPlan": {

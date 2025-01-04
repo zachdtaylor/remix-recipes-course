@@ -1,6 +1,6 @@
 import {
   type ActionFunctionArgs,
-  json,
+  data,
   type LoaderFunctionArgs,
   redirect,
 } from "@remix-run/node";
@@ -46,7 +46,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     });
   }
 
-  return json("ok", {
+  return data("ok", {
     headers: {
       "Set-Cookie": await commitSession(session),
     },
@@ -84,7 +84,7 @@ export async function action({ request }: ActionFunctionArgs) {
       });
     },
     (errors) =>
-      json(
+      data(
         {
           errors,
           firstName: formData.get("firstName"),

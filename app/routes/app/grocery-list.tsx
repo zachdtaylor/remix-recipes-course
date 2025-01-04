@@ -1,6 +1,6 @@
 import {
   type ActionFunctionArgs,
-  json,
+  data,
   type LoaderFunctionArgs,
 } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
@@ -124,7 +124,7 @@ export async function action({ request }: ActionFunctionArgs) {
             data: { userId: user.id, name, shelfId: shoppingTripShelf.id },
           });
         },
-        (errors) => json({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 })
       );
     }
     default: {

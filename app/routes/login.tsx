@@ -1,7 +1,7 @@
 import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
-  json,
+  data,
 } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import { z } from "zod";
@@ -38,7 +38,7 @@ export async function action({ request }: ActionFunctionArgs) {
       const link = generateMagicLink(email, nonce);
       await sendMagicLinkEmail(link, email);
 
-      return json(
+      return data(
         { success: true },
         {
           headers: {
@@ -47,7 +47,7 @@ export async function action({ request }: ActionFunctionArgs) {
         }
       );
     },
-    (errors) => json({ errors, email: formData.get("email") }, { status: 400 })
+    (errors) => data({ errors, email: formData.get("email") }, { status: 400 })
   );
 }
 

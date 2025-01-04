@@ -1,6 +1,6 @@
 import {
   type ActionFunctionArgs,
-  json,
+  data,
   type LoaderFunctionArgs,
   redirect,
   unstable_composeUploadHandlers,
@@ -63,20 +63,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   });
 
   if (recipe === null) {
-    throw json(
+    throw data(
       { message: "A recipe with that id does not exist" },
       { status: 404 }
     );
   }
 
   if (recipe.userId !== user.id) {
-    throw json(
+    throw data(
       { message: "You are not authorized to view this recipe" },
       { status: 401 }
     );
   }
 
-  return json({ recipe }, { headers: { "Cache-Control": "max-age=10" } });
+  return data({ recipe }, { headers: { "Cache-Control": "max-age=10" } });
 }
 
 const saveNameSchema = z.object({
@@ -177,7 +177,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
               },
             },
           }),
-        (errors) => json({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 })
       );
     }
     case "createIngredient": {
@@ -192,7 +192,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
               name: newIngredientName,
             },
           }),
-        (errors) => json({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 })
       );
     }
     case "deleteRecipe": {
@@ -204,7 +204,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         formData,
         saveNameSchema,
         (data) => db.recipe.update({ where: { id: recipeId }, data }),
-        (errors) => json({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 })
       );
     }
     case "saveTotalTime": {
@@ -212,7 +212,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         formData,
         saveTotalTimeSchema,
         (data) => db.recipe.update({ where: { id: recipeId }, data }),
-        (errors) => json({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 })
       );
     }
     case "saveInstructions": {
@@ -220,7 +220,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         formData,
         saveInstructionsSchema,
         (data) => db.recipe.update({ where: { id: recipeId }, data }),
-        (errors) => json({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 })
       );
     }
     case "saveIngredientAmount": {
@@ -229,7 +229,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         saveIngredientAmountSchema,
         ({ id, amount }) =>
           db.ingredient.update({ where: { id }, data: { amount } }),
-        (errors) => json({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 })
       );
     }
     case "saveIngredientName": {
@@ -238,7 +238,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         saveIngredientNameSchema,
         ({ id, name }) =>
           db.ingredient.update({ where: { id }, data: { name } }),
-        (errors) => json({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 })
       );
     }
     default: {

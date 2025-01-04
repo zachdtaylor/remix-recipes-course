@@ -1,7 +1,7 @@
 import {
   type HeadersArgs,
   type LoaderFunctionArgs,
-  json,
+  data,
 } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import {
@@ -34,7 +34,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   });
 
   if (recipe === null) {
-    throw json(
+    throw data(
       {
         message: `A recipe with id ${params.id} does not exist.`,
       },
@@ -51,7 +51,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   const user = await getCurrentUser(request);
   const pageEtag = `${hash(user?.id ?? "anonymous")}.${etag}`;
 
-  return json(
+  return data(
     { recipe },
     {
       headers: {

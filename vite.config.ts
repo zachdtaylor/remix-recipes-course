@@ -3,6 +3,13 @@ import { createRoutesFromFolders } from "@remix-run/v1-route-convention";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
+declare module "@remix-run/server-runtime" {
+  // or cloudflare, deno, etc.
+  interface Future {
+    v3_singleFetch: true;
+  }
+}
+
 export default defineConfig({
   plugins: [
     remix({
@@ -28,7 +35,8 @@ export default defineConfig({
         v3_fetcherPersist: true,
         v3_relativeSplatPath: true,
         v3_throwAbortReason: true,
-        unstable_lazyRouteDiscovery: true,
+        v3_lazyRouteDiscovery: true,
+        v3_singleFetch: true,
       },
     }),
     tsconfigPaths(),

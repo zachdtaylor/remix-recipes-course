@@ -1,7 +1,7 @@
-import { json } from "@remix-run/node";
 import Cryptr from "cryptr";
 import { renderToStaticMarkup } from "react-dom/server";
 import { sendEmail } from "./utils/emails.server";
+import { data } from "@remix-run/node";
 
 if (typeof process.env.MAGIC_LINK_SECRET !== "string") {
   throw new Error("Missing env: MAGIC_LINK_SECRET");
@@ -43,7 +43,7 @@ function isMagicLinkPayload(value: any): value is MagicLinkPayload {
 }
 
 export function invalidMagicLink(message: string) {
-  return json({ message }, { status: 400 });
+  return data({ message }, { status: 400 });
 }
 
 export function getMagicLinkPayload(request: Request) {

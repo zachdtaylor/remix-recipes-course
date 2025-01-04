@@ -1,6 +1,6 @@
 import {
   type ActionFunctionArgs,
-  json,
+  data,
   type LoaderFunctionArgs,
 } from "@remix-run/node";
 import {
@@ -41,7 +41,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
   const shelves = await getAllShelves(user.id, q);
-  return json({ shelves });
+  return { shelves };
 };
 
 const deleteShelfSchema = z.object({
@@ -74,27 +74,27 @@ export async function action({ request }: ActionFunctionArgs) {
       return validateForm(
         formData,
         deleteShelfSchema,
-        async (data) => {
-          const shelf = await getShelf(data.shelfId);
+        async (parsedData) => {
+          const shelf = await getShelf(parsedData.shelfId);
           if (shelf !== null && shelf.userId !== user.id) {
-            throw json(
+            throw data(
               { message: "This shelf is not yours, so you cannot delete it" },
               { status: 401 }
             );
           }
-          return deleteShelf(data.shelfId);
+          return deleteShelf(parsedData.shelfId);
         },
-        (errors) => json({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 })
       );
     }
     case "saveShelfName": {
       return validateForm(
         formData,
         saveShelfNameSchema,
-        async (data) => {
-          const shelf = await getShelf(data.shelfId);
+        async (parsedData) => {
+          const shelf = await getShelf(parsedData.shelfId);
           if (shelf !== null && shelf.userId !== user.id) {
-            throw json(
+            throw data(
               {
                 message:
                   "This shelf is not yours, so you cannot change its name",
@@ -102,9 +102,9 @@ export async function action({ request }: ActionFunctionArgs) {
               { status: 401 }
             );
           }
-          return saveShelfName(data.shelfId, data.shelfName);
+          return saveShelfName(parsedData.shelfId, parsedData.shelfName);
         },
-        (errors) => json({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 })
       );
     }
     case "createShelfItem": {
@@ -112,24 +112,24 @@ export async function action({ request }: ActionFunctionArgs) {
         formData,
         createShelfItemSchema,
         (data) => createShelfItem(user.id, data.shelfId, data.itemName),
-        (errors) => json({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 })
       );
     }
     case "deleteShelfItem": {
       return validateForm(
         formData,
         deleteShelfItemSchema,
-        async (data) => {
-          const item = await getShelfItem(data.itemId);
+        async (parsedData) => {
+          const item = await getShelfItem(parsedData.itemId);
           if (item !== null && item.userId !== user.id) {
-            throw json(
+            throw data(
               { message: "This item is not yours, so you cannot delete it" },
               { status: 401 }
             );
           }
-          return deleteShelfItem(data.itemId);
+          return deleteShelfItem(parsedData.itemId);
         },
-        (errors) => json({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 })
       );
     }
     default: {

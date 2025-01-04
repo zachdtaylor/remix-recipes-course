@@ -1,7 +1,7 @@
 import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
-  json,
+  data,
 } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { z } from "zod";
@@ -27,13 +27,13 @@ export async function action({ request }: ActionFunctionArgs) {
     formData,
     themeSchema,
     async ({ theme }) =>
-      json(
+      data(
         { theme },
         {
           headers: { "Set-Cookie": await themeCookie.serialize(theme) },
         }
       ),
-    (errors) => json({ errors }, { status: 400 })
+    (errors) => data({ errors }, { status: 400 })
   );
 }
 
