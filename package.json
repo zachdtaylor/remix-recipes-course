@@ -15,7 +15,7 @@
   "dependencies": {
     "@mjackson/file-storage": "^0.3.0",
     "@mjackson/form-data-parser": "^0.5.1",
-    "@prisma/client": "^3.15.2",
+    "@prisma/client": "^6.0.0",
     "@react-router/node": "^7.0.0",
     "@react-router/serve": "^7.0.0",
     "cross-env": "^7.0.3",
@@ -40,7 +40,7 @@
     "@types/react-dom": "^18.2.5",
     "@types/react-modal": "^3.16.0",
     "@types/uuid": "^8.3.4",
-    "prisma": "^3.15.2",
+    "prisma": "^6.0.0",
     "tailwindcss": "^3.3.5",
     "tsx": "^4.1.4",
     "typescript": "^5.2.2",
