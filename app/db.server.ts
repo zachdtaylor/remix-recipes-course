@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 
-interface CustomNodeJSGlobal extends NodeJS.Global {
+type NodeJSGlobal = typeof globalThis;
+
+interface CustomNodeJSGlobal extends NodeJSGlobal {
   db: PrismaClient;
 }
 
