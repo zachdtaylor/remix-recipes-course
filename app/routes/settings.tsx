@@ -1,5 +1,12 @@
 import React from "react";
-import { Await, Link, Outlet, useLoaderData, useLocation } from "react-router";
+import {
+  Await,
+  Link,
+  Outlet,
+  useLoaderData,
+  useLocation,
+  useRouteError,
+} from "react-router";
 
 export async function loader() {
   const slowMessage = new Promise<string>((resolve) => {
@@ -29,4 +36,18 @@ export default function Settings() {
       <Outlet />
     </div>
   );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (error instanceof Error) {
+    return (
+      <div className="bg-red-300 border-2 border-red-600 rounded-md p-4">
+        <h1>Whoops, something went wrong.</h1>
+        <p>{error.message}</p>
+      </div>
+    );
+  }
+  return <div>An unexpected error occurred.</div>;
 }
