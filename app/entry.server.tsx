@@ -6,7 +6,11 @@
 
 import { PassThrough } from "node:stream";
 
-import type { EntryContext } from "react-router";
+import type {
+  ActionFunctionArgs,
+  EntryContext,
+  LoaderFunctionArgs,
+} from "react-router";
 import { createReadableStreamFromReadable } from "@react-router/node";
 import { ServerRouter } from "react-router";
 import { isbot } from "isbot";
@@ -14,16 +18,31 @@ import { renderToPipeableStream } from "react-dom/server";
 
 const ABORT_DELAY = 5_000;
 
+function matchingEtag(requestHeaders: Headers, responseHeaders: Headers) {
+  const ifNoneMatch = requestHeaders.get("if-none-match");
+  const etag = responseHeaders.get("etag");
+
+  return ifNoneMatch !== null && etag !== null && etag === ifNoneMatch;
+}
+
+export function handleDataRequest(
+  response: Response,
+  { request }: LoaderFunctionArgs | ActionFunctionArgs
+) {
+  if (matchingEtag(request.headers, response.headers)) {
+    return new Response(null, { status: 304, headers: response.headers });
+  }
+
+  return response;
+}
+
 export default function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
   reactRouterContext: EntryContext
 ) {
-  const ifNoneMatch = request.headers.get("if-none-match");
-  const etag = responseHeaders.get("etag");
-
-  if (ifNoneMatch !== null && etag !== null && etag === ifNoneMatch) {
+  if (matchingEtag(request.headers, responseHeaders)) {
     return new Response(null, { status: 304, headers: responseHeaders });
   }
 

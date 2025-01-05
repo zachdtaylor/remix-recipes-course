@@ -1,9 +1,4 @@
-import {
-  type ActionFunctionArgs,
-  data,
-  type LoaderFunctionArgs,
-  redirect,
-} from "react-router";
+import { data, redirect } from "react-router";
 import { type FileUpload, parseFormData } from "@mjackson/form-data-parser";
 import {
   Form,
@@ -41,8 +36,15 @@ import {
 } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 import { fileStorage, getStorageKey } from "~/recipe-image-storage.server";
+import { Route } from "./+types/$recipeId";
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export function headers() {
+  return {
+    "Cache-Control": "max-age=10",
+  };
+}
+
+export async function loader({ request, params }: Route.LoaderArgs) {
   const user = await requireLoggedInUser(request);
   const recipe = await db.recipe.findUnique({
     where: { id: params.recipeId },
@@ -74,7 +76,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     );
   }
 
-  return data({ recipe }, { headers: { "Cache-Control": "max-age=10" } });
+  return { recipe };
 }
 
 const saveNameSchema = z.object({
@@ -127,7 +129,7 @@ const createIngredientSchema = z.object({
   newIngredientName: z.string().min(1, "Name cannot be blank"),
 });
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
   const recipeId = String(params.recipeId);
   await canChangeRecipe(request, recipeId);
 

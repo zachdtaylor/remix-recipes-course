@@ -1,4 +1,4 @@
-import { type HeadersArgs, type LoaderFunctionArgs, data } from "react-router";
+import { data } from "react-router";
 import { useLoaderData } from "react-router";
 import {
   DiscoverRecipeDetails,
@@ -7,15 +7,16 @@ import {
 import db from "~/db.server";
 import { getCurrentUser } from "~/utils/auth.server";
 import { hash } from "~/utils/cryptography.server";
+import { Route } from "./+types/discover.$recipeId";
 
-export function headers({ loaderHeaders }: HeadersArgs) {
+export function headers({ loaderHeaders }: Route.HeadersArgs) {
   return {
-    etag: loaderHeaders.get("x-page-etag"),
-    "Cache-Control": `max-age=3600, stale-while-revalidate=${3600 * 24 * 7}`,
+    etag: loaderHeaders.get("etag"),
+    "Cache-Control": `max-age=5, stale-while-revalidate=60`,
   };
 }
 
-export async function loader({ params, request }: LoaderFunctionArgs) {
+export async function loader({ params, request }: Route.LoaderArgs) {
   const recipe = await db.recipe.findUnique({
     where: { id: params.recipeId },
     include: {
@@ -38,25 +39,12 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     );
   }
 
-  const etag = hash(JSON.stringify(recipe));
-
-  if (etag === request.headers.get("if-none-match")) {
-    return new Response(null, { status: 304 });
-  }
-
   const user = await getCurrentUser(request);
-  const pageEtag = `${hash(user?.id ?? "anonymous")}.${etag}`;
+  const hashedUserId = hash(user?.id ?? "anonymous");
+  const hashedRecipe = hash(JSON.stringify(recipe));
+  const etag = `${hashedUserId}.${hashedRecipe}`;
 
-  return data(
-    { recipe },
-    {
-      headers: {
-        etag,
-        "x-page-etag": pageEtag,
-        "cache-control": "max-age=5, stale-while-revalidate=10",
-      },
-    }
-  );
+  return data({ recipe }, { headers: { etag } });
 }
 
 export default function DiscoverRecipe() {
