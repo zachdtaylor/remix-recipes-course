@@ -119,7 +119,7 @@ type AppNavLinkProps = {
 function AppNavLink({ children, to }: AppNavLinkProps) {
   return (
     <li className="w-16">
-      <NavLink to={to}>
+      <NavLink to={to} reloadDocument>
         {({ isActive }) => (
           <div
             className={classNames(
