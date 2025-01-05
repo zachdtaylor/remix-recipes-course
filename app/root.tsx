@@ -6,6 +6,8 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useNavigation,
+  useResolvedPath,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -117,15 +119,23 @@ type AppNavLinkProps = {
   to: string;
 };
 function AppNavLink({ children, to }: AppNavLinkProps) {
+  const path = useResolvedPath(to);
+  const navigation = useNavigation();
+
+  const isLoading =
+    navigation.state === "loading" &&
+    navigation.location.pathname === path.pathname;
+
   return (
     <li className="w-16">
-      <NavLink to={to} reloadDocument>
+      <NavLink to={to}>
         {({ isActive }) => (
           <div
             className={classNames(
               "py-4 flex justify-center hover:bg-primary-light",
               {
-                "bg-primary-light": isActive,
+                "bg-primary-light": isActive || isLoading,
+                "animate-pulse": isLoading,
               }
             )}
           >
