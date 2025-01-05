@@ -1,9 +1,8 @@
-import { PrismaClient } from "@prisma/client";
 import { useLoaderData } from "react-router";
+import { getAllShelves } from "~/models/pantry-shelf.server";
 
 export async function loader() {
-  const db = new PrismaClient();
-  const shelves = await db.pantryShelf.findMany();
+  const shelves = await getAllShelves();
   return { shelves };
 }
 
