@@ -70,7 +70,7 @@ export default function App() {
           <AppNavLink to="discover">
             <DiscoverIcon />
           </AppNavLink>
-          <AppNavLink to="app">
+          <AppNavLink to="app/pantry">
             <RecipeBookIcon />
           </AppNavLink>
           <AppNavLink to="settings">
