@@ -1,5 +1,5 @@
-import { type ActionFunctionArgs, type LoaderFunctionArgs, redirect } from "react-router";
 import {
+  redirect,
   Form,
   Link,
   NavLink,
@@ -21,8 +21,9 @@ import {
 import db from "~/db.server";
 import { requireLoggedInUser } from "~/utils/auth.server";
 import { classNames, useBuildSearchParams } from "~/utils/misc";
+import { Route } from "./+types/recipes";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const user = await requireLoggedInUser(request);
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
@@ -52,7 +53,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return { recipes };
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const user = await requireLoggedInUser(request);
   const formData = await request.formData();
 

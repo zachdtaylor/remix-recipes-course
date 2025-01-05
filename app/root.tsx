@@ -1,4 +1,3 @@
-import { type LinksFunction, type LoaderFunctionArgs } from "react-router";
 import {
   isRouteErrorResponse,
   Link,
@@ -23,6 +22,7 @@ import {
 import { classNames } from "./utils/misc";
 import React from "react";
 import { getCurrentUser } from "./utils/auth.server";
+import { Route } from "./+types/root";
 
 import styles from "./tailwind.css?url";
 
@@ -33,14 +33,14 @@ export function meta() {
   ];
 }
 
-export const links: LinksFunction = () => {
+export const links: Route.LinksFunction = () => {
   return [
     { rel: "stylesheet", href: "/theme.css" },
     { rel: "stylesheet", href: styles },
   ];
 };
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const user = await getCurrentUser(request);
 
   return { isLoggedIn: user !== null };

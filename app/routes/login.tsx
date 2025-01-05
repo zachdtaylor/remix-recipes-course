@@ -1,5 +1,4 @@
-import { type ActionFunctionArgs, type LoaderFunctionArgs, data } from "react-router";
-import { useActionData } from "react-router";
+import { data, useActionData } from "react-router";
 import { z } from "zod";
 import { ErrorMessage, PrimaryButton, PrimaryInput } from "~/components/forms";
 import { generateMagicLink, sendMagicLinkEmail } from "~/magic-links.server";
@@ -7,8 +6,9 @@ import { commitSession, getSession } from "~/sessions";
 import { validateForm } from "~/utils/validation";
 import { v4 as uuid } from "uuid";
 import { requireLoggedOutUser } from "~/utils/auth.server";
+import { Route } from "./+types/login";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   await requireLoggedOutUser(request);
   return null;
 }
@@ -17,7 +17,7 @@ const loginSchema = z.object({
   email: z.string().email(),
 });
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   await requireLoggedOutUser(request);
 
   const cookieHeader = request.headers.get("cookie");

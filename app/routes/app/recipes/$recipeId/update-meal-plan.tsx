@@ -1,6 +1,5 @@
 import ReactModal from "react-modal";
-import { type ActionFunctionArgs, data, redirect } from "react-router";
-import { Form, Link, useActionData } from "react-router";
+import { Form, Link, useActionData, data, redirect } from "react-router";
 import { z } from "zod";
 import {
   DeleteButton,
@@ -14,6 +13,7 @@ import { canChangeRecipe } from "~/utils/abilities.server";
 import { classNames } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 import { useRecipeContext } from "../$recipeId";
+import { Route } from "./+types/update-meal-plan";
 
 const updateMealPlanSchema = z.object({
   mealPlanMultiplier: z.preprocess(
@@ -21,7 +21,7 @@ const updateMealPlanSchema = z.object({
     z.number().min(1)
   ),
 });
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
   const recipeId = String(params.recipeId);
   await canChangeRecipe(request, recipeId);
 

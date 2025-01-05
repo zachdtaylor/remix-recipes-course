@@ -1,11 +1,11 @@
-import { type ActionFunctionArgs, type LoaderFunctionArgs, data } from "react-router";
-import { Form, useActionData, useLoaderData } from "react-router";
+import { data, Form, useActionData, useLoaderData } from "react-router";
 import { z } from "zod";
 import { PrimaryButton } from "~/components/forms";
 import { themeCookie } from "~/cookies";
 import { validateForm } from "~/utils/validation";
+import { Route } from "./+types/app";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const cookieHeader = request.headers.get("cookie");
   const theme = await themeCookie.parse(cookieHeader);
 
@@ -16,7 +16,7 @@ const themeSchema = z.object({
   theme: z.string(),
 });
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
 
   return validateForm(

@@ -1,5 +1,4 @@
-import { type ActionFunctionArgs, data, type LoaderFunctionArgs, redirect } from "react-router";
-import { useActionData } from "react-router";
+import { data, redirect, useActionData } from "react-router";
 import { z } from "zod";
 import { ErrorMessage, PrimaryButton, PrimaryInput } from "~/components/forms";
 import { getMagicLinkPayload, invalidMagicLink } from "~/magic-links.server";
@@ -7,10 +6,11 @@ import { createUser, getUser } from "~/models/user.server";
 import { commitSession, getSession } from "~/sessions";
 import { classNames } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
+import { Route } from "./+types/validate-magic-link";
 
 const magicLinkMaxAge = 1000 * 60 * 10; // 10 minutes
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const magicLinkPayload = getMagicLinkPayload(request);
 
   // 1. Validate expiration time
@@ -53,7 +53,7 @@ const signUpSchema = z.object({
   lastName: z.string().min(1, "Last name cannot be blank"),
 });
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
   return validateForm(
     formData,

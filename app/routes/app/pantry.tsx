@@ -1,5 +1,10 @@
-import { type ActionFunctionArgs, data, type LoaderFunctionArgs } from "react-router";
-import { isRouteErrorResponse, useFetcher, useLoaderData, useRouteError } from "react-router";
+import {
+  data,
+  isRouteErrorResponse,
+  useFetcher,
+  useLoaderData,
+  useRouteError,
+} from "react-router";
 import React from "react";
 import { z } from "zod";
 import {
@@ -25,8 +30,9 @@ import {
 import { requireLoggedInUser } from "~/utils/auth.server";
 import { classNames, useIsHydrated, useServerLayoutEffect } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
+import { Route } from "./+types/pantry";
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: Route.LoaderArgs) => {
   const user = await requireLoggedInUser(request);
 
   const url = new URL(request.url);
@@ -53,7 +59,7 @@ const deleteShelfItemSchema = z.object({
   itemId: z.string(),
 });
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const user = await requireLoggedInUser(request);
 
   const formData = await request.formData();

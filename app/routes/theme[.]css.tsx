@@ -1,5 +1,5 @@
-import { type LoaderFunctionArgs } from "react-router";
 import { themeCookie } from "~/cookies";
+import { Route } from "./+types/theme[.]css";
 
 function getTheme(color: string) {
   switch (color) {
@@ -42,7 +42,7 @@ function getTheme(color: string) {
   }
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const cookieHeader = request.headers.get("cookie");
   const cookieValue = await themeCookie.parse(cookieHeader);
 

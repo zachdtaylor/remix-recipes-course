@@ -1,7 +1,8 @@
-import { type LoaderFunctionArgs, data } from "react-router";
+import { data } from "react-router";
 import { destroySession, getSession } from "~/sessions";
+import { Route } from "./+types/logout";
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const cookieHeader = request.headers.get("cookie");
   const session = await getSession(cookieHeader);
 

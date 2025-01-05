@@ -1,10 +1,10 @@
-import { type ActionFunctionArgs, data, type LoaderFunctionArgs } from "react-router";
-import { useFetcher, useLoaderData } from "react-router";
+import { data, useFetcher, useLoaderData } from "react-router";
 import { z } from "zod";
 import { CheckCircleIcon } from "~/components/icons";
 import db from "~/db.server";
 import { requireLoggedInUser } from "~/utils/auth.server";
 import { validateForm } from "~/utils/validation";
+import { Route } from "./+types/grocery-list";
 
 type GroceryListItem = {
   id: string;
@@ -23,7 +23,7 @@ function isMatch(ingredientName: string, pantryItemName: string) {
   return lowerIngredientName === lowerPantryItemName;
 }
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const user = await requireLoggedInUser(request);
 
   const ingredients = await db.ingredient.findMany({
@@ -97,7 +97,7 @@ const checkOffItemSchema = z.object({
   name: z.string(),
 });
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
   const user = await requireLoggedInUser(request);
   const formData = await request.formData();
 
