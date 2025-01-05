@@ -9,6 +9,7 @@
     "typecheck": "react-router typegen && tsc --build --noEmit"
   },
   "dependencies": {
+    "@prisma/client": "^6.1.0",
     "@react-router/node": "^7.1.0",
     "@react-router/serve": "^7.1.0",
     "classnames": "^2.5.1",

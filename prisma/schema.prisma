@@ -12,3 +12,24 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model PantryShelf {
+  id   String @id @default(cuid())
+  name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items PantryItem[]
+}
+
+model PantryItem {
+  id      String @id @default(cuid())
+  name    String
+  shelfId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shelf PantryShelf @relation(fields: [shelfId], references: [id], onDelete: Cascade)
+}
