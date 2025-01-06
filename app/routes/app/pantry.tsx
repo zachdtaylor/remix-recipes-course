@@ -31,7 +31,7 @@ const deleteShelfSchema = z.object({
 
 const saveShelfNameSchema = z.object({
   shelfId: z.string(),
-  shelfName: z.string().min(1),
+  shelfName: z.string().min(1, "Shelf name cannot be blank"),
 });
 
 export async function action({ request }: Route.ActionArgs) {
@@ -148,17 +148,26 @@ function Shelf({ shelf }: ShelfProps) {
       )}
     >
       <saveShelfNameFetcher.Form method="post" className="flex">
-        <input
-          type="text"
-          defaultValue={shelf.name}
-          name="shelfName"
-          placeholder="Shelf Name"
-          autoComplete="off"
-          className={classNames(
-            "text-2xl font-extrabold mb-2 w-full outline-none",
-            "border-b-2 focus:border-b-primary border-b-background"
-          )}
-        />
+        <div className="w-full mb-2">
+          <input
+            type="text"
+            defaultValue={shelf.name}
+            name="shelfName"
+            placeholder="Shelf Name"
+            autoComplete="off"
+            className={classNames(
+              "text-2xl font-extrabold w-full outline-none",
+              "border-b-2 focus:border-b-primary border-b-background",
+              {
+                "border-b-red-600":
+                  saveShelfNameFetcher.data?.errors?.shelfName,
+              }
+            )}
+          />
+          <span className="text-red-600 text-xs">
+            {saveShelfNameFetcher.data?.errors?.shelfName}
+          </span>
+        </div>
         <button name="_action" value="saveShelfName" className="ml-4">
           <SaveIcon />
         </button>
