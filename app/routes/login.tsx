@@ -4,6 +4,12 @@ import { validateForm } from "~/utils/validation";
 import { z } from "zod";
 import { data, useActionData } from "react-router";
 
+export function headers() {
+  return {
+    "Set-Cookie": "remix-recipes-cookie=myValue",
+  };
+}
+
 const loginSchema = z.object({
   email: z.string().email(),
 });
