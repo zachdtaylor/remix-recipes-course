@@ -12,6 +12,7 @@ function createUser() {
 }
 
 function getShelves(userId: string) {
+  const date = new Date();
   return [
     {
       userId,
@@ -21,7 +22,7 @@ function getShelves(userId: string) {
           { userId, name: "Milk" },
           { userId, name: "Eggs" },
           { userId, name: "Cheese" },
-        ],
+        ].map(addCreatedAt(date)),
       },
     },
     {
@@ -31,13 +32,15 @@ function getShelves(userId: string) {
         create: [
           { userId, name: "Apples" },
           { userId, name: "Oranges" },
-        ],
+        ].map(addCreatedAt(date)),
       },
     },
-  ];
+  ].map(addCreatedAt(date));
 }
 
 function getRecipes(userId: string) {
+  const date = new Date();
+
   return [
     {
       userId,
@@ -56,7 +59,7 @@ function getRecipes(userId: string) {
           { amount: "2", name: "eggs" },
           { amount: "2 cups", name: "buttermilk" },
           { amount: "2 tbsp", name: "butter, melted" },
-        ],
+        ].map(addCreatedAt(date)),
       },
     },
     {
@@ -74,7 +77,7 @@ function getRecipes(userId: string) {
           { amount: "2 cans", name: "water" },
           { amount: "", name: "sliced swiss cheese" },
           { amount: "", name: "hoagie buns" },
-        ],
+        ].map(addCreatedAt(date)),
       },
     },
     {
@@ -94,7 +97,7 @@ function getRecipes(userId: string) {
           { amount: "1 tsp", name: "mustard" },
           { amount: "", name: "mashed potatoes" },
           { amount: "", name: "grated cheese" },
-        ],
+        ].map(addCreatedAt(date)),
       },
     },
     {
@@ -119,10 +122,10 @@ function getRecipes(userId: string) {
           { amount: "3", name: "eggs" },
           { amount: "1 1/2 cup", name: "bread crumbs" },
           { amount: "1 1/2 cup", name: "parmesan cheese" },
-        ],
+        ].map(addCreatedAt(date)),
       },
     },
-  ];
+  ].map(addCreatedAt(date));
 }
 
 async function deleteAll() {
@@ -140,6 +143,13 @@ async function createAll() {
     ...getRecipes(user.id).map((recipe) => db.recipe.create({ data: recipe })),
   ]);
 }
+
+const addCreatedAt =
+  <T>(startDate: Date) =>
+  (obj: T, index: number): T & { createdAt: Date } => ({
+    ...obj,
+    createdAt: new Date(startDate.getTime() + index * 1000),
+  });
 
 async function seed() {
   await deleteAll();
