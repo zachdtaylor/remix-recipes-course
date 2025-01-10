@@ -60,7 +60,12 @@ export default function Login() {
       ? actionData?.errors.email
       : "";
 
-  return (
+  return actionData !== undefined && "ok" in actionData && actionData.ok ? (
+    <div className="text-center pt-20">
+      <h1 className="text-2xl py-8">Yum!</h1>
+      <p>Check your email and follow the instructions to finish logging in.</p>
+    </div>
+  ) : (
     <div className="text-center mt-36">
       <h1 className="text-3xl mb-8">Remix Recipes</h1>
       <form method="post" className="mx-auto md:w-1/3">
