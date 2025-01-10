@@ -1,7 +1,7 @@
 import { getMagicLinkPayload, invalidMagicLink } from "~/magic-links.server";
 import { commitSession, getSession } from "~/sessions";
 import { Route } from "./+types/validate-magic-link";
-import { data } from "react-router";
+import { data, isRouteErrorResponse } from "react-router";
 
 const magicLinkMaxAge = 1000 * 60 * 10; // 10 minutes
 
@@ -33,4 +33,11 @@ export async function loader({ request }: Route.LoaderArgs) {
       },
     }
   );
+}
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  if (isRouteErrorResponse(error)) {
+    return `There was an error validating the magic link: ${error.data.message}`;
+  }
+  return "An unknown error occurred";
 }
