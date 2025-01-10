@@ -3,8 +3,9 @@ import { Route } from "./+types/login";
 import { validateForm } from "~/utils/validation";
 import { z } from "zod";
 import { data, useActionData } from "react-router";
-import { getUser } from "~/models/user.server";
-import { commitSession, getSession } from "~/sessions";
+import { getSession } from "~/sessions";
+import { v4 as uuid } from "uuid";
+import { generateMagicLink } from "~/magic-links.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const cookieHeader = request.headers.get("cookie");
@@ -26,25 +27,10 @@ export async function action({ request }: Route.ActionArgs) {
     formData,
     loginSchema,
     async ({ email }) => {
-      const user = await getUser(email);
-
-      if (user === null) {
-        return data(
-          { errors: { email: "User with this email does not exist" } },
-          { status: 404 }
-        );
-      }
-
-      session.set("userId", user.id);
-
-      return data(
-        { user },
-        {
-          headers: {
-            "Set-Cookie": await commitSession(session),
-          },
-        }
-      );
+      const nonce = uuid();
+      const link = generateMagicLink(email, nonce);
+      console.log(link);
+      return { ok: true };
     },
     (errors) =>
       data(
