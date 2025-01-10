@@ -6,6 +6,7 @@ export default [
   route("app", "routes/app.tsx", [
     index("routes/app/index.tsx"),
     route("pantry", "routes/app/pantry.tsx"),
+    route("recipes", "routes/app/recipes.tsx"),
   ]),
   route("login", "routes/login.tsx"),
   route("logout", "routes/logout.tsx"),
