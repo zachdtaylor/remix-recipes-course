@@ -1,5 +1,4 @@
 import {
-  isRouteErrorResponse,
   Link,
   Links,
   Meta,
@@ -7,6 +6,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  isRouteErrorResponse,
   useNavigation,
   useResolvedPath,
   useRouteError,
@@ -105,11 +105,25 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       </head>
       <body>
         <div className="p-4">
-          <h1 className="text-2xl pb-3">Whoops!</h1>
-          <p>You're seeing this page because an unexpected error occurred.</p>
-          {error instanceof Error ? (
-            <p className="my-4 font-bold">{error.message}</p>
-          ) : null}
+          {isRouteErrorResponse(error) ? (
+            <>
+              <h1 className="text-2xl pb-3">
+                {error.status} - {error.statusText}
+              </h1>
+              <p>You're seeing this page because an error occurred.</p>
+              <p className="my-4 font-bold">{error.data.message}</p>
+            </>
+          ) : (
+            <>
+              <h1 className="text-2xl pb-3">Whoops!</h1>
+              <p>
+                You're seeing this page because an unexpected error occurred.
+              </p>
+              {error instanceof Error ? (
+                <p className="my-4 font-bold">{error.message}</p>
+              ) : null}
+            </>
+          )}
           <Link to="/" className="text-primary">
             Take me home
           </Link>

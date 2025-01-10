@@ -2,9 +2,11 @@ import classNames from "classnames";
 import {
   data,
   Form,
+  isRouteErrorResponse,
   useFetcher,
   useLoaderData,
   useNavigation,
+  useRouteError,
   useSearchParams,
 } from "react-router";
 import {
@@ -423,4 +425,25 @@ function useOptimisticItems(
 
 function createItemId() {
   return `${Math.round(Math.random() * 1_000_000)}`;
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    return (
+      <div className="bg-red-600 text-white rounded-md p-4">
+        <h1 className="mb-2">
+          {error.status} - {error.statusText}
+        </h1>
+        <p>{error.data.message}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-red-600 text-white rounded-md p-4">
+      <h1 className="mb-2">An unexpected error occurred.</h1>
+    </div>
+  );
 }
