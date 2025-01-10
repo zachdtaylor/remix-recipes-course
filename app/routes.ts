@@ -8,6 +8,7 @@ export default [
     route("pantry", "routes/app/pantry.tsx"),
   ]),
   route("login", "routes/login.tsx"),
+  route("logout", "routes/logout.tsx"),
   route("settings", "routes/settings.tsx", [
     route("app", "routes/settings/app.tsx"),
     route("profile", "routes/settings/profile.tsx"),
