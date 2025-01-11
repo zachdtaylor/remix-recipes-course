@@ -72,8 +72,16 @@ const createIngredientSchema = z.object({
 export async function action({ request, params }: Route.ActionArgs) {
   const formData = await request.formData();
   const recipeId = params.recipeId;
+  const _action = formData.get("_action");
 
-  switch (formData.get("_action")) {
+  if (typeof _action === "string" && _action.includes("deleteIngredient")) {
+    const ingredientId = _action.split(".")[1];
+    return handleDelete(() =>
+      db.ingredient.delete({ where: { id: ingredientId } })
+    );
+  }
+
+  switch (_action) {
     case "saveRecipe": {
       return validateForm(
         formData,
@@ -127,7 +135,9 @@ export default function RecipeDetail() {
   const actionData = useActionData<typeof action>();
 
   const actionDataErrors =
-    actionData && "errors" in actionData ? actionData.errors : null;
+    actionData && typeof actionData !== "string" && "errors" in actionData
+      ? actionData.errors
+      : null;
 
   return (
     <Form method="post" reloadDocument>
@@ -190,7 +200,7 @@ export default function RecipeDetail() {
                 {actionDataErrors?.[`ingredientNames.${idx}`]}
               </ErrorMessage>
             </div>
-            <button>
+            <button name="_action" value={`deleteIngredient.${ingredient.id}`}>
               <TrashIcon />
             </button>
           </React.Fragment>
