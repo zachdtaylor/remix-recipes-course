@@ -87,6 +87,10 @@ const createIngredientSchema = z.object({
   newIngredientName: z.string().min(1, "Name cannot be blank"),
 });
 
+function actionData<T, E>(data: T, errors?: E) {
+  return { data, errors };
+}
+
 export async function action({ request, params }: Route.ActionArgs) {
   const user = await requireLoggedInUser(request);
   const recipeId = params.recipeId;
@@ -111,12 +115,9 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   if (typeof _action === "string" && _action.includes("deleteIngredient")) {
     const ingredientId = _action.split(".")[1];
-    return {
-      data: handleDelete(() =>
-        db.ingredient.delete({ where: { id: ingredientId } })
-      ),
-      errors: null,
-    };
+    return actionData(
+      handleDelete(() => db.ingredient.delete({ where: { id: ingredientId } }))
+    );
   }
 
   switch (_action) {
@@ -124,42 +125,42 @@ export async function action({ request, params }: Route.ActionArgs) {
       return validateForm(
         formData,
         saveRecipeSchema,
-        ({ ingredientIds, ingredientNames, ingredientAmounts, ...data }) => ({
-          data: db.recipe.update({
-            where: { id: recipeId },
-            data: {
-              ...data,
-              ingredients: {
-                updateMany: ingredientIds?.map((id, index) => ({
-                  where: { id },
-                  data: {
-                    amount: ingredientAmounts?.[index],
-                    name: ingredientNames?.[index],
-                  },
-                })),
+        ({ ingredientIds, ingredientNames, ingredientAmounts, ...data }) =>
+          actionData(
+            db.recipe.update({
+              where: { id: recipeId },
+              data: {
+                ...data,
+                ingredients: {
+                  updateMany: ingredientIds?.map((id, index) => ({
+                    where: { id },
+                    data: {
+                      amount: ingredientAmounts?.[index],
+                      name: ingredientNames?.[index],
+                    },
+                  })),
+                },
               },
-            },
-          }),
-          errors: null,
-        }),
-        (errors) => data({ data: null, errors }, { status: 400 })
+            })
+          ),
+        (errors) => data(actionData(null, errors), { status: 400 })
       );
     }
     case "createIngredient": {
       return validateForm(
         formData,
         createIngredientSchema,
-        ({ newIngredientAmount, newIngredientName }) => ({
-          data: db.ingredient.create({
-            data: {
-              recipeId,
-              amount: newIngredientAmount,
-              name: newIngredientName,
-            },
-          }),
-          errors: null,
-        }),
-        (errors) => data({ data: null, errors }, { status: 400 })
+        ({ newIngredientAmount, newIngredientName }) =>
+          actionData(
+            db.ingredient.create({
+              data: {
+                recipeId,
+                amount: newIngredientAmount,
+                name: newIngredientName,
+              },
+            })
+          ),
+        (errors) => data(actionData(null, errors), { status: 400 })
       );
     }
     case "deleteRecipe": {
@@ -167,7 +168,7 @@ export async function action({ request, params }: Route.ActionArgs) {
       return redirect("/app/recipes");
     }
     default: {
-      return { data: null, errors: null };
+      return actionData(null);
     }
   }
 }
