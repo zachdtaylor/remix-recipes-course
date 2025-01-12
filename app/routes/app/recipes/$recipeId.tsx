@@ -24,6 +24,10 @@ import { validateForm } from "~/utils/validation";
 import { handleDelete } from "~/models/utils";
 import { requireLoggedInUser } from "~/utils/auth.server";
 import { useDebouncedFunction } from "~/utils/misc";
+import {
+  useSaveRecipeNameFetcher,
+  useSaveRecipeTotalTimeFetcher,
+} from "~/utils/hooks";
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
   return loaderHeaders;
@@ -253,11 +257,15 @@ export async function action({ request, params }: Route.ActionArgs) {
   }
 }
 
-export default function RecipeDetail() {
+export default function RecipeDetail({ params }: Route.ComponentProps) {
   const data = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  const saveNameFetcher = useFetcher<typeof action>();
-  const saveTotalTimeFetcher = useFetcher<typeof action>();
+  const saveNameFetcher = useSaveRecipeNameFetcher<typeof action>(
+    params.recipeId
+  );
+  const saveTotalTimeFetcher = useSaveRecipeTotalTimeFetcher<typeof action>(
+    params.recipeId
+  );
   const saveInstructionsFetcher = useFetcher<typeof action>();
 
   const saveName = useDebouncedFunction(

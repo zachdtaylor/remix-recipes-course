@@ -18,6 +18,11 @@ import {
 } from "~/components/recipes";
 import { PrimaryButton, SearchBar } from "~/components/form";
 import { PlusIcon } from "~/components/icons";
+import {
+  useSaveRecipeNameFetcher,
+  useSaveRecipeTotalTimeFetcher,
+} from "~/utils/hooks";
+import { formDataValueAsString } from "~/utils/forms";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await requireLoggedInUser(request);
@@ -100,6 +105,15 @@ function RecipeListItem({ recipe }: RecipeListItemProps) {
   const navigation = useNavigation();
   const location = useLocation();
   const isLoading = navigation.location?.pathname.endsWith(recipe.id);
+  const saveNameFetcher = useSaveRecipeNameFetcher(recipe.id);
+  const saveTotalTimeFetcher = useSaveRecipeTotalTimeFetcher(recipe.id);
+
+  const optimisticData = {
+    name: formDataValueAsString(saveNameFetcher.formData?.get("name")),
+    totalTime: formDataValueAsString(
+      saveTotalTimeFetcher.formData?.get("totalTime")
+    ),
+  };
 
   return (
     <li className="my-4" key={recipe.id}>
@@ -109,8 +123,8 @@ function RecipeListItem({ recipe }: RecipeListItemProps) {
       >
         {({ isActive }) => (
           <RecipeCard
-            name={recipe.name}
-            totalTime={recipe.totalTime}
+            name={optimisticData.name ?? recipe.name}
+            totalTime={optimisticData.totalTime ?? recipe.totalTime}
             imageUrl={recipe.imageUrl}
             isActive={isActive}
             isLoading={isLoading}
