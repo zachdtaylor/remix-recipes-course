@@ -63,11 +63,20 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   return data({ recipe }, { headers: { "Cache-Control": "max-age=5" } });
 }
 
+const saveNameSchema = z.object({
+  name: z.string().min(1, "Name cannot be blank"),
+});
+
+const saveTotalTimeSchema = z.object({
+  totalTime: z.string().min(1, "Total time cannot be blank"),
+});
+
+const saveInstructionsSchema = z.object({
+  instructions: z.string().min(1, "Instructions cannot be blank"),
+});
+
 const saveRecipeSchema = z
   .object({
-    name: z.string().min(1, "Name cannot be blank"),
-    totalTime: z.string().min(1, "Total time cannot be blank"),
-    instructions: z.string().min(1, "Instructions cannot be blank"),
     ingredientIds: z
       .array(z.string().min(1, "Ingredient ID is missing"))
       .optional(),
@@ -76,6 +85,9 @@ const saveRecipeSchema = z
       .array(z.string().min(1, "Name cannot be blank"))
       .optional(),
   })
+  .and(saveNameSchema)
+  .and(saveTotalTimeSchema)
+  .and(saveInstructionsSchema)
   .refine(
     (data) =>
       data.ingredientIds?.length === data.ingredientAmounts?.length &&
@@ -126,9 +138,14 @@ export async function action({ request, params }: Route.ActionArgs) {
       return validateForm(
         formData,
         saveRecipeSchema,
-        ({ ingredientIds, ingredientNames, ingredientAmounts, ...data }) =>
+        async ({
+          ingredientIds,
+          ingredientNames,
+          ingredientAmounts,
+          ...data
+        }) =>
           actionData(
-            db.recipe.update({
+            await db.recipe.update({
               where: { id: recipeId },
               data: {
                 ...data,
@@ -151,9 +168,9 @@ export async function action({ request, params }: Route.ActionArgs) {
       return validateForm(
         formData,
         createIngredientSchema,
-        ({ newIngredientAmount, newIngredientName }) =>
+        async ({ newIngredientAmount, newIngredientName }) =>
           actionData(
-            db.ingredient.create({
+            await db.ingredient.create({
               data: {
                 recipeId,
                 amount: newIngredientAmount,
@@ -167,6 +184,33 @@ export async function action({ request, params }: Route.ActionArgs) {
     case "deleteRecipe": {
       await handleDelete(() => db.recipe.delete({ where: { id: recipeId } }));
       return redirect("/app/recipes");
+    }
+    case "saveName": {
+      return validateForm(
+        formData,
+        saveNameSchema,
+        async (data) =>
+          actionData(await db.recipe.update({ where: { id: recipeId }, data })),
+        (errors) => data(actionData(null, errors), { status: 400 })
+      );
+    }
+    case "saveTotalTime": {
+      return validateForm(
+        formData,
+        saveTotalTimeSchema,
+        async (data) =>
+          actionData(await db.recipe.update({ where: { id: recipeId }, data })),
+        (errors) => data(actionData(null, errors), { status: 400 })
+      );
+    }
+    case "saveInstructions": {
+      return validateForm(
+        formData,
+        saveInstructionsSchema,
+        async (data) =>
+          actionData(await db.recipe.update({ where: { id: recipeId }, data })),
+        (errors) => data(actionData(null, errors), { status: 400 })
+      );
     }
     default: {
       return actionData(null);
