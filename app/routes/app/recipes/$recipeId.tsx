@@ -28,6 +28,7 @@ import {
   useSaveRecipeNameFetcher,
   useSaveRecipeTotalTimeFetcher,
 } from "~/utils/hooks";
+import { FileUpload, parseFormData } from "@mjackson/form-data-parser";
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
   return loaderHeaders;
@@ -140,7 +141,9 @@ export async function action({ request, params }: Route.ActionArgs) {
     );
   }
 
-  const formData = await request.formData();
+  const uploadHandler = async (fileUpload: FileUpload) => {};
+
+  const formData = await parseFormData(request, uploadHandler);
   const _action = formData.get("_action");
 
   if (typeof _action === "string" && _action.includes("deleteIngredient")) {
