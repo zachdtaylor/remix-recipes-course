@@ -9,6 +9,7 @@
     "typecheck": "react-router typegen && tsc --build --noEmit"
   },
   "dependencies": {
+    "@mjackson/file-storage": "^0.4.1",
     "@mjackson/form-data-parser": "^0.5.1",
     "@prisma/client": "^6.1.0",
     "@react-router/node": "^7.1.0",
