@@ -29,7 +29,7 @@ import {
   useSaveRecipeTotalTimeFetcher,
 } from "~/utils/hooks";
 import { FileUpload, parseFormData } from "@mjackson/form-data-parser";
-import { fileStorage } from "~/recipe-image-storage.server";
+import { fileStorage, getStorageKey } from "~/recipe-image-storage.server";
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
   return loaderHeaders;
@@ -144,8 +144,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   const uploadHandler = async (fileUpload: FileUpload) => {
     if (fileUpload.fieldName === "image") {
-      const key = `recipe-${recipeId}-image`;
-      console.log("hi", key);
+      const key = getStorageKey(recipeId);
       await fileStorage.set(key, fileUpload);
       return fileStorage.get(key);
     }
