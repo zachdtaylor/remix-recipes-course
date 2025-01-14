@@ -151,6 +151,15 @@ export async function action({ request, params }: Route.ActionArgs) {
   };
 
   const formData = await parseFormData(request, uploadHandler);
+  const image = formData.get("image");
+
+  if (image && typeof image !== "string" && image.size !== 0) {
+    await db.recipe.update({
+      where: { id: recipeId },
+      data: { imageUrl: `/recipes/${recipeId}/image` },
+    });
+  }
+
   const _action = formData.get("_action");
 
   if (typeof _action === "string" && _action.includes("deleteIngredient")) {
