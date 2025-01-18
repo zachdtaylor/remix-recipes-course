@@ -7,7 +7,12 @@ export default [
     index("routes/app/index.tsx"),
     route("pantry", "routes/app/pantry.tsx"),
     route("recipes", "routes/app/recipes.tsx", [
-      route(":recipeId", "routes/app/recipes/$recipeId.tsx"),
+      route(":recipeId", "routes/app/recipes/$recipeId.tsx", [
+        route(
+          "update-meal-plan",
+          "routes/app/recipes/$recipeId/update-meal-plan.tsx"
+        ),
+      ]),
     ]),
   ]),
   route("login", "routes/login.tsx"),
