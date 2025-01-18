@@ -61,10 +61,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body className="md:flex md:h-screen">
-        {children}
-        <ScrollRestoration />
-        <Scripts />
+      <body>
+        <div id="root" className="md:flex md:h-screen">
+          {children}
+          <ScrollRestoration />
+          <Scripts />
+        </div>
       </body>
     </html>
   );
