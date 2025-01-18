@@ -7,6 +7,7 @@ import {
   Link,
   Outlet,
   redirect,
+  ShouldRevalidateFunctionArgs,
   useActionData,
   useFetcher,
   useLoaderData,
@@ -37,6 +38,11 @@ import {
 } from "~/utils/hooks";
 import { FileUpload, parseFormData } from "@mjackson/form-data-parser";
 import { fileStorage, getStorageKey } from "~/recipe-image-storage.server";
+import { mealPlanModalIsOpeningOrClosing } from "~/utils/revalidation";
+
+export function shouldRevalidate(arg: ShouldRevalidateFunctionArgs) {
+  return !mealPlanModalIsOpeningOrClosing(arg);
+}
 
 export function headers({ loaderHeaders }: Route.HeadersArgs) {
   return loaderHeaders;

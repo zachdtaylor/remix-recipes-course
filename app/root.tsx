@@ -6,6 +6,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  ShouldRevalidateFunctionArgs,
   isRouteErrorResponse,
   useLoaderData,
   useNavigation,
@@ -24,6 +25,7 @@ import {
 } from "./components/icons";
 import classNames from "classnames";
 import { getCurrentUser } from "./utils/auth.server";
+import { mealPlanModalIsOpeningOrClosing } from "./utils/revalidation";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -45,6 +47,10 @@ export const links: Route.LinksFunction = () => [
   },
   { rel: "stylesheet", href: stylesheet },
 ];
+
+export function shouldRevalidate(arg: ShouldRevalidateFunctionArgs) {
+  return !mealPlanModalIsOpeningOrClosing(arg);
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getCurrentUser(request);

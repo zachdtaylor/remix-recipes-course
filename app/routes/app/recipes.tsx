@@ -6,6 +6,7 @@ import {
   NavLink,
   Outlet,
   redirect,
+  ShouldRevalidateFunctionArgs,
   useLoaderData,
   useLocation,
   useNavigation,
@@ -23,6 +24,11 @@ import {
   useSaveRecipeTotalTimeFetcher,
 } from "~/utils/hooks";
 import { formDataValueAsString } from "~/utils/forms";
+import { mealPlanModalIsOpeningOrClosing } from "~/utils/revalidation";
+
+export function shouldRevalidate(arg: ShouldRevalidateFunctionArgs) {
+  return !mealPlanModalIsOpeningOrClosing(arg);
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await requireLoggedInUser(request);
