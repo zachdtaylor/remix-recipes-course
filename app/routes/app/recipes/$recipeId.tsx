@@ -11,6 +11,7 @@ import {
   useActionData,
   useFetcher,
   useLoaderData,
+  useOutletContext,
   useRouteError,
 } from "react-router";
 import {
@@ -289,6 +290,13 @@ export async function action({ request, params }: Route.ActionArgs) {
   }
 }
 
+export function useRecipeContext() {
+  return useOutletContext<{
+    recipeName: string;
+    mealPlanMultiplier: number | null;
+  }>();
+}
+
 export default function RecipeDetail({ params }: Route.ComponentProps) {
   const data = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
@@ -352,7 +360,12 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
 
   return (
     <>
-      <Outlet />
+      <Outlet
+        context={{
+          recipeName: data.recipe.name,
+          mealPlanMultiplier: data.recipe.mealPlanMultiplier,
+        }}
+      />
       <Form
         id="recipe-detail-form"
         method="post"

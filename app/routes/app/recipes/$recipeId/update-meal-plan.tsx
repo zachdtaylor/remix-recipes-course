@@ -3,12 +3,15 @@ import ReactModal from "react-modal";
 import { Form, Link } from "react-router";
 import { DeleteButton, IconInput, PrimaryButton } from "~/components/form";
 import { XIcon } from "~/components/icons";
+import { useRecipeContext } from "../$recipeId";
 
 if (typeof window !== "undefined") {
   ReactModal.setAppElement("#root");
 }
 
 export default function UpdateMealPlan() {
+  const { recipeName, mealPlanMultiplier } = useRecipeContext();
+
   const [isOpen, setIsOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -28,18 +31,20 @@ export default function UpdateMealPlan() {
           </Link>
         </div>
         <Form method="post" reloadDocument>
-          <h2 className="mb-2">Recipe Name</h2>
+          <h2 className="mb-2">{recipeName}</h2>
           <IconInput
             icon={<XIcon />}
-            defaultValue={1}
+            defaultValue={mealPlanMultiplier ?? 1}
             type="number"
             autoComplete="off"
             name="mealPlanMultiplier"
           />
           <div className="flex justify-end gap-4 mt-8">
-            <DeleteButton name="_action" value="removeFromMealPlan">
-              Remove from Meal Plan
-            </DeleteButton>
+            {mealPlanMultiplier === null ? null : (
+              <DeleteButton name="_action" value="removeFromMealPlan">
+                Remove from Meal Plan
+              </DeleteButton>
+            )}
             <PrimaryButton name="_action" value="updateMealPlan">
               Save
             </PrimaryButton>
