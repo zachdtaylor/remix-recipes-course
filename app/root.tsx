@@ -85,9 +85,6 @@ export default function App() {
     <>
       <nav className="bg-primary text-white md:w-16 flex justify-between md:flex-col">
         <ul className="flex md:flex-col">
-          <AppNavLink to="/">
-            <HomeIcon />
-          </AppNavLink>
           <AppNavLink to="discover">
             <DiscoverIcon />
           </AppNavLink>
