@@ -37,6 +37,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const user = await requireLoggedInUser(request);
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
+  const filter = url.searchParams.get("filter");
 
   const recipes = await db.recipe.findMany({
     where: {
@@ -45,6 +46,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         contains: q ?? "",
         mode: "insensitive",
       },
+      mealPlanMultiplier: filter === "mealPlanOnly" ? { not: null } : {},
     },
     select: {
       name: true,
