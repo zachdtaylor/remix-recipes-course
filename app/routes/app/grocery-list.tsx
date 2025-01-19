@@ -72,7 +72,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         uses: [
           ...existing.uses,
           {
-            id: ingredient.recipeId,
+            id: `${ingredient.id}-${ingredient.recipeId}`,
             amount: ingredient.amount,
             recipeName: ingredient.recipe.name,
             multiplier: ingredient.recipe.mealPlanMultiplier,
