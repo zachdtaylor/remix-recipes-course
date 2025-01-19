@@ -24,4 +24,5 @@ export default [
     route("app", "routes/settings/app.tsx"),
   ]),
   route("validate-magic-link", "routes/validate-magic-link.tsx"),
+  route("my-resource", "routes/my-resource.tsx"),
 ] satisfies RouteConfig;
