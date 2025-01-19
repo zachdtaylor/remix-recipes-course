@@ -363,7 +363,9 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
           <Link
             replace
             to="update-meal-plan"
-            className="flex flex-col justify-center"
+            className={classNames("flex flex-col justify-center", {
+              "text-primary": data.recipe.mealPlanMultiplier !== null,
+            })}
           >
             <CalendarIcon />
           </Link>

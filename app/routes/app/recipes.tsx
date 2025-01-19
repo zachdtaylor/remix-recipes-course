@@ -43,7 +43,13 @@ export async function loader({ request }: Route.LoaderArgs) {
         mode: "insensitive",
       },
     },
-    select: { name: true, totalTime: true, imageUrl: true, id: true },
+    select: {
+      name: true,
+      totalTime: true,
+      imageUrl: true,
+      id: true,
+      mealPlanMultiplier: true,
+    },
     orderBy: {
       createdAt: "desc",
     },
@@ -103,6 +109,7 @@ type RecipeListItemProps = {
   recipe: {
     id: string;
     name: string;
+    mealPlanMultiplier: number | null;
     totalTime: string;
     imageUrl: string;
   };
@@ -131,6 +138,7 @@ function RecipeListItem({ recipe }: RecipeListItemProps) {
           <RecipeCard
             name={optimisticData.name ?? recipe.name}
             totalTime={optimisticData.totalTime ?? recipe.totalTime}
+            mealPlanMultiplier={recipe.mealPlanMultiplier}
             imageUrl={recipe.imageUrl}
             isActive={isActive}
             isLoading={isLoading}
