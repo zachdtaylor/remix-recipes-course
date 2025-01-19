@@ -1,7 +1,8 @@
 export function loader() {
   const data = `
-    .my-class {
-      color: #abc123;
+    :root {
+      --color-primary: #00743e;
+      --color-primary-light: #4c9d77;
     }
   `;
 
