@@ -23,6 +23,6 @@ export default [
     index("routes/settings/index.tsx"),
     route("app", "routes/settings/app.tsx"),
   ]),
+  route("theme.css", "routes/theme.tsx"),
   route("validate-magic-link", "routes/validate-magic-link.tsx"),
-  route("my-resource", "routes/my-resource.tsx"),
 ] satisfies RouteConfig;
