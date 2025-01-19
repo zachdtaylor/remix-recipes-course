@@ -20,8 +20,8 @@ export default [
   route("logout", "routes/logout.tsx"),
   route("recipes/:recipeId/image", "routes/recipe-image.tsx"),
   route("settings", "routes/settings.tsx", [
+    index("routes/settings/index.tsx"),
     route("app", "routes/settings/app.tsx"),
-    route("profile", "routes/settings/profile.tsx"),
   ]),
   route("validate-magic-link", "routes/validate-magic-link.tsx"),
 ] satisfies RouteConfig;
