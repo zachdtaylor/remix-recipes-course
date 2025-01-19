@@ -5,6 +5,7 @@ export default [
   route("discover", "routes/discover.tsx"),
   route("app", "routes/app.tsx", [
     index("routes/app/index.tsx"),
+    route("grocery-list", "routes/app/grocery-list.tsx"),
     route("pantry", "routes/app/pantry.tsx"),
     route("recipes", "routes/app/recipes.tsx", [
       route(":recipeId", "routes/app/recipes/$recipeId.tsx", [

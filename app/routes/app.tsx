@@ -8,6 +8,7 @@ export default function App() {
       <nav className="border-b-2 pb-2 mt-2">
         <NavLink to="recipes">Recipes</NavLink>
         <NavLink to="pantry">Pantry</NavLink>
+        <NavLink to="grocery-list">Grocery List</NavLink>
       </nav>
       <div className="py-4 overflow-y-auto">
         <Outlet />
