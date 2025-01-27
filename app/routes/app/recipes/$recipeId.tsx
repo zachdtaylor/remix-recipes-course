@@ -308,7 +308,10 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
 
   const saveName = useDebouncedFunction(
     (name: string) =>
-      saveNameFetcher.submit({ _action: "saveName", name }, { method: "post" }),
+      saveNameFetcher.submit(
+        { _action: "saveName", name },
+        { method: "post", action: `/app/recipes/${data.recipe.id}` }
+      ),
     1000
   );
 
@@ -316,7 +319,7 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
     (totalTime: string) =>
       saveTotalTimeFetcher.submit(
         { _action: "saveTotalTime", totalTime },
-        { method: "post" }
+        { method: "post", action: `/app/recipes/${data.recipe.id}` }
       ),
     1000
   );
@@ -325,7 +328,7 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
     (instructions: string) =>
       saveInstructionsFetcher.submit(
         { _action: "saveInstructions", instructions },
-        { method: "post" }
+        { method: "post", action: `/app/recipes/${data.recipe.id}` }
       ),
     1000
   );
@@ -338,7 +341,7 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
         newIngredientAmount: createIngredientForm.amount,
         newIngredientName: createIngredientForm.name,
       },
-      { method: "post" }
+      { method: "post", action: `/app/recipes/${data.recipe.id}` }
     );
     setCreateIngredientForm({ amount: "", name: "" });
     newIngredientAmountRef.current?.focus();
@@ -423,6 +426,7 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
             <IngredientRow
               key={ingredient.id}
               id={ingredient.id}
+              recipeId={data.recipe.id}
               amount={ingredient.amount}
               name={ingredient.name}
               amountError={actionData?.errors?.[`ingredientAmounts.${idx}`]}
@@ -559,6 +563,7 @@ export default function RecipeDetail({ params }: Route.ComponentProps) {
 
 type IngredientRowProps = {
   id: string;
+  recipeId: string;
   amount: string | null;
   amountError?: string;
   name: string;
@@ -567,6 +572,7 @@ type IngredientRowProps = {
 };
 function IngredientRow({
   id,
+  recipeId,
   amount,
   amountError,
   name,
@@ -585,7 +591,7 @@ function IngredientRow({
           amount,
           id,
         },
-        { method: "post" }
+        { method: "post", action: `/app/recipes/${recipeId}` }
       ),
     1000
   );
@@ -598,7 +604,7 @@ function IngredientRow({
           name,
           id,
         },
-        { method: "post" }
+        { method: "post", action: `/app/recipes/${recipeId}` }
       ),
     1000
   );
