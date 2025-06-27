@@ -1,6 +1,11 @@
 import { PassThrough } from "node:stream";
 
-import type { AppLoadContext, EntryContext } from "react-router";
+import type {
+  ActionFunctionArgs,
+  AppLoadContext,
+  EntryContext,
+  LoaderFunctionArgs,
+} from "react-router";
 import { createReadableStreamFromReadable } from "@react-router/node";
 import { ServerRouter } from "react-router";
 import { isbot } from "isbot";
@@ -9,6 +14,24 @@ import { renderToPipeableStream } from "react-dom/server";
 
 export const streamTimeout = 5_000;
 
+function matchingEtag(requestHeaders: Headers, responseHeaders: Headers) {
+  const ifNoneMatch = requestHeaders.get("if-none-match");
+  const etag = responseHeaders.get("etag");
+
+  return ifNoneMatch !== null && etag !== null && ifNoneMatch === etag;
+}
+
+export function handleDataRequest(
+  response: Response,
+  { request }: LoaderFunctionArgs | ActionFunctionArgs
+) {
+  if (matchingEtag(request.headers, response.headers)) {
+    return new Response(null, { status: 304, headers: response.headers });
+  }
+
+  return response;
+}
+
 export default function handleRequest(
   request: Request,
   responseStatusCode: number,
@@ -16,6 +39,10 @@ export default function handleRequest(
   routerContext: EntryContext,
   loadContext: AppLoadContext
 ) {
+  if (matchingEtag(request.headers, responseHeaders)) {
+    return new Response(null, { status: 304, headers: responseHeaders });
+  }
+
   return new Promise((resolve, reject) => {
     let shellRendered = false;
     let userAgent = request.headers.get("user-agent");
