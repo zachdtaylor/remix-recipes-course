@@ -12,8 +12,8 @@
     "@mjackson/file-storage": "^0.4.1",
     "@mjackson/form-data-parser": "^0.5.1",
     "@prisma/client": "^6.1.0",
-    "@react-router/node": "^7.1.0",
-    "@react-router/serve": "^7.1.0",
+    "@react-router/node": "^7.6.0",
+    "@react-router/serve": "^7.6.0",
     "classnames": "^2.5.1",
     "cryptr": "^6.3.0",
     "isbot": "^5.1.17",
@@ -21,12 +21,12 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-modal": "^3.16.3",
-    "react-router": "^7.1.0",
+    "react-router": "^7.6.0",
     "uuid": "^11.0.5",
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@react-router/dev": "^7.1.0",
+    "@react-router/dev": "^7.6.0",
     "@types/node": "^20",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -37,8 +37,8 @@
     "tailwindcss": "^3.4.15",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3",
-    "vite": "^5.4.11",
-    "vite-tsconfig-paths": "^5.1.2"
+    "vite": "^6.3.3",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
