@@ -36,7 +36,10 @@ export async function loader({ params }: Route.LoaderArgs) {
 
   const etag = hash(JSON.stringify(recipe));
 
-  return data({ recipe }, { headers: { etag } });
+  return data(
+    { recipe },
+    { headers: { etag, "cache-control": "stale-while-revalidate=60" } }
+  );
 }
 
 export default function DiscoverRecipe() {
