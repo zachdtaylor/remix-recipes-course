@@ -10,7 +10,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   if (recipe === null) {
     throw data(
       {
-        message: `A recipe with id ${params.id} does not exist.`,
+        message: `A recipe with id ${params.recipeId} does not exist.`,
       },
       { status: 404 }
     );
