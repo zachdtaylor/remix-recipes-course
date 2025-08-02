@@ -102,21 +102,7 @@ Create a production build:
 npm run build
 ```
 
-## Deployment
-
-### Docker Deployment
-
-This application includes Docker configuration for easy deployment:
-
-```bash
-# Build the Docker image
-docker build -t react-router-recipes .
-
-# Run the container
-docker run -p 3000:3000 react-router-recipes
-```
-
-### Fly.io Deployment
+## Fly.io Deployment
 
 The application is configured for deployment on Fly.io:
 
@@ -124,16 +110,6 @@ The application is configured for deployment on Fly.io:
 # Deploy to Fly.io
 npm run deploy
 ```
-
-### Other Platforms
-
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Railway
 
 ## Testing
 
@@ -146,16 +122,6 @@ npm run test:e2e
 # Run tests with UI
 npm run test:e2e:ui
 ```
-
-## Database Schema
-
-The application uses the following main entities:
-
-- **Users** - Authentication and user management
-- **Recipes** - Recipe data with ingredients and instructions
-- **Ingredients** - Individual ingredients for recipes
-- **PantryShelves** - Custom shelves for organizing pantry items
-- **PantryItems** - Individual items stored in pantry shelves
 
 ## License
 
