@@ -17,8 +17,18 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { shelves };
 }
 
-export async function action() {
-  return createShelf();
+export async function action({ request }: Route.ActionArgs) {
+  const formData = await request.formData();
+  switch (formData.get("_action")) {
+    case "createShelf": {
+      return createShelf();
+    }
+    case "deleteShelf": {
+    }
+    default: {
+      return null;
+    }
+  }
 }
 
 export default function Pantry() {
@@ -27,7 +37,7 @@ export default function Pantry() {
   const navigation = useNavigation();
 
   const isSearching = navigation.formData?.has("q");
-  const isCreatingShelf = navigation.formData?.has("createShelf");
+  const isCreatingShelf = navigation.formData?.get("_action") === "createShelf";
 
   return (
     <div>
@@ -52,7 +62,8 @@ export default function Pantry() {
       </Form>
       <Form method="post">
         <PrimaryButton
-          name="createShelf"
+          name="_action"
+          value="createShelf"
           className={classNames("mt-4 w-full md:w-fit", {
             "bg-primary-light": isCreatingShelf,
           })}
@@ -87,7 +98,11 @@ export default function Pantry() {
               ))}
             </ul>
             <Form method="post" className="pt-8">
-              <DeleteButton className="w-full" name="deleteShelf">
+              <DeleteButton
+                className="w-full"
+                name="_action"
+                value="deleteShelf"
+              >
                 Delete Shelf
               </DeleteButton>
             </Form>
