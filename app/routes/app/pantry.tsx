@@ -8,7 +8,7 @@ import {
 import { createShelf, getAllShelves } from "~/models/pantry-shelf.server";
 import { Route } from "./+types/pantry";
 import { PlusIcon, SearchIcon } from "~/components/icons";
-import { PrimaryButton } from "~/components/form";
+import { DeleteButton, PrimaryButton } from "~/components/form";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
@@ -86,6 +86,11 @@ export default function Pantry() {
                 </li>
               ))}
             </ul>
+            <Form method="post" className="pt-8">
+              <DeleteButton className="w-full" name="deleteShelf">
+                Delete Shelf
+              </DeleteButton>
+            </Form>
           </li>
         ))}
       </ul>
