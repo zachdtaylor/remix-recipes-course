@@ -5,7 +5,11 @@ import {
   useNavigation,
   useSearchParams,
 } from "react-router";
-import { createShelf, getAllShelves } from "~/models/pantry-shelf.server";
+import {
+  createShelf,
+  deleteShelf,
+  getAllShelves,
+} from "~/models/pantry-shelf.server";
 import { Route } from "./+types/pantry";
 import { PlusIcon, SearchIcon } from "~/components/icons";
 import { DeleteButton, PrimaryButton } from "~/components/form";
@@ -24,6 +28,11 @@ export async function action({ request }: Route.ActionArgs) {
       return createShelf();
     }
     case "deleteShelf": {
+      const shelfId = formData.get("shelfId");
+      if (typeof shelfId !== "string") {
+        return { errors: { shelfId: "Shelf ID must be a string" } };
+      }
+      return deleteShelf(shelfId);
     }
     default: {
       return null;
@@ -64,9 +73,8 @@ export default function Pantry() {
         <PrimaryButton
           name="_action"
           value="createShelf"
-          className={classNames("mt-4 w-full md:w-fit", {
-            "bg-primary-light": isCreatingShelf,
-          })}
+          className="mt-4 w-full md:w-fit"
+          isLoading={isCreatingShelf}
         >
           <PlusIcon />
           <span className="pl-2">
@@ -80,34 +88,41 @@ export default function Pantry() {
           "snap-x snap-mandatory md:snap-none"
         )}
       >
-        {data.shelves.map((shelf) => (
-          <li
-            key={shelf.id}
-            className={classNames(
-              "border-2 border-primary rounded-md p-4 h-fit",
-              "w-[calc(100vw-2rem)] flex-none snap-center",
-              "md:w-96"
-            )}
-          >
-            <h1 className="text-2xl font-extrabold mb-2">{shelf.name}</h1>
-            <ul>
-              {shelf.items.map((item) => (
-                <li key={item.id} className="py-2">
-                  {item.name}
-                </li>
-              ))}
-            </ul>
-            <Form method="post" className="pt-8">
-              <DeleteButton
-                className="w-full"
-                name="_action"
-                value="deleteShelf"
-              >
-                Delete Shelf
-              </DeleteButton>
-            </Form>
-          </li>
-        ))}
+        {data.shelves.map((shelf) => {
+          const isDeletingShelf =
+            navigation.formData?.get("_action") === "deleteShelf" &&
+            navigation.formData?.get("shelfId") === shelf.id;
+          return (
+            <li
+              key={shelf.id}
+              className={classNames(
+                "border-2 border-primary rounded-md p-4 h-fit",
+                "w-[calc(100vw-2rem)] flex-none snap-center",
+                "md:w-96"
+              )}
+            >
+              <h1 className="text-2xl font-extrabold mb-2">{shelf.name}</h1>
+              <ul>
+                {shelf.items.map((item) => (
+                  <li key={item.id} className="py-2">
+                    {item.name}
+                  </li>
+                ))}
+              </ul>
+              <Form method="post" className="pt-8">
+                <input type="hidden" name="shelfId" value={shelf.id} />
+                <DeleteButton
+                  className="w-full"
+                  name="_action"
+                  value="deleteShelf"
+                  isLoading={isDeletingShelf}
+                >
+                  {isDeletingShelf ? "Deleting Shelf" : "Delete Shelf"}
+                </DeleteButton>
+              </Form>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
