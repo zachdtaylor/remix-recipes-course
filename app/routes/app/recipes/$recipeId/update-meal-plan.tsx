@@ -14,16 +14,18 @@ import { classNames } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 import { useRecipeContext } from "../$recipeId";
 import { Route } from "./+types/update-meal-plan";
+import { userContext } from "~/context";
 
 const updateMealPlanSchema = z.object({
   mealPlanMultiplier: z.preprocess(
     (value) => parseInt(String(value)),
-    z.number().min(1)
+    z.number().min(1),
   ),
 });
-export async function action({ request, params }: Route.ActionArgs) {
+export async function action({ context, request, params }: Route.ActionArgs) {
+  const user = context.get(userContext);
   const recipeId = String(params.recipeId);
-  await canChangeRecipe(request, recipeId);
+  await canChangeRecipe(user, recipeId);
 
   const formData = await request.formData();
 
@@ -39,7 +41,7 @@ export async function action({ request, params }: Route.ActionArgs) {
           });
           return redirect("..");
         },
-        (errors) => data({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 }),
       );
     }
     case "removeFromMealPlan": {
@@ -67,7 +69,7 @@ export default function UpdateMealPlanModal() {
       isOpen
       className={classNames(
         "m-4 w-[calc(100%-2rem)] h-[calc(100%-2rem)]",
-        "md:h-fit lg:w-1/2 md:mx-auto md:mt-24"
+        "md:h-fit lg:w-1/2 md:mx-auto md:mt-24",
       )}
     >
       <div className="p-4 rounded-md bg-white shadow-md">

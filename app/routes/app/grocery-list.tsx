@@ -2,9 +2,9 @@ import { data, useFetcher, useLoaderData } from "react-router";
 import { z } from "zod";
 import { CheckCircleIcon } from "~/components/icons";
 import db from "~/db.server";
-import { requireLoggedInUser } from "~/utils/auth.server";
 import { validateForm } from "~/utils/validation";
 import { Route } from "./+types/grocery-list";
+import { userContext } from "~/context";
 
 type GroceryListItem = {
   id: string;
@@ -23,8 +23,8 @@ function isMatch(ingredientName: string, pantryItemName: string) {
   return lowerIngredientName === lowerPantryItemName;
 }
 
-export async function loader({ request }: Route.LoaderArgs) {
-  const user = await requireLoggedInUser(request);
+export async function loader({ context }: Route.LoaderArgs) {
+  const user = context.get(userContext);
 
   const ingredients = await db.ingredient.findMany({
     where: {
@@ -52,8 +52,8 @@ export async function loader({ request }: Route.LoaderArgs) {
   const missingIngredients = ingredients.filter(
     (ingredient) =>
       !pantryItems.find((pantryItem) =>
-        isMatch(ingredient.name, pantryItem.name)
-      )
+        isMatch(ingredient.name, pantryItem.name),
+      ),
   );
 
   const groceryListItems = missingIngredients.reduce<{
@@ -97,8 +97,8 @@ const checkOffItemSchema = z.object({
   name: z.string(),
 });
 
-export async function action({ request }: Route.ActionArgs) {
-  const user = await requireLoggedInUser(request);
+export async function action({ context, request }: Route.ActionArgs) {
+  const user = context.get(userContext);
   const formData = await request.formData();
 
   switch (formData.get("_action")) {
@@ -120,7 +120,7 @@ export async function action({ request }: Route.ActionArgs) {
             data: { userId: user.id, name, shelfId: shoppingTripShelf.id },
           });
         },
-        (errors) => data({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 }),
       );
     }
     default: {

@@ -1,4 +1,3 @@
-import { redirect } from "react-router";
 import { getUserById } from "~/models/user.server";
 import { getSession } from "~/sessions";
 
@@ -13,22 +12,4 @@ export async function getCurrentUser(request: Request) {
   }
 
   return getUserById(userId);
-}
-
-export async function requireLoggedOutUser(request: Request) {
-  const user = await getCurrentUser(request);
-
-  if (user !== null) {
-    throw redirect("/app");
-  }
-}
-
-export async function requireLoggedInUser(request: Request) {
-  const user = await getCurrentUser(request);
-
-  if (user === null) {
-    throw redirect("/login");
-  }
-
-  return user;
 }

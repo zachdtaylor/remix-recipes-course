@@ -5,21 +5,16 @@ import { generateMagicLink, sendMagicLinkEmail } from "~/magic-links.server";
 import { commitSession, getSession } from "~/sessions";
 import { validateForm } from "~/utils/validation";
 import { v4 as uuid } from "uuid";
-import { requireLoggedOutUser } from "~/utils/auth.server";
 import { Route } from "./+types/login";
+import { requireLoggedOutUserMiddleware } from "~/middleware/auth";
 
-export async function loader({ request }: Route.LoaderArgs) {
-  await requireLoggedOutUser(request);
-  return null;
-}
+export const middleware = [requireLoggedOutUserMiddleware];
 
 const loginSchema = z.object({
   email: z.string().email(),
 });
 
 export async function action({ request }: Route.ActionArgs) {
-  await requireLoggedOutUser(request);
-
   const cookieHeader = request.headers.get("cookie");
   const session = await getSession(cookieHeader);
   const formData = await request.formData();
@@ -40,10 +35,10 @@ export async function action({ request }: Route.ActionArgs) {
           headers: {
             "Set-Cookie": await commitSession(session),
           },
-        }
+        },
       );
     },
-    (errors) => data({ errors, email: formData.get("email") }, { status: 400 })
+    (errors) => data({ errors, email: formData.get("email") }, { status: 400 }),
   );
 }
 

@@ -29,7 +29,6 @@ import {
 import db from "~/db.server";
 import { handleDelete } from "~/models/utils";
 import { canChangeRecipe } from "~/utils/abilities.server";
-import { requireLoggedInUser } from "~/utils/auth.server";
 import {
   classNames,
   useDebouncedFunction,
@@ -38,6 +37,7 @@ import {
 import { validateForm } from "~/utils/validation";
 import { fileStorage, getStorageKey } from "~/recipe-image-storage.server";
 import { Route } from "./+types/$recipeId";
+import { userContext } from "~/context";
 
 export function headers() {
   return {
@@ -45,8 +45,8 @@ export function headers() {
   };
 }
 
-export async function loader({ request, params }: Route.LoaderArgs) {
-  const user = await requireLoggedInUser(request);
+export async function loader({ params, context }: Route.LoaderArgs) {
+  const user = context.get(userContext);
   const recipe = await db.recipe.findUnique({
     where: { id: params.recipeId },
     include: {
@@ -66,14 +66,14 @@ export async function loader({ request, params }: Route.LoaderArgs) {
   if (recipe === null) {
     throw data(
       { message: "A recipe with that id does not exist" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
   if (recipe.userId !== user.id) {
     throw data(
       { message: "You are not authorized to view this recipe" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -122,7 +122,7 @@ const saveRecipeSchema = z
     (data) =>
       data.ingredientIds?.length === data.ingredientAmounts?.length &&
       data.ingredientIds?.length === data.ingredientNames?.length,
-    { message: "Ingredient arrays must all be the same length" }
+    { message: "Ingredient arrays must all be the same length" },
   );
 
 const createIngredientSchema = z.object({
@@ -130,9 +130,10 @@ const createIngredientSchema = z.object({
   newIngredientName: z.string().min(1, "Name cannot be blank"),
 });
 
-export async function action({ request, params }: Route.ActionArgs) {
+export async function action({ context, request, params }: Route.ActionArgs) {
+  const user = context.get(userContext);
   const recipeId = String(params.recipeId);
-  await canChangeRecipe(request, recipeId);
+  await canChangeRecipe(user, recipeId);
 
   async function uploadHandler(fileUpload: FileUpload) {
     if (
@@ -162,7 +163,7 @@ export async function action({ request, params }: Route.ActionArgs) {
   if (typeof _action === "string" && _action.includes("deleteIngredient")) {
     const ingredientId = _action.split(".")[1];
     return handleDelete(() =>
-      db.ingredient.delete({ where: { id: ingredientId } })
+      db.ingredient.delete({ where: { id: ingredientId } }),
     );
   }
 
@@ -187,7 +188,7 @@ export async function action({ request, params }: Route.ActionArgs) {
               },
             },
           }),
-        (errors) => data({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 }),
       );
     }
     case "createIngredient": {
@@ -202,7 +203,7 @@ export async function action({ request, params }: Route.ActionArgs) {
               name: newIngredientName,
             },
           }),
-        (errors) => data({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 }),
       );
     }
     case "deleteRecipe": {
@@ -214,7 +215,7 @@ export async function action({ request, params }: Route.ActionArgs) {
         formData,
         saveNameSchema,
         (data) => db.recipe.update({ where: { id: recipeId }, data }),
-        (errors) => data({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 }),
       );
     }
     case "saveTotalTime": {
@@ -222,7 +223,7 @@ export async function action({ request, params }: Route.ActionArgs) {
         formData,
         saveTotalTimeSchema,
         (data) => db.recipe.update({ where: { id: recipeId }, data }),
-        (errors) => data({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 }),
       );
     }
     case "saveInstructions": {
@@ -230,7 +231,7 @@ export async function action({ request, params }: Route.ActionArgs) {
         formData,
         saveInstructionsSchema,
         (data) => db.recipe.update({ where: { id: recipeId }, data }),
-        (errors) => data({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 }),
       );
     }
     case "saveIngredientAmount": {
@@ -239,7 +240,7 @@ export async function action({ request, params }: Route.ActionArgs) {
         saveIngredientAmountSchema,
         ({ id, amount }) =>
           db.ingredient.update({ where: { id }, data: { amount } }),
-        (errors) => data({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 }),
       );
     }
     case "saveIngredientName": {
@@ -248,7 +249,7 @@ export async function action({ request, params }: Route.ActionArgs) {
         saveIngredientNameSchema,
         ({ id, name }) =>
           db.ingredient.update({ where: { id }, data: { name } }),
-        (errors) => data({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 }),
       );
     }
     default: {
@@ -275,7 +276,7 @@ export default function RecipeDetail() {
 
   const { renderedIngredients, addIngredient } = useOptimisticIngredients(
     data.recipe.ingredients,
-    createIngredientFetcher.state
+    createIngredientFetcher.state,
   );
 
   const [createIngredientForm, setCreateIngredientForm] = React.useState({
@@ -290,9 +291,9 @@ export default function RecipeDetail() {
           _action: "saveName",
           name,
         },
-        { method: "post" }
+        { method: "post" },
       ),
-    1000
+    1000,
   );
 
   const saveTotalTime = useDebouncedFunction(
@@ -302,9 +303,9 @@ export default function RecipeDetail() {
           _action: "saveTotalTime",
           totalTime,
         },
-        { method: "post" }
+        { method: "post" },
       ),
-    1000
+    1000,
   );
 
   const saveInstructions = useDebouncedFunction(
@@ -314,9 +315,9 @@ export default function RecipeDetail() {
           _action: "saveInstructions",
           instructions,
         },
-        { method: "post" }
+        { method: "post" },
       ),
-    1000
+    1000,
   );
 
   const createIngredient = () => {
@@ -327,7 +328,7 @@ export default function RecipeDetail() {
         newIngredientAmount: createIngredientForm.amount,
         newIngredientName: createIngredientForm.name,
       },
-      { method: "post" }
+      { method: "post" },
     );
     setCreateIngredientForm({ amount: "", name: "" });
     newIngredientAmountRef.current?.focus();
@@ -348,7 +349,7 @@ export default function RecipeDetail() {
             to="update-meal-plan"
             className={classNames(
               "flex flex-col justify-center",
-              data.recipe?.mealPlanMultiplier !== null ? "text-primary" : ""
+              data.recipe?.mealPlanMultiplier !== null ? "text-primary" : "",
             )}
           >
             <CalendarIcon />
@@ -506,7 +507,7 @@ export default function RecipeDetail() {
             saveInstructionsFetcher?.data?.errors?.instructions ||
               actionData?.errors?.instructions
               ? "border-2 border-red-500 p-3"
-              : ""
+              : "",
           )}
           onChange={(e) => saveInstructions(e.target.value)}
         />
@@ -568,9 +569,9 @@ function IngredientRow({
           amount,
           id,
         },
-        { method: "post" }
+        { method: "post" },
       ),
-    1000
+    1000,
   );
 
   const saveName = useDebouncedFunction(
@@ -581,9 +582,9 @@ function IngredientRow({
           name,
           id,
         },
-        { method: "post" }
+        { method: "post" },
       ),
-    1000
+    1000,
   );
 
   return deleteIngredientFetcher.state !== "idle" ? null : (
@@ -626,7 +627,7 @@ function IngredientRow({
             {
               _action: `deleteIngredient.${id}`,
             },
-            { method: "post" }
+            { method: "post" },
           );
         }}
       >
@@ -644,7 +645,7 @@ type RenderedIngredient = {
 };
 function useOptimisticIngredients(
   savedIngredients: Array<RenderedIngredient>,
-  createIngredientState: "idle" | "submitting" | "loading"
+  createIngredientState: "idle" | "submitting" | "loading",
 ) {
   const [optimisticIngredients, setOptimisticIngredients] = React.useState<
     Array<RenderedIngredient>

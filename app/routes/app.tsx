@@ -1,4 +1,7 @@
 import { PageLayout } from "~/components/layout";
+import { requireLoggedInUserMiddleware } from "~/middleware/auth";
+
+export const middleware = [requireLoggedInUserMiddleware];
 
 export default function App() {
   return (

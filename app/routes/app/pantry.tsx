@@ -27,13 +27,13 @@ import {
   getShelf,
   saveShelfName,
 } from "~/models/pantry-shelf.server";
-import { requireLoggedInUser } from "~/utils/auth.server";
 import { classNames, useIsHydrated, useServerLayoutEffect } from "~/utils/misc";
 import { validateForm } from "~/utils/validation";
 import { Route } from "./+types/pantry";
+import { userContext } from "~/context";
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
-  const user = await requireLoggedInUser(request);
+export const loader = async ({ request, context }: Route.LoaderArgs) => {
+  const user = context.get(userContext);
 
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
@@ -59,8 +59,8 @@ const deleteShelfItemSchema = z.object({
   itemId: z.string(),
 });
 
-export async function action({ request }: Route.ActionArgs) {
-  const user = await requireLoggedInUser(request);
+export async function action({ request, context }: Route.ActionArgs) {
+  const user = context.get(userContext);
 
   const formData = await request.formData();
   switch (formData.get("_action")) {
@@ -76,12 +76,12 @@ export async function action({ request }: Route.ActionArgs) {
           if (shelf !== null && shelf.userId !== user.id) {
             throw data(
               { message: "This shelf is not yours, so you cannot delete it" },
-              { status: 401 }
+              { status: 401 },
             );
           }
           return deleteShelf(parsedData.shelfId);
         },
-        (errors) => data({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 }),
       );
     }
     case "saveShelfName": {
@@ -96,12 +96,12 @@ export async function action({ request }: Route.ActionArgs) {
                 message:
                   "This shelf is not yours, so you cannot change its name",
               },
-              { status: 401 }
+              { status: 401 },
             );
           }
           return saveShelfName(parsedData.shelfId, parsedData.shelfName);
         },
-        (errors) => data({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 }),
       );
     }
     case "createShelfItem": {
@@ -109,7 +109,7 @@ export async function action({ request }: Route.ActionArgs) {
         formData,
         createShelfItemSchema,
         (data) => createShelfItem(user.id, data.shelfId, data.itemName),
-        (errors) => data({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 }),
       );
     }
     case "deleteShelfItem": {
@@ -121,12 +121,12 @@ export async function action({ request }: Route.ActionArgs) {
           if (item !== null && item.userId !== user.id) {
             throw data(
               { message: "This item is not yours, so you cannot delete it" },
-              { status: 401 }
+              { status: 401 },
             );
           }
           return deleteShelfItem(parsedData.itemId);
         },
-        (errors) => data({ errors }, { status: 400 })
+        (errors) => data({ errors }, { status: 400 }),
       );
     }
     default: {
@@ -169,7 +169,7 @@ export default function Pantry() {
         ref={containerRef}
         className={classNames(
           "flex gap-8 overflow-x-auto mt-4 pb-4",
-          "snap-x snap-mandatory md:snap-none"
+          "snap-x snap-mandatory md:snap-none",
         )}
       >
         {data.shelves.map((shelf) => (
@@ -194,7 +194,7 @@ function Shelf({ shelf }: ShelfProps) {
   const createItemFormRef = React.useRef<HTMLFormElement>(null);
   const { renderedItems, addItem } = useOptimisticItems(
     shelf.items,
-    createShelfItemFetcher.state
+    createShelfItemFetcher.state,
   );
   const isHydrated = useIsHydrated();
   const isDeletingShelf =
@@ -206,7 +206,7 @@ function Shelf({ shelf }: ShelfProps) {
       className={classNames(
         "border-2 border-primary rounded-md p-4 h-fit",
         "w-[calc(100vw-2rem)] flex-none snap-center",
-        "md:w-96"
+        "md:w-96",
       )}
     >
       <saveShelfNameFetcher.Form method="post" className="flex">
@@ -229,7 +229,7 @@ function Shelf({ shelf }: ShelfProps) {
                   shelfName: event.target.value,
                   shelfId: shelf.id,
                 },
-                { method: "post" }
+                { method: "post" },
               )
             }
           />
@@ -243,7 +243,7 @@ function Shelf({ shelf }: ShelfProps) {
             value="saveShelfName"
             className={classNames(
               "ml-4 opacity-0 hover:opacity-100 focus:opacity-100",
-              "peer-focus-within:opacity-100"
+              "peer-focus-within:opacity-100",
             )}
           >
             <SaveIcon />
@@ -261,7 +261,7 @@ function Shelf({ shelf }: ShelfProps) {
         onSubmit={(event) => {
           const target = event.target as HTMLFormElement;
           const itemNameInput = target.elements.namedItem(
-            "itemName"
+            "itemName",
           ) as HTMLInputElement;
           addItem(itemNameInput.value);
           event.preventDefault();
@@ -271,7 +271,7 @@ function Shelf({ shelf }: ShelfProps) {
               shelfId: shelf.id,
               _action: "createShelfItem",
             },
-            { method: "post" }
+            { method: "post" },
           );
           createItemFormRef.current?.reset();
         }}
@@ -288,7 +288,7 @@ function Shelf({ shelf }: ShelfProps) {
               "border-b-2 border-b-background focus:border-b-primary",
               createShelfItemFetcher.data?.errors?.shelfName
                 ? "border-b-red-600"
-                : ""
+                : "",
             )}
           />
           <ErrorMessage>
@@ -300,7 +300,7 @@ function Shelf({ shelf }: ShelfProps) {
           value="createShelfItem"
           className={classNames(
             "ml-4 opacity-0 hover:opacity-100 focus:opacity-100",
-            "peer-focus-within:opacity-100"
+            "peer-focus-within:opacity-100",
           )}
         >
           <SaveIcon />
@@ -372,7 +372,7 @@ type RenderedItem = {
 };
 function useOptimisticItems(
   savedItems: Array<RenderedItem>,
-  createShelfItemState: "idle" | "submitting" | "loading"
+  createShelfItemState: "idle" | "submitting" | "loading",
 ) {
   const [optimisticItems, setOptimisticItems] = React.useState<
     Array<RenderedItem>

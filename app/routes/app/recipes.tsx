@@ -19,12 +19,12 @@ import {
   RecipePageWrapper,
 } from "~/components/recipes";
 import db from "~/db.server";
-import { requireLoggedInUser } from "~/utils/auth.server";
 import { classNames, useBuildSearchParams } from "~/utils/misc";
 import { Route } from "./+types/recipes";
+import { userContext } from "~/context";
 
-export async function loader({ request }: Route.LoaderArgs) {
-  const user = await requireLoggedInUser(request);
+export async function loader({ context, request }: Route.LoaderArgs) {
+  const user = context.get(userContext);
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
   const filter = url.searchParams.get("filter");
@@ -53,8 +53,8 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { recipes };
 }
 
-export async function action({ request }: Route.ActionArgs) {
-  const user = await requireLoggedInUser(request);
+export async function action({ context, request }: Route.ActionArgs) {
+  const user = context.get(userContext);
   const formData = await request.formData();
 
   switch (formData.get("_action")) {
@@ -107,11 +107,11 @@ export default function Recipes() {
             reloadDocument
             to={buildSearchParams(
               "filter",
-              mealPlanOnlyFilterOn ? "" : "mealPlanOnly"
+              mealPlanOnlyFilterOn ? "" : "mealPlanOnly",
             )}
             className={classNames(
               "flex flex-col justify-center border-2 border-primary rounded-md px-2",
-              mealPlanOnlyFilterOn ? "text-white bg-primary" : "text-primary"
+              mealPlanOnlyFilterOn ? "text-white bg-primary" : "text-primary",
             )}
           >
             <CalendarIcon />
@@ -153,7 +153,7 @@ export default function Recipes() {
                 if (fetcher.formData?.get("_action") === "saveTotalTime") {
                   optimisticData.set(
                     "totalTime",
-                    fetcher.formData?.get("totalTime")
+                    fetcher.formData?.get("totalTime"),
                   );
                 }
               }
