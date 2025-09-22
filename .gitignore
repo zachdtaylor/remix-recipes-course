@@ -6,3 +6,9 @@ build
 node_modules
 *.tsbuildinfo
 recipe-images/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
