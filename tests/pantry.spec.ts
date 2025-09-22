@@ -31,4 +31,11 @@ test("lets a user do a typical flow", async ({ page }) => {
   expect(page.getByText("Milk")).toBeVisible();
   expect(page.getByText("Eggs")).toBeVisible();
   expect(page.getByText("Yogurt")).toBeVisible();
+
+  await page.getByRole("button", { name: /delete eggs/i }).click();
+  expect(page.getByText("Eggs")).not.toBeVisible();
+
+  page.on("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: /delete shelf/i }).click();
+  expect(shelfNameInput).not.toBeVisible();
 });

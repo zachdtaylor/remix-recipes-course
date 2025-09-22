@@ -354,7 +354,11 @@ function ShelfItem({ shelfItem }: ShelfItemProps) {
       <deleteShelfItemFetcher.Form method="post" className="flex">
         <p className="w-full">{shelfItem.name}</p>
         {shelfItem.isOptimistic ? null : (
-          <button name="_action" value="deleteShelfItem">
+          <button
+            name="_action"
+            value="deleteShelfItem"
+            aria-label={`delete ${shelfItem.name}`}
+          >
             <TrashIcon />
           </button>
         )}
