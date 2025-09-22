@@ -1,5 +1,19 @@
 import { type RouteConfig, index, route } from "@react-router/dev/routes";
 
+const testRoutes = () => {
+  if (process.env.INCLUDE_TEST_ROUTES) {
+    if (process.env.NODE_ENV === "production") {
+      console.warn(
+        "WARNING: NODE_ENV is set to 'production', so we are going to skip creating test routes"
+      );
+      return [];
+    }
+    return [route("__tests/login", "__test-routes__/login.tsx")];
+  }
+
+  return [];
+};
+
 export default [
   index("routes/home.tsx"),
   route("discover", "routes/discover.tsx"),
@@ -26,4 +40,6 @@ export default [
   ]),
   route("theme.css", "routes/theme.tsx"),
   route("validate-magic-link", "routes/validate-magic-link.tsx"),
+
+  ...testRoutes(),
 ] satisfies RouteConfig;
